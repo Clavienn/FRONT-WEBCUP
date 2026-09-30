@@ -1,4 +1,7 @@
 import React from 'react';
+import Link from 'next/link';
+import { UsersIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 function Page() {
   return (
@@ -9,8 +12,16 @@ function Page() {
           DevAtoandro
         </h1>
         <p className="mt-6 text-3xl md:text-5xl font-semibold text-gray-200">
-          Webcup 2026 
+          Webcup 2026
         </p>
+        <Button
+          size="lg"
+          className="mt-10"
+          nativeButton={false}
+          render={<Link href="/personnes" />}
+        >
+          <UsersIcon /> Gérer personne
+        </Button>
       </header>
 
       {/* Footer */}
