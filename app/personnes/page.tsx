@@ -127,21 +127,21 @@ export default function PersonnesPage() {
 
   return (
     <Toaster>
-      <div className="min-h-screen bg-background px-6 py-10">
+      <div className="app-atmosphere min-h-screen px-6 py-10">
         <div className="mx-auto max-w-4xl space-y-6">
           <div className="flex items-end justify-between gap-4">
             <div className="space-y-2">
               <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/" />}>
                 <ArrowLeftIcon /> Accueil
               </Button>
-              <h1 className="text-2xl font-semibold">Gestion des personnes</h1>
+              <h1 className="text-2xl font-medium tracking-tight text-foreground">Gestion des personnes</h1>
             </div>
             <Button onClick={openAdd}>
               <PlusIcon /> Ajouter
             </Button>
           </div>
 
-          <div className="rounded-xl ring-1 ring-foreground/10">
+          <div className="overflow-hidden rounded-2xl border border-border/80 bg-white/70 shadow-[0_8px_30px_rgba(50,80,120,0.04)] backdrop-blur-sm">
             <Table>
               <TableHeader>
                 <TableRow>
