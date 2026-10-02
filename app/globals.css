@@ -84,37 +84,38 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  color-scheme: dark;
+  --background: #09182f;
+  --foreground: #e8efff;
+  --card: #10213b;
+  --card-foreground: #e8efff;
+  --popover: #10213b;
+  --popover-foreground: #e8efff;
+  --primary: #91b1ff;
+  --primary-foreground: #10213b;
+  --secondary: #1a2c49;
+  --secondary-foreground: #d8e4fa;
+  --muted: #142640;
+  --muted-foreground: #a3b2cb;
+  --accent: #1c3457;
+  --accent-foreground: #d4e1ff;
+  --destructive: #f17883;
+  --border: rgba(173, 195, 231, 0.2);
+  --input: rgba(173, 195, 231, 0.28);
+  --ring: #8eafff;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: #10213b;
+  --sidebar-foreground: #e8efff;
+  --sidebar-primary: #91b1ff;
+  --sidebar-primary-foreground: #10213b;
+  --sidebar-accent: #1c3457;
+  --sidebar-accent-foreground: #d4e1ff;
+  --sidebar-border: rgba(173, 195, 231, 0.2);
+  --sidebar-ring: #8eafff;
 }
 
 @layer base {
@@ -133,10 +134,89 @@
 }
 
 .app-atmosphere {
-  background-color: var(--background);
+  background-color: rgba(247, 250, 255, 0.52);
   background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(92, 145, 238, 0.12), transparent 55%),
+    radial-gradient(ellipse at 50% 0%, rgba(151, 133, 219, 0.09), transparent 55%),
     linear-gradient(rgba(90, 120, 160, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(90, 120, 160, 0.035) 1px, transparent 1px);
   background-size: auto, 44px 44px, 44px 44px;
+}
+
+.ambient-clouds {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.ambient-cloud {
+  position: absolute;
+  top: var(--cloud-y);
+  left: 0;
+  width: var(--cloud-width);
+  height: var(--cloud-height);
+  opacity: var(--cloud-opacity);
+  filter: blur(30px);
+  animation: cloud-drift var(--cloud-duration) linear var(--cloud-delay) infinite;
+  will-change: transform;
+}
+
+.ambient-cloud__body,
+.ambient-cloud__puff {
+  position: absolute;
+  display: block;
+  background: radial-gradient(ellipse at 48% 48%, rgba(158, 141, 222, 0.72), rgba(178, 169, 230, 0.48) 48%, rgba(196, 190, 237, 0.08) 78%, transparent 100%);
+}
+
+.ambient-cloud__body {
+  inset: 22% 0 12%;
+  border-radius: var(--cloud-shape);
+}
+
+.ambient-cloud__puff--one {
+  top: var(--puff-one-y);
+  left: var(--puff-one-x);
+  width: var(--puff-one-width);
+  height: var(--puff-one-height);
+  border-radius: 50%;
+}
+
+.ambient-cloud__puff--two {
+  top: var(--puff-two-y);
+  left: var(--puff-two-x);
+  width: var(--puff-two-width);
+  height: var(--puff-two-height);
+  border-radius: 50%;
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translate3d(calc(0px - var(--cloud-width) - 20vw), 0, 0);
+  }
+
+  to {
+    transform: translate3d(120vw, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-cloud {
+    animation: none;
+    transform: translate3d(12vw, 0, 0);
+  }
+}
+
+.dark .app-atmosphere {
+  background-color: rgba(9, 24, 47, 0.62);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(83, 126, 207, 0.16), transparent 58%),
+    linear-gradient(rgba(228, 237, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(228, 237, 255, 0.055) 1px, transparent 1px);
+}
+
+.dark .ambient-cloud__body,
+.dark .ambient-cloud__puff {
+  background: radial-gradient(ellipse at 48% 48%, rgba(244, 247, 255, 0.92), rgba(220, 229, 250, 0.72) 48%, rgba(180, 199, 239, 0.16) 78%, transparent 100%);
 }

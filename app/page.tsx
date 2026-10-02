@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { UsersIcon } from 'lucide-react';
+import { Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 function Page() {
@@ -20,7 +20,7 @@ function Page() {
           nativeButton={false}
           render={<Link href="/connexion" />}
         >
-          <UsersIcon /> Gérer personne
+          <Compass /> Explorer
         </Button>
       </header>
 

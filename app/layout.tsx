@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { AmbientClouds } from "@/components/ambient-clouds";
+import { ThemeToggle } from "@/components/theme-toggle";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -24,8 +26,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="fr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <AuthProvider>{children}</AuthProvider>
+      <body className="isolate min-h-full flex flex-col">
+        <AmbientClouds />
+        <ThemeToggle />
+        <div className="relative z-10 flex min-h-full flex-1 flex-col">
+          <AuthProvider>{children}</AuthProvider>
+        </div>
       </body>
     </html>
   );

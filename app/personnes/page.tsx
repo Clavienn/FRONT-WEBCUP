@@ -141,7 +141,7 @@ export default function PersonnesPage() {
             </Button>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-border/80 bg-white/70 shadow-[0_8px_30px_rgba(50,80,120,0.04)] backdrop-blur-sm">
+          <div className="overflow-hidden rounded-2xl border border-border/80 bg-card/70 shadow-[0_8px_30px_rgba(50,80,120,0.04)] backdrop-blur-sm">
             <Table>
               <TableHeader>
                 <TableRow>

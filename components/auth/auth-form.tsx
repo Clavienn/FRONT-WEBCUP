@@ -66,7 +66,7 @@ export function AuthForm() {
           Retour à l’accueil
         </Link>
 
-        <div className="rounded-2xl border border-border/80 bg-white/85 p-6 shadow-[0_16px_48px_rgba(30,55,90,0.08)] backdrop-blur-xl sm:p-8">
+        <div className="rounded-2xl border border-border/80 bg-card/85 p-6 shadow-[0_16px_48px_rgba(30,55,90,0.08)] backdrop-blur-xl sm:p-8">
           <div className="mb-8 flex items-center gap-3">
             <span className="grid size-10 place-items-center rounded-xl bg-accent text-primary">
               <ShieldCheck className="size-5" aria-hidden="true" />
@@ -79,7 +79,7 @@ export function AuthForm() {
 
           <header className="mb-7 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-              Espace personnel
+              DevAtoandro Space
             </p>
             <h1 className="text-3xl font-medium tracking-tight text-foreground">
               {isRegistering ? "Créer un compte" : "Connexion"}
@@ -87,7 +87,7 @@ export function AuthForm() {
             <p className="text-sm leading-6 text-muted-foreground">
               {isRegistering
                 ? "Renseignez vos informations pour rejoindre votre espace."
-                : "Connectez-vous pour accéder à votre espace Webcup."}
+                : "Connectez-vous à l'espace de DevAtoandro"}
             </p>
           </header>
 
