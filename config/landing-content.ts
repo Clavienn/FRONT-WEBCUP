@@ -88,8 +88,8 @@ export const CTA_CONTENT = {
 export const FOOTER_CONTENT = {
   contact: { email: "contact@terra-nova.world" },
   legalLinks: [
-    { id: "mentions", href: "#" },
-    { id: "privacy", href: "#" },
+    { id: "mentions" },
+    { id: "privacy" },
   ],
   webcup: { href: "#" },
 }

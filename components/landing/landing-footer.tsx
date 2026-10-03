@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Mail } from "lucide-react"
 
 import { FOOTER_CONTENT, NAV_LINKS, SITE_NAME } from "@/config/landing-content"
+import { LegalDocumentDialog } from "@/components/legal/legal-document-dialog"
 import { useLanguage } from "@/components/i18n/language-provider"
 
 export function LandingFooter() {
@@ -53,9 +54,12 @@ export function LandingFooter() {
               </li>
               {FOOTER_CONTENT.legalLinks.map((link) => (
                 <li key={link.id}>
-                  <a href={link.href} className="text-sm text-[var(--tn-text-muted)] hover:text-[var(--tn-text)]">
+                  <LegalDocumentDialog
+                    kind={link.id === "mentions" ? "legal" : "privacy"}
+                    className="text-sm text-[var(--tn-text-muted)] no-underline hover:text-[var(--tn-text)]"
+                  >
                     {t(`footer.legal.${link.id}`)}
-                  </a>
+                  </LegalDocumentDialog>
                 </li>
               ))}
             </ul>

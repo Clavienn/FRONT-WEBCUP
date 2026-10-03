@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation"
 import { ArrowRight, CircleAlert, ShieldCheck } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { LegalDocumentDialog } from "@/components/legal/legal-document-dialog"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Breadcrumb } from "@/components/navigation/breadcrumb"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
@@ -29,6 +31,8 @@ export function AuthForm() {
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [acceptedLegal, setAcceptedLegal] = useState(false)
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false)
   const [role, setRole] = useState<SignupRole>("citizen")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -43,6 +47,10 @@ export function AuthForm() {
     setError("")
     if (isRegistering && !isPasswordStrong(password)) {
       setError(t("authForm.passwordRequirementsError"))
+      return
+    }
+    if (isRegistering && (!acceptedLegal || !acceptedPrivacy)) {
+      setError(t("authForm.legalConsentRequired"))
       return
     }
     setIsSubmitting(true)
@@ -69,6 +77,8 @@ export function AuthForm() {
 
   const changeMode = () => {
     setError("")
+    setAcceptedLegal(false)
+    setAcceptedPrivacy(false)
     setMode(isRegistering ? "login" : "register")
   }
 
@@ -158,6 +168,45 @@ export function AuthForm() {
               </fieldset>
             )}
 
+            {isRegistering && (
+              <fieldset className="space-y-3 rounded-xl border border-border/70 bg-background/50 p-4">
+                <legend className="px-1 text-sm font-medium">{t("authForm.legalConsentTitle")}</legend>
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="accept-legal-terms"
+                    checked={acceptedLegal}
+                    aria-required="true"
+                    onCheckedChange={(checked) => setAcceptedLegal(checked === true)}
+                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="accept-legal-terms" className="cursor-pointer leading-5">
+                      {t("authForm.acceptLegal")}
+                    </Label>
+                    <LegalDocumentDialog kind="legal" className="text-sm font-medium text-primary hover:underline">
+                      {t("authForm.readLegal")}
+                    </LegalDocumentDialog>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="accept-privacy-policy"
+                    checked={acceptedPrivacy}
+                    aria-required="true"
+                    onCheckedChange={(checked) => setAcceptedPrivacy(checked === true)}
+                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="accept-privacy-policy" className="cursor-pointer leading-5">
+                      {t("authForm.acceptPrivacy")}
+                    </Label>
+                    <LegalDocumentDialog kind="privacy" className="text-sm font-medium text-primary hover:underline">
+                      {t("authForm.readPrivacy")}
+                    </LegalDocumentDialog>
+                  </div>
+                </div>
+                <p className="text-xs leading-5 text-muted-foreground">{t("authForm.legalConsentHint")}</p>
+              </fieldset>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email">{t("authForm.email")}</Label>
               <Input
@@ -200,7 +249,11 @@ export function AuthForm() {
             <Button
               type="submit"
               className="h-10 w-full rounded-xl"
-              disabled={isLoading || isSubmitting || (isRegistering && !isPasswordStrong(password))}
+              disabled={
+                isLoading ||
+                isSubmitting ||
+                (isRegistering && (!isPasswordStrong(password) || !acceptedLegal || !acceptedPrivacy))
+              }
             >
               {(isLoading || isSubmitting) ? <Spinner /> : null}
               {isLoading

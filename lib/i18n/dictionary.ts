@@ -150,6 +150,15 @@ const fr = {
     webcupLabel: "Webcup",
   },
 
+  legalDocuments: {
+    eyebrow: "Terra Nova · informations officielles",
+    questionsTitle: "Une question ou une inquiétude ?",
+    questionsDescription: "Contactez l’administration depuis Aide et support. Votre message est enregistré et une référence vous est affichée pour en suivre la prise en compte.",
+    supportButton: "Aide et support",
+    close: "Fermer",
+    contentAriaLabel: "Contenu de {{title}}",
+  },
+
   roles: { admin: "Administrateur", agent: "Agent de service", citizen: "Citoyen" },
 
   sidebar: {
@@ -796,6 +805,13 @@ const fr = {
     emailPlaceholder: "nom@exemple.com",
     passwordMinHint: "8 caractères minimum.",
     passwordRequirementsError: "Le mot de passe ne respecte pas tous les critères de sécurité.",
+    legalConsentTitle: "Documents à accepter pour créer un compte",
+    acceptLegal: "J’accepte les conditions d’utilisation des mentions légales.",
+    readLegal: "Lire les mentions légales",
+    acceptPrivacy: "J’accepte la politique de confidentialité.",
+    readPrivacy: "Lire la politique de confidentialité",
+    legalConsentHint: "Vous pouvez relire ces documents à tout moment depuis le pied de page.",
+    legalConsentRequired: "Veuillez accepter les deux documents pour créer votre compte.",
     roleLegend: "Je suis",
     roleCitizen: { label: "Citoyen", hint: "Demandes et signalements" },
     roleAgent: { label: "Agent", hint: "Console des agents" },
@@ -1025,6 +1041,15 @@ const en = {
     legal: { mentions: "Legal notice", privacy: "Privacy" },
     credits: { team: "Designed by the DevAtoandro team", event: "24h Hackathon by Webcup 2026" },
     webcupLabel: "Webcup",
+  },
+
+  legalDocuments: {
+    eyebrow: "Terra Nova · official information",
+    questionsTitle: "Questions or concerns?",
+    questionsDescription: "Contact the administration through Help and support. Your message is recorded and a reference is shown so you can track its receipt.",
+    supportButton: "Help and support",
+    close: "Close",
+    contentAriaLabel: "{{title}} content",
   },
 
   roles: { admin: "Administrator", agent: "Municipal agent", citizen: "Citizen" },
@@ -1667,6 +1692,13 @@ const en = {
     emailPlaceholder: "name@example.com",
     passwordMinHint: "8 characters minimum.",
     passwordRequirementsError: "The password does not meet all security requirements.",
+    legalConsentTitle: "Documents required to create an account",
+    acceptLegal: "I accept the terms of use in the legal notice.",
+    readLegal: "Read the legal notice",
+    acceptPrivacy: "I accept the privacy policy.",
+    readPrivacy: "Read the privacy policy",
+    legalConsentHint: "You can review these documents at any time from the footer.",
+    legalConsentRequired: "Please accept both documents to create your account.",
     roleLegend: "I am a",
     roleCitizen: { label: "Citizen", hint: "Requests and reports" },
     roleAgent: { label: "Agent", hint: "Agent console" },

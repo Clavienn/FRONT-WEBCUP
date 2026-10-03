@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import Link from "next/link"
 import { CheckCircle2, CircleAlert, LifeBuoy, Send } from "lucide-react"
 
@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import { contactMessageRepository, type ContactReceipt } from "@/repository/contactMessage.repository"
+import { OPEN_SUPPORT_BUBBLE_EVENT } from "@/lib/support-events"
 
 interface DragState {
   pointerId: number
@@ -44,6 +45,16 @@ export function SupportBubble() {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
   const dragState = useRef<DragState | null>(null)
   const suppressClick = useRef(false)
+
+  useEffect(() => {
+    const openSupport = () => {
+      setError("")
+      setIsOpen(true)
+    }
+
+    window.addEventListener(OPEN_SUPPORT_BUBBLE_EVENT, openSupport)
+    return () => window.removeEventListener(OPEN_SUPPORT_BUBBLE_EVENT, openSupport)
+  }, [])
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (event.button !== 0) return
