@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import Link from "next/link"
 import { Bell, CheckCheck, CircleAlert } from "lucide-react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
@@ -23,6 +24,32 @@ function formatTimestamp(value: string, locale: Locale) {
 // Pas de WebSocket dans ce projet : un sondage espacé suffit à faire apparaître un
 // rappel sans recharger la page, sans justifier une connexion persistante.
 const POLL_MS = 45_000
+
+// Corps d'une notification, partagé par la variante lien et la variante bouton : seul l'élément
+// interactif change selon qu'il existe une destination à ouvrir.
+function renderContent(
+  notification: AppNotification,
+  locale: Locale,
+  t: (key: string) => string,
+) {
+  return (
+    <>
+      <p className="flex items-start gap-2 text-sm font-medium">
+        {!notification.read && (
+          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+        )}
+        <span>{notification.title}</span>
+      </p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">{notification.body}</p>
+      <p className="mt-1 text-[11px] text-muted-foreground/80">
+        {formatTimestamp(notification.createdAt, locale)}
+        {notification.requestId && (
+          <span className="ml-1 font-medium text-primary">{t("notifications.viewRequest")}</span>
+        )}
+      </p>
+    </>
+  )
+}
 
 export function NotificationBell() {
   const { t, locale } = useLanguage()
@@ -132,22 +159,25 @@ export function NotificationBell() {
             <ul className="space-y-1.5">
               {notifications.map((notification) => (
                 <li key={notification.id}>
-                  <button
-                    type="button"
-                    onClick={() => !notification.read && handleMarkRead(notification.id)}
-                    className={`w-full rounded-lg p-2.5 text-left transition-colors hover:bg-accent/60 ${notification.read ? "opacity-60" : "bg-accent/30"}`}
-                  >
-                    <p className="flex items-start gap-2 text-sm font-medium">
-                      {!notification.read && (
-                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-                      )}
-                      <span>{notification.title}</span>
-                    </p>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{notification.body}</p>
-                    <p className="mt-1 text-[11px] text-muted-foreground/80">
-                      {formatTimestamp(notification.createdAt, locale)}
-                    </p>
-                  </button>
+                  {/* Une notification de demande se consulte sur place : un lien, sinon le citoyen
+                      doit retrouver son dossier lui-même après avoir lu "refusée, motif : ..." */}
+                  {notification.requestId ? (
+                    <Link
+                      href="/dashboard/my-requests"
+                      onClick={() => !notification.read && handleMarkRead(notification.id)}
+                      className={`block rounded-lg p-2.5 transition-colors hover:bg-accent/60 ${notification.read ? "opacity-60" : "bg-accent/30"}`}
+                    >
+                      {renderContent(notification, locale, t)}
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => !notification.read && handleMarkRead(notification.id)}
+                      className={`w-full rounded-lg p-2.5 text-left transition-colors hover:bg-accent/60 ${notification.read ? "opacity-60" : "bg-accent/30"}`}
+                    >
+                      {renderContent(notification, locale, t)}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>

@@ -8,6 +8,7 @@ import {
   CalendarClock,
   Globe,
   Landmark,
+  MapPin,
   ShieldAlert,
   ClipboardList,
   Home,
@@ -80,6 +81,7 @@ const menu: MenuGroup[] = [
     items: [
       { label: "sidebar.items.accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
       { label: "sidebar.items.servicesMunicipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
+      { label: "sidebar.items.lieuxUtiles", icon: MapPin, permission: "citizen.establishments.view", href: "/dashboard/lieux-utiles" },
       { label: "sidebar.items.annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
       { label: "sidebar.items.monProfil", icon: UserRound, href: "/profil" },
     ],
@@ -99,6 +101,7 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.comptesCitoyens", icon: Users, permission: "agent.citizens.manage", view: "staff", href: "/dashboard/agent/citizens" },
       { label: "sidebar.items.rendezVousCitoyens", icon: CalendarClock, permission: "agent.appointments.view", view: "staff", href: "/dashboard/appointments" },
       { label: "sidebar.items.historiqueOperations", icon: ScrollText, permission: "agent.activity.view", view: "staff", href: "/dashboard/agent/activite" },
+      { label: "sidebar.items.gererEtablissements", icon: MapPin, permission: "agent.establishments.manage", view: "staff", href: "/dashboard/agent/etablissements" },
     ],
   },
   {

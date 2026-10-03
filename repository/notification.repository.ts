@@ -6,6 +6,9 @@ export interface AppNotification {
   title: string
   body: string
   appointmentId: number | null
+  // Demande concernée quand la notification décrit un changement d'état : l'interface peut
+  // alors renvoyer le citoyen vers son dossier. Null pour un rappel de rendez-vous.
+  requestId: number | null
   read: boolean
   createdAt: string
 }
