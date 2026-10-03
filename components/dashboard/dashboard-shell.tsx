@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 import {
   Building2,
   CalendarClock,
+  FolderKanban,
   Globe,
   Landmark,
   MapPin,
@@ -84,6 +85,7 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
       { label: "sidebar.items.servicesMunicipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
       { label: "sidebar.items.lieuxUtiles", icon: MapPin, permission: "citizen.establishments.view", href: "/dashboard/lieux-utiles" },
+      { label: "sidebar.items.projets", icon: FolderKanban, permission: "citizen.projects.view", href: "/dashboard/projects" },
       { label: "sidebar.items.annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
       { label: "sidebar.items.monProfil", icon: UserRound, href: "/profil" },
     ],
@@ -109,6 +111,7 @@ const menu: MenuGroup[] = [
     label: "sidebar.groups.administration",
     items: [
       { label: "sidebar.items.gererServices", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
+      { label: "sidebar.items.gererProjets", icon: FolderKanban, permission: "admin.projects.manage", href: "/dashboard/admin/projects" },
       { label: "sidebar.items.messagesHabitants", icon: MessageSquare, adminOnly: true, newMessagesBadge: true, href: "/dashboard/admin/messages" },
       { label: "sidebar.items.utilisateurs", icon: Users, permission: "admin.users.manage", href: "/dashboard/admin/users" },
       { label: "sidebar.items.roles", icon: ShieldCheck, permission: "admin.users.manage", href: "/dashboard/admin/roles" },
