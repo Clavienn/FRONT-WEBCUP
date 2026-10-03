@@ -568,6 +568,16 @@ const fr = {
     errorMismatch: "Les deux mots de passe ne correspondent pas.",
     errorSameAsOld: "Le nouveau mot de passe doit être différent de l'actuel.",
     errorGeneric: "Une erreur est survenue. Réessayez.",
+    errorWeakPassword: "Le nouveau mot de passe ne respecte pas tous les critères de sécurité.",
+  },
+
+  passwordRequirements: {
+    title: "Votre mot de passe doit contenir :",
+    length: "Au moins 8 caractères",
+    lowercase: "Une lettre minuscule",
+    uppercase: "Une lettre majuscule",
+    number: "Un chiffre",
+    special: "Un caractère spécial (hors espace)",
   },
 
   authForm: {
@@ -584,6 +594,7 @@ const fr = {
     password: "Mot de passe",
     emailPlaceholder: "nom@exemple.com",
     passwordMinHint: "8 caractères minimum.",
+    passwordRequirementsError: "Le mot de passe ne respecte pas tous les critères de sécurité.",
     roleLegend: "Je suis",
     roleCitizen: { label: "Citoyen", hint: "Demandes et signalements" },
     roleAgent: { label: "Agent", hint: "Console des agents" },
@@ -1211,6 +1222,16 @@ const en = {
     errorMismatch: "The two passwords don't match.",
     errorSameAsOld: "The new password must be different from the current one.",
     errorGeneric: "An error occurred. Please try again.",
+    errorWeakPassword: "The new password does not meet all security requirements.",
+  },
+
+  passwordRequirements: {
+    title: "Your password must contain:",
+    length: "At least 8 characters",
+    lowercase: "A lowercase letter",
+    uppercase: "An uppercase letter",
+    number: "A number",
+    special: "A special character (not a space)",
   },
 
   authForm: {
@@ -1227,6 +1248,7 @@ const en = {
     password: "Password",
     emailPlaceholder: "name@example.com",
     passwordMinHint: "8 characters minimum.",
+    passwordRequirementsError: "The password does not meet all security requirements.",
     roleLegend: "I am a",
     roleCitizen: { label: "Citizen", hint: "Requests and reports" },
     roleAgent: { label: "Agent", hint: "Agent console" },
