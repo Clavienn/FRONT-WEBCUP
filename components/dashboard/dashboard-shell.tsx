@@ -86,10 +86,9 @@ const menu: MenuGroup[] = [
   {
     label: "sidebar.groups.citizenSpace",
     items: [
-      { label: "sidebar.items.mesDemarches", icon: ClipboardList, permission: "citizen.services.view", view: "citizen", href: "/dashboard#recent-requests-title" },
+      { label: "sidebar.items.mesDemarches", icon: ClipboardList, permission: "citizen.requests.view", view: "citizen", href: "/dashboard/my-requests" },
       { label: "sidebar.items.mesRendezVous", icon: CalendarClock, permission: "citizen.appointments.view", view: "citizen", href: "/dashboard/appointments" },
       { label: "sidebar.items.communiques", icon: Megaphone, permission: "citizen.announcements.view", view: "citizen", href: "/dashboard#city-updates-title" },
-      { label: "sidebar.items.envoyerMessage", icon: MessageSquare, permission: "citizen.message.send", view: "citizen" },
     ],
   },
   {
