@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { isStaff } from "@/repository/auth.repository"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -82,12 +83,12 @@ export function AgentDashboard() {
     )
   }
 
-  if (user.role === "USER") {
+  if (!isStaff(user)) {
     return <CitizenDashboard user={user} />
   }
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
-  const roleLabel = user.role === "ADMIN" ? "Administrateur" : "Agent de service"
+  const roleLabel = user.roles.includes("admin") ? "Administrateur" : "Agent de service"
 
   return (
     <main className="app-atmosphere min-h-screen px-4 pb-12 pt-20 text-foreground sm:px-6 lg:px-8">
