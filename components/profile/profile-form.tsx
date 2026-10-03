@@ -18,12 +18,16 @@ export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
   const [firstName, setFirstName] = useState(user.firstName ?? "")
   const [lastName, setLastName] = useState(user.lastName ?? "")
   const [email, setEmail] = useState(user.email)
+  const [phone, setPhone] = useState(user.phone ?? "")
+  const [address, setAddress] = useState(user.address ?? "")
   const [saving, setSaving] = useState(false)
 
   const hasChanges =
     firstName.trim() !== (user.firstName ?? "") ||
     lastName.trim() !== (user.lastName ?? "") ||
-    email.trim().toLowerCase() !== user.email
+    email.trim().toLowerCase() !== user.email ||
+    phone.trim() !== (user.phone ?? "") ||
+    address.trim() !== (user.address ?? "")
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -34,6 +38,8 @@ export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
         email: email.trim(),
         firstName: firstName.trim() || null,
         lastName: lastName.trim() || null,
+        phone: phone.trim() || null,
+        address: address.trim() || null,
       })
       toast.add({ title: t("profileForm.successTitle"), type: "success" })
     } catch (err) {
@@ -82,6 +88,31 @@ export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="phone">{t("profileForm.phone")}</Label>
+        <Input
+          id="phone"
+          type="tel"
+          autoComplete="tel"
+          maxLength={30}
+          value={phone}
+          onChange={(event) => setPhone(event.target.value)}
+          placeholder={t("profileForm.phonePlaceholder")}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="address">{t("profileForm.address")}</Label>
+        <Input
+          id="address"
+          autoComplete="street-address"
+          maxLength={255}
+          value={address}
+          onChange={(event) => setAddress(event.target.value)}
+          placeholder={t("profileForm.addressPlaceholder")}
         />
       </div>
 
