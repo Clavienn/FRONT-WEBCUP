@@ -27,6 +27,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { CitizenDashboard } from "@/components/dashboard/citizen-dashboard"
+import { AdminDashboard } from "@/components/dashboard/admin-dashboard"
+import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 
 const metrics = [
   { label: "En attente", icon: Clock3, tone: "text-amber-700 dark:text-amber-300" },
@@ -85,6 +87,10 @@ export function AgentDashboard() {
 
   if (!isStaff(user)) {
     return <CitizenDashboard user={user} />
+  }
+
+  if (user.roles.includes("admin")) {
+    return <AdminDashboard user={user} />
   }
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
