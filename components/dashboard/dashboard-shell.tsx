@@ -1,9 +1,12 @@
 "use client"
 
+import { useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
   Building2,
+  Landmark,
+  ShieldAlert,
   ClipboardList,
   Home,
   LogOut,
@@ -19,6 +22,8 @@ import {
 import { useAuth } from "@/components/auth/auth-provider"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Spinner } from "@/components/ui/spinner"
+import { Toaster } from "@/components/ui/toast"
 import {
   Sidebar,
   SidebarContent,
@@ -59,13 +64,13 @@ const menu: MenuGroup[] = [
     label: "Navigation",
     items: [
       { label: "Accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
+      { label: "Services municipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
       { label: "Mon profil", icon: UserRound, href: "/profil" },
     ],
   },
   {
     label: "Espace citoyen",
     items: [
-      { label: "Services de la ville", icon: Building2, permission: "citizen.services.view", view: "citizen", href: "/dashboard#services-title" },
       { label: "Mes démarches", icon: ClipboardList, permission: "citizen.services.view", view: "citizen", href: "/dashboard#recent-requests-title" },
       { label: "Communiqués", icon: Megaphone, permission: "citizen.announcements.view", view: "citizen", href: "/dashboard#city-updates-title" },
       { label: "Envoyer un message", icon: MessageSquare, permission: "citizen.message.send", view: "citizen" },
@@ -82,6 +87,7 @@ const menu: MenuGroup[] = [
   {
     label: "Administration",
     items: [
+      { label: "Gérer les services", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
       { label: "Utilisateurs et rôles", icon: Users, permission: "admin.users.manage" },
       { label: "Permissions", icon: Settings2, permission: "admin.users.manage" },
     ],
@@ -203,7 +209,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
   )
 }
 
-export function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children: React.ReactNode }>) {
+function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children: React.ReactNode }>) {
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
@@ -214,5 +220,43 @@ export function DashboardShell({ user, children }: Readonly<{ user: AuthUser; ch
         </div>
       </SidebarInset>
     </SidebarProvider>
+  )
+}
+
+// Layout de toutes les pages /dashboard : exige une session, puis affiche sidebar + contenu
+export function DashboardFrame({ children }: Readonly<{ children: React.ReactNode }>) {
+  const router = useRouter()
+  const { user, isLoading } = useAuth()
+
+  useEffect(() => {
+    if (!isLoading && !user) router.replace("/connexion")
+  }, [isLoading, router, user])
+
+  if (isLoading || !user) {
+    return (
+      <main className="app-atmosphere grid min-h-screen place-items-center">
+        <Spinner />
+      </main>
+    )
+  }
+
+  return (
+    <Toaster>
+      <DashboardShell user={user}>{children}</DashboardShell>
+    </Toaster>
+  )
+}
+
+// Protège une page par permission (le serveur refuse de toute façon les appels sans droit)
+export function RequirePermission({ permission, children }: Readonly<{ permission: string; children: React.ReactNode }>) {
+  const { user } = useAuth()
+  if (user?.permissions.includes(permission)) return <>{children}</>
+
+  return (
+    <div className="flex min-h-64 flex-col items-center justify-center gap-2 rounded-2xl border border-border/80 bg-card/70 p-8 text-center">
+      <ShieldAlert className="size-6 text-muted-foreground" aria-hidden="true" />
+      <p className="font-medium">Accès refusé</p>
+      <p className="text-sm text-muted-foreground">Votre rôle ne donne pas accès à cette page.</p>
+    </div>
   )
 }
