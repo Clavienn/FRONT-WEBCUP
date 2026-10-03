@@ -36,6 +36,9 @@ export interface ProfileUpdate {
   email?: string
   firstName?: string | null
   lastName?: string | null
+  // Champ vide -> null : le backend efface la valeur
+  phone?: string | null
+  address?: string | null
 }
 
 export interface PasswordChange {

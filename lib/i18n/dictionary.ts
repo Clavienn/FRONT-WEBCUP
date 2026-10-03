@@ -272,6 +272,26 @@ const fr = {
     statusRejected: "Refusée",
   },
 
+  // Accueil de l'espace citoyen : modale affichée une seule fois par utilisateur
+  welcomeModal: {
+    title: "Bienvenue sur Terra Nova",
+    titleNamed: "Bienvenue sur Terra Nova, {{name}}",
+    description: "Votre espace citoyen est prêt. Voici trois façons simples de commencer.",
+    profile: {
+      title: "Compléter votre profil",
+      description: "Ajoutez votre téléphone et votre adresse pour être joint plus facilement.",
+    },
+    services: {
+      title: "Consulter tous les services",
+      description: "Découvrez les services municipaux de la ville et ce qu'ils proposent.",
+    },
+    request: {
+      title: "Faire une démarche ou une demande",
+      description: "Déposez une demande à la ville et suivez son traitement.",
+    },
+    later: "Explorer plus tard",
+  },
+
   // Rendez-vous citoyens — parcours de réservation, sans ambiguïté sur le créneau choisi
   appointments: {
     title: "Prendre rendez-vous",
@@ -527,11 +547,13 @@ const fr = {
       email: "Adresse e-mail",
       firstName: "Prénom",
       lastName: "Nom",
+      phone: "Téléphone",
+      address: "Adresse",
       memberSince: "Membre depuis",
       lastUpdate: "Dernière mise à jour",
     },
     editTitle: "Modifier le profil",
-    editSubtitle: "Mettez à jour votre nom et votre adresse e-mail.",
+    editSubtitle: "Mettez à jour vos informations personnelles et de contact.",
     passwordTitle: "Mot de passe",
     passwordSubtitle: "Les autres appareils seront déconnectés après le changement.",
     sessionsTitle: "Sessions",
@@ -551,6 +573,10 @@ const fr = {
     firstName: "Prénom",
     lastName: "Nom",
     email: "Adresse e-mail",
+    phone: "Téléphone",
+    phonePlaceholder: "+261 34 00 000 00",
+    address: "Adresse",
+    addressPlaceholder: "N° et rue, quartier",
     save: "Enregistrer",
     successTitle: "Profil mis à jour",
     errorTitle: "Erreur",
@@ -568,6 +594,16 @@ const fr = {
     errorMismatch: "Les deux mots de passe ne correspondent pas.",
     errorSameAsOld: "Le nouveau mot de passe doit être différent de l'actuel.",
     errorGeneric: "Une erreur est survenue. Réessayez.",
+    errorWeakPassword: "Le nouveau mot de passe ne respecte pas tous les critères de sécurité.",
+  },
+
+  passwordRequirements: {
+    title: "Votre mot de passe doit contenir :",
+    length: "Au moins 8 caractères",
+    lowercase: "Une lettre minuscule",
+    uppercase: "Une lettre majuscule",
+    number: "Un chiffre",
+    special: "Un caractère spécial (hors espace)",
   },
 
   authForm: {
@@ -584,6 +620,7 @@ const fr = {
     password: "Mot de passe",
     emailPlaceholder: "nom@exemple.com",
     passwordMinHint: "8 caractères minimum.",
+    passwordRequirementsError: "Le mot de passe ne respecte pas tous les critères de sécurité.",
     roleLegend: "Je suis",
     roleCitizen: { label: "Citoyen", hint: "Demandes et signalements" },
     roleAgent: { label: "Agent", hint: "Console des agents" },
@@ -918,6 +955,26 @@ const en = {
     statusRejected: "Refused",
   },
 
+  // Citizen space welcome: modal shown only once per user
+  welcomeModal: {
+    title: "Welcome to Terra Nova",
+    titleNamed: "Welcome to Terra Nova, {{name}}",
+    description: "Your citizen space is ready. Here are three simple ways to get started.",
+    profile: {
+      title: "Complete your profile",
+      description: "Add your phone number and address so the city can reach you more easily.",
+    },
+    services: {
+      title: "Browse all services",
+      description: "Discover the city's municipal services and what they offer.",
+    },
+    request: {
+      title: "Submit a request",
+      description: "Send a request to the city and follow how it is handled.",
+    },
+    later: "Explore later",
+  },
+
   appointments: {
     title: "Book an appointment",
     subtitle: "Choose a slot with an agent and prepare for your visit.",
@@ -1170,11 +1227,13 @@ const en = {
       email: "Email address",
       firstName: "First name",
       lastName: "Last name",
+      phone: "Phone",
+      address: "Address",
       memberSince: "Member since",
       lastUpdate: "Last updated",
     },
     editTitle: "Edit profile",
-    editSubtitle: "Update your name and email address.",
+    editSubtitle: "Update your personal and contact information.",
     passwordTitle: "Password",
     passwordSubtitle: "Other devices will be signed out after the change.",
     sessionsTitle: "Sessions",
@@ -1194,6 +1253,10 @@ const en = {
     firstName: "First name",
     lastName: "Last name",
     email: "Email address",
+    phone: "Phone",
+    phonePlaceholder: "+261 34 00 000 00",
+    address: "Address",
+    addressPlaceholder: "Street number and name, district",
     save: "Save",
     successTitle: "Profile updated",
     errorTitle: "Error",
@@ -1211,6 +1274,16 @@ const en = {
     errorMismatch: "The two passwords don't match.",
     errorSameAsOld: "The new password must be different from the current one.",
     errorGeneric: "An error occurred. Please try again.",
+    errorWeakPassword: "The new password does not meet all security requirements.",
+  },
+
+  passwordRequirements: {
+    title: "Your password must contain:",
+    length: "At least 8 characters",
+    lowercase: "A lowercase letter",
+    uppercase: "An uppercase letter",
+    number: "A number",
+    special: "A special character (not a space)",
   },
 
   authForm: {
@@ -1227,6 +1300,7 @@ const en = {
     password: "Password",
     emailPlaceholder: "name@example.com",
     passwordMinHint: "8 characters minimum.",
+    passwordRequirementsError: "The password does not meet all security requirements.",
     roleLegend: "I am a",
     roleCitizen: { label: "Citizen", hint: "Requests and reports" },
     roleAgent: { label: "Agent", hint: "Agent console" },

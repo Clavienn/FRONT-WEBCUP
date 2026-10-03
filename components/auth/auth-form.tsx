@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import { isPasswordStrong, PasswordRequirements } from "@/components/auth/password-requirements"
 import type { SignupRole } from "@/repository/auth.repository"
 
 const signupRoles: SignupRole[] = ["citizen", "agent"]
@@ -39,6 +40,10 @@ export function AuthForm() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
+    if (isRegistering && !isPasswordStrong(password)) {
+      setError(t("authForm.passwordRequirementsError"))
+      return
+    }
     setIsSubmitting(true)
 
     try {
@@ -170,12 +175,14 @@ export function AuthForm() {
                 type="password"
                 autoComplete={isRegistering ? "new-password" : "current-password"}
                 minLength={isRegistering ? 8 : undefined}
+                aria-invalid={isRegistering && password.length > 0 && !isPasswordStrong(password)}
+                aria-describedby={isRegistering ? "password-requirements" : undefined}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
               />
               {isRegistering && (
-                <p className="text-xs text-muted-foreground">{t("authForm.passwordMinHint")}</p>
+                <PasswordRequirements password={password} />
               )}
             </div>
 
@@ -186,7 +193,11 @@ export function AuthForm() {
               </p>
             )}
 
-            <Button type="submit" className="h-10 w-full rounded-xl" disabled={isLoading || isSubmitting}>
+            <Button
+              type="submit"
+              className="h-10 w-full rounded-xl"
+              disabled={isLoading || isSubmitting || (isRegistering && !isPasswordStrong(password))}
+            >
               {(isLoading || isSubmitting) ? <Spinner /> : null}
               {isLoading
                 ? t("authForm.submitChecking")

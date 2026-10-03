@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeftIcon, CalendarIcon, DownloadIcon, LogOutIcon, MailIcon, MonitorSmartphoneIcon, UserIcon } from "lucide-react"
+import { ArrowLeftIcon, CalendarIcon, DownloadIcon, LogOutIcon, MailIcon, MapPinIcon, MonitorSmartphoneIcon, PhoneIcon, UserIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
@@ -273,6 +273,8 @@ export default function ProfilPage() {
     { icon: MailIcon, label: t("profilePage.fields.email"), value: user.email },
     { icon: UserIcon, label: t("profilePage.fields.firstName"), value: user.firstName || "—" },
     { icon: UserIcon, label: t("profilePage.fields.lastName"), value: user.lastName || "—" },
+    { icon: PhoneIcon, label: t("profilePage.fields.phone"), value: user.phone || "—" },
+    { icon: MapPinIcon, label: t("profilePage.fields.address"), value: user.address || "—" },
     { icon: CalendarIcon, label: t("profilePage.fields.memberSince"), value: formatDate(user.createdAt) },
     { icon: CalendarIcon, label: t("profilePage.fields.lastUpdate"), value: formatDate(user.updatedAt) },
   ]
