@@ -94,6 +94,7 @@ const menu: MenuGroup[] = [
     label: "sidebar.groups.administration",
     items: [
       { label: "sidebar.items.gererServices", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
+      { label: "sidebar.items.messagesHabitants", icon: MessageSquare, adminOnly: true, newMessagesBadge: true, href: "/dashboard/admin/messages" },
       { label: "sidebar.items.utilisateursRoles", icon: Users, permission: "admin.users.manage" },
       { label: "sidebar.items.permissions", icon: Settings2, permission: "admin.users.manage" },
     ],
@@ -193,7 +194,9 @@ function AppSidebar({ user }: { user: AuthUser }) {
                     </SidebarMenuButton>
                   )}
                   {newMessagesBadge && newMessages > 0 && (
-                    <SidebarMenuBadge aria-label={`${newMessages} nouveaux messages`}>{newMessages}</SidebarMenuBadge>
+                    <SidebarMenuBadge aria-label={t("sidebar.newMessagesAriaLabel", { count: newMessages })}>
+                      {newMessages}
+                    </SidebarMenuBadge>
                   )}
                 </SidebarMenuItem>
               ))}
@@ -281,6 +284,20 @@ export function RequirePermission({ permission, children }: Readonly<{ permissio
       <ShieldAlert className="size-6 text-muted-foreground" aria-hidden="true" />
       <p className="font-medium">{t("requirePermission.title")}</p>
       <p className="text-sm text-muted-foreground">{t("requirePermission.description")}</p>
+    </div>
+  )
+}
+
+export function RequireAdmin({ children }: Readonly<{ children: React.ReactNode }>) {
+  const { user } = useAuth()
+  const { t } = useLanguage()
+  if (user?.roles.includes("admin")) return <>{children}</>
+
+  return (
+    <div className="flex min-h-64 flex-col items-center justify-center gap-2 rounded-2xl border border-border/80 bg-card/70 p-8 text-center">
+      <ShieldAlert className="size-6 text-muted-foreground" aria-hidden="true" />
+      <p className="font-medium">{t("requireAdmin.title")}</p>
+      <p className="text-sm text-muted-foreground">{t("requireAdmin.description")}</p>
     </div>
   )
 }

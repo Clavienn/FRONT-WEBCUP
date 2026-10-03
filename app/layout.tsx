@@ -41,10 +41,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <LanguageProvider>
           <SiteChrome>
             <div className="relative z-10 flex min-h-full flex-1 flex-col">
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                {children}
+                <SupportBubble />
+              </AuthProvider>
             </div>
           </SiteChrome>
-          <SupportBubble />
         </LanguageProvider>
       </body>
     </html>

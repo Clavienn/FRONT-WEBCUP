@@ -189,17 +189,24 @@ const fr = {
       demandesCitoyennes: "Demandes citoyennes",
       integrationApi: "Intégration API",
       gererServices: "Gérer les services",
+      messagesHabitants: "Messages des habitants",
       utilisateursRoles: "Utilisateurs et rôles",
       permissions: "Permissions",
     },
     comingSoon: "Bientôt",
     toggleAriaLabel: "Afficher ou masquer le menu",
     signOut: "Se déconnecter",
+    newMessagesAriaLabel: "{{count}} nouveaux messages",
   },
 
   requirePermission: {
     title: "Accès refusé",
     description: "Votre rôle ne donne pas accès à cette page.",
+  },
+
+  requireAdmin: {
+    title: "Accès réservé à l'administration",
+    description: "Votre compte ne dispose pas du rôle administrateur.",
   },
 
   citizenDashboard: {
@@ -497,14 +504,23 @@ const fr = {
   supportBubble: {
     openAriaLabel: "Ouvrir l'aide et contacter le support",
     dragTitle: "Aide et support · glisser pour déplacer",
-    dialogTitle: "Besoin d'aide ?",
-    dialogDescription: "Contactez le support ou l'administrateur au sujet de la plateforme Terra Nova.",
+    sentTitle: "Demande transmise",
+    reference: "Référence #{{id}}",
+    done: "Terminer",
+    loginRequiredTitle: "Connectez-vous pour écrire à l'administration",
+    loginRequiredDescription: "Les demandes de support sont associées à votre compte pour permettre leur suivi.",
+    loginCta: "Se connecter",
+    formTitle: "Contacter l'administration",
+    formDescription:
+      "Décrivez votre question ou la difficulté rencontrée. Une confirmation avec une référence sera affichée après l'envoi.",
+    subjectLabel: "Sujet",
+    subjectPlaceholder: "Ex. : difficulté avec une démarche",
     messageLabel: "Votre message",
     messagePlaceholder: "Décrivez brièvement le problème rencontré...",
-    emailConfigured: "Le message sera préparé dans votre application e-mail pour {{email}}.",
-    emailNotConfigured: "L'adresse du support n'est pas encore configurée.",
-    submit: "Contacter le support",
-    mailSubject: "Aide sur la plateforme Terra Nova",
+    identityHint: "Votre identité de compte sera jointe à la demande.",
+    submitLabel: "Envoyer à l'administration",
+    sendingLabel: "Envoi en cours...",
+    submitError: "Impossible d'envoyer votre demande.",
   },
 
   servicesList: {
@@ -720,17 +736,24 @@ const en = {
       demandesCitoyennes: "Citizen requests",
       integrationApi: "API integration",
       gererServices: "Manage services",
+      messagesHabitants: "Resident messages",
       utilisateursRoles: "Users and roles",
       permissions: "Permissions",
     },
     comingSoon: "Coming soon",
     toggleAriaLabel: "Show or hide the menu",
     signOut: "Sign out",
+    newMessagesAriaLabel: "{{count}} new messages",
   },
 
   requirePermission: {
     title: "Access denied",
     description: "Your role does not grant access to this page.",
+  },
+
+  requireAdmin: {
+    title: "Restricted to administrators",
+    description: "Your account does not have the administrator role.",
   },
 
   citizenDashboard: {
@@ -1024,14 +1047,23 @@ const en = {
   supportBubble: {
     openAriaLabel: "Open help and contact support",
     dragTitle: "Help and support · drag to move",
-    dialogTitle: "Need help?",
-    dialogDescription: "Contact support or the administrator about the Terra Nova platform.",
+    sentTitle: "Request sent",
+    reference: "Reference #{{id}}",
+    done: "Done",
+    loginRequiredTitle: "Sign in to write to the administration",
+    loginRequiredDescription: "Support requests are linked to your account so they can be tracked.",
+    loginCta: "Sign in",
+    formTitle: "Contact the administration",
+    formDescription:
+      "Describe your question or the difficulty you're facing. A confirmation with a reference will be shown after sending.",
+    subjectLabel: "Subject",
+    subjectPlaceholder: "E.g.: trouble with a request",
     messageLabel: "Your message",
     messagePlaceholder: "Briefly describe the problem you ran into...",
-    emailConfigured: "Your message will be prepared in your email app for {{email}}.",
-    emailNotConfigured: "The support address hasn't been configured yet.",
-    submit: "Contact support",
-    mailSubject: "Help with the Terra Nova platform",
+    identityHint: "Your account identity will be attached to the request.",
+    submitLabel: "Send to the administration",
+    sendingLabel: "Sending...",
+    submitError: "Your request could not be sent.",
   },
 
   servicesList: {
