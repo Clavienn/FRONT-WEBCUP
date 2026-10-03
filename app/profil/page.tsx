@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { ArrowLeftIcon, CalendarIcon, LogOutIcon, MailIcon, MonitorSmartphoneIcon, UserIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { DashboardFrame } from "@/components/dashboard/dashboard-shell"
 import { roleLabel } from "@/repository/auth.repository"
 import { PasswordForm } from "@/components/profile/password-form"
 import { ProfileForm } from "@/components/profile/profile-form"
@@ -13,7 +14,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { Toaster, toast } from "@/components/ui/toast"
+import { toast } from "@/components/ui/toast"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -66,7 +67,7 @@ export default function ProfilPage() {
 
   if (isLoading || !user) {
     return (
-      <div className="app-atmosphere grid min-h-screen place-items-center">
+      <div className="grid min-h-screen place-items-center">
         <Spinner />
       </div>
     )
@@ -86,8 +87,7 @@ export default function ProfilPage() {
   ]
 
   return (
-    <Toaster>
-      <div className="app-atmosphere min-h-screen px-6 py-10">
+    <DashboardFrame>
         <div className="mx-auto max-w-2xl space-y-6">
           <div className="flex items-end justify-between gap-4">
             <div className="space-y-2">
@@ -181,7 +181,6 @@ export default function ProfilPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-      </div>
-    </Toaster>
+    </DashboardFrame>
   )
 }
