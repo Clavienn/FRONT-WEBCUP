@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation"
 import type { ReactNode } from "react"
 
-import { AmbientClouds } from "@/components/ambient-clouds"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 const ROUTES_WITHOUT_APP_CHROME = new Set(["/"])
@@ -14,12 +13,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {showAppChrome && (
-        <>
-          <AmbientClouds />
-          <ThemeToggle />
-        </>
-      )}
+      {showAppChrome && <ThemeToggle />}
       {children}
     </>
   )
