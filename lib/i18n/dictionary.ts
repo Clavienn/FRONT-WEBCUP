@@ -151,6 +151,7 @@ const fr = {
     brand: { staff: "Console des agents", citizen: "Espace citoyen" },
     groups: {
       navigation: "Navigation",
+      settings: "Réglages",
       citizenSpace: "Espace citoyen",
       agentConsole: "Console des agents",
       administration: "Administration",
@@ -160,6 +161,10 @@ const fr = {
       servicesMunicipaux: "Services municipaux",
       annonces: "Annonces",
       monProfil: "Mon profil",
+      lightMode: "Mode clair",
+      darkMode: "Mode sombre",
+      french: "Français",
+      english: "Anglais",
       mesDemarches: "Mes démarches",
       mesRendezVous: "Mes rendez-vous",
       communiques: "Communiqués",
@@ -341,6 +346,14 @@ const fr = {
     byCitizen: "Déposée par {{name}}",
   },
 
+  notifications: {
+    bellAriaLabel: "Notifications",
+    title: "Notifications",
+    empty: "Aucune notification pour le moment.",
+    errorLoad: "Impossible de charger les notifications.",
+    markAllRead: "Tout marquer comme lu",
+  },
+
   agentAppointments: {
     title: "Rendez-vous citoyens",
     subtitle: "Ouvrez des créneaux et suivez vos rendez-vous.",
@@ -385,6 +398,8 @@ const fr = {
     deleteConfirmTitle: "Supprimer ce créneau ?",
     deleteConfirmDescription: "Cette action est définitive.",
     deleteConfirmAction: "Oui, supprimer",
+    reopenLabel: "Rouvrir ce créneau",
+    reopened: "Créneau rouvert",
     updated: "Créneau mis à jour",
     updateError: "L'action n'a pas pu être effectuée",
   },
@@ -785,6 +800,7 @@ const en = {
     brand: { staff: "Agent console", citizen: "Citizen space" },
     groups: {
       navigation: "Navigation",
+      settings: "Settings",
       citizenSpace: "Citizen space",
       agentConsole: "Agent console",
       administration: "Administration",
@@ -794,6 +810,10 @@ const en = {
       servicesMunicipaux: "Municipal services",
       annonces: "Announcements",
       monProfil: "My profile",
+      lightMode: "Light mode",
+      darkMode: "Dark mode",
+      french: "French",
+      english: "English",
       mesDemarches: "My requests",
       mesRendezVous: "My appointments",
       communiques: "Announcements",
@@ -971,6 +991,14 @@ const en = {
     byCitizen: "Submitted by {{name}}",
   },
 
+  notifications: {
+    bellAriaLabel: "Notifications",
+    title: "Notifications",
+    empty: "No notification yet.",
+    errorLoad: "The notifications could not be loaded.",
+    markAllRead: "Mark all as read",
+  },
+
   agentAppointments: {
     title: "Citizen appointments",
     subtitle: "Open slots and track your appointments.",
@@ -1015,6 +1043,8 @@ const en = {
     deleteConfirmTitle: "Delete this slot?",
     deleteConfirmDescription: "This action is final.",
     deleteConfirmAction: "Yes, delete",
+    reopenLabel: "Reopen this slot",
+    reopened: "Slot reopened",
     updated: "Slot updated",
     updateError: "The action could not be completed",
   },

@@ -102,6 +102,11 @@ function cancelSlot(id: number): Promise<AgentAppointment> {
   return authorizedRequest<AgentAppointment>(`/appointments/${id}/cancel`, { method: "PATCH" })
 }
 
+/** Remet un créneau annulé en circulation (citizenId/subject sont effacés côté serveur). */
+function reopenSlot(id: number): Promise<AgentAppointment> {
+  return authorizedRequest<AgentAppointment>(`/appointments/${id}/reopen`, { method: "PATCH" })
+}
+
 function deleteSlot(id: number): Promise<void> {
   return authorizedRequest<void>(`/appointments/${id}`, { method: "DELETE" })
 }
@@ -114,5 +119,6 @@ export const appointmentRepository = {
   createSlot,
   listMySlots,
   cancelSlot,
+  reopenSlot,
   deleteSlot,
 }

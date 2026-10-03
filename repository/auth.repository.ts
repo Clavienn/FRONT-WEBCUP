@@ -1,3 +1,5 @@
+import { getAppLocale } from "@/lib/i18n/types"
+
 export type UserRole = "citizen" | "agent" | "admin"
 
 // Rôles que l'utilisateur peut choisir à l'inscription (admin est attribué côté serveur)
@@ -147,6 +149,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Content-Type", "application/json")
   }
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`)
+  // L'API génère notamment les rappels de rendez-vous : la locale du header décide de la
+  // langue du texte écrit en base. Le fetch navigateur envoie un Accept-Language issu des
+  // préférences système, pas de notre choix, donc on l'écrase avec la locale de l'app.
+  if (!headers.has("Accept-Language")) {
+    headers.set("Accept-Language", getAppLocale().toUpperCase())
+  }
 
   let response: Response
   try {
