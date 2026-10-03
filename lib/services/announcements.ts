@@ -1,39 +1,43 @@
 export interface Announcement {
-  id: string
-  date: string
+  id: number
   title: string
-  summary: string
+  content: string
+  // Date de publication (ISO)
+  date: string
 }
 
-const MOCK_ANNOUNCEMENTS: Announcement[] = [
-  {
-    id: "quartier-aurora",
-    date: "2026-09-18",
-    title: "Ouverture du quartier Aurora",
-    summary:
-      "Le Haut Conseil annonce l'ouverture officielle du quatorzième quartier de Terra Nova, destiné à accueillir 800 nouveaux habitants.",
-  },
-  {
-    id: "reseau-eau",
-    date: "2026-09-05",
-    title: "Mise à niveau du réseau de distribution d'eau",
-    summary:
-      "Des interventions de maintenance renforceront la capacité du réseau hydrique commun à l'ensemble des quartiers d'ici la fin de la saison.",
-  },
-  {
-    id: "cartographie-australe",
-    date: "2026-08-27",
-    title: "Appel à volontaires pour la cartographie australe",
-    summary:
-      "Le Haut Conseil recherche des volontaires pour cartographier les terres australes en vue d'une future extension de la ville.",
-  },
-]
+export interface AnnouncementsPage {
+  announcements: Announcement[]
+  total: number
+}
+
+interface PublicAnnouncement {
+  id: number
+  title: string
+  content: string
+  publishedAt: string
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
 
 /**
- * Point d'intégration unique pour les actualités du Haut Conseil : la mise en œuvre
- * mockée ci-dessous sera remplacée par un appel à l'API officielle de Terra Nova.
+ * Annonces publiées par les agents et administrateurs de la ville.
+ * Route publique de l'API : aucune session requise.
  */
-export async function getAnnouncements(): Promise<Announcement[]> {
-  await new Promise((resolve) => setTimeout(resolve, 650))
-  return MOCK_ANNOUNCEMENTS
+export async function getAnnouncements(page = 1, limit = 9): Promise<AnnouncementsPage> {
+  if (!API_URL) throw new Error("NEXT_PUBLIC_API_URL n'est pas configurée.")
+
+  const response = await fetch(`${API_URL}/public/announcements?page=${page}&limit=${limit}`, { cache: "no-store" })
+  if (!response.ok) throw new Error(`Erreur ${response.status}`)
+
+  const body: { announcements: PublicAnnouncement[]; total: number } = await response.json()
+  return {
+    total: body.total,
+    announcements: body.announcements.map(({ id, title, content, publishedAt }) => ({
+      id,
+      title,
+      content,
+      date: publishedAt,
+    })),
+  }
 }
