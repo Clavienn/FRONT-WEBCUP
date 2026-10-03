@@ -14,6 +14,7 @@ import {
   MessageSquare,
   RadioTower,
   KeyRound,
+  ScrollText,
   ShieldCheck,
   UserRound,
   Users,
@@ -72,6 +73,7 @@ const menu: MenuGroup[] = [
     items: [
       { label: "sidebar.items.accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
       { label: "sidebar.items.servicesMunicipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
+      { label: "sidebar.items.annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
       { label: "sidebar.items.monProfil", icon: UserRound, href: "/profil" },
     ],
   },
@@ -79,7 +81,6 @@ const menu: MenuGroup[] = [
     label: "sidebar.groups.citizenSpace",
     items: [
       { label: "sidebar.items.mesDemarches", icon: ClipboardList, permission: "citizen.services.view", view: "citizen", href: "/dashboard#recent-requests-title" },
-      { label: "sidebar.items.communiques", icon: Megaphone, permission: "citizen.announcements.view", view: "citizen", href: "/dashboard#city-updates-title" },
       { label: "sidebar.items.envoyerMessage", icon: MessageSquare, permission: "citizen.message.send", view: "citizen" },
     ],
   },
@@ -88,7 +89,6 @@ const menu: MenuGroup[] = [
     items: [
       { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard#queues-title" },
       { label: "sidebar.items.integrationApi", icon: RadioTower, permission: "agent.dashboard.access", view: "staff", href: "/dashboard#api-status-title" },
-      { label: "sidebar.items.communiques", icon: Megaphone, permission: "citizen.announcements.view", view: "staff", href: "/dashboard#announcements-title" },
     ],
   },
   {
@@ -99,6 +99,7 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.utilisateurs", icon: Users, permission: "admin.users.manage", href: "/dashboard/admin/users" },
       { label: "sidebar.items.roles", icon: ShieldCheck, permission: "admin.users.manage", href: "/dashboard/admin/roles" },
       { label: "sidebar.items.permissions", icon: KeyRound, permission: "admin.users.manage", href: "/dashboard/admin/permissions" },
+      { label: "sidebar.items.journalAudit", icon: ScrollText, permission: "admin.users.manage", href: "/dashboard/admin/audit" },
     ],
   },
 ]

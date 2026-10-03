@@ -102,3 +102,35 @@ export const permissionRepository = {
   remove: (id: number, force = false) =>
     authorizedRequest<void>(`/permissions/${id}${force ? "?force=true" : ""}`, { method: "DELETE" }),
 }
+
+// ── Journal d'audit ──────────────────────────────────────────
+export interface AuditLog {
+  id: number
+  userId: number | null
+  action: string
+  entityType: string | null
+  entityId: number | null
+  ipAddress: string | null
+  createdAt: string
+  // Auteur de l'action ; null si l'action est anonyme ou le compte supprimé
+  user: { id: number; email: string; firstName: string; lastName: string } | null
+}
+
+export interface AuditLogPage {
+  logs: AuditLog[]
+  page: number
+  limit: number
+  total: number
+}
+
+export const auditRepository = {
+  list(query: { userId?: number; action?: string; page?: number; limit?: number } = {}) {
+    const params = new URLSearchParams()
+    if (query.userId) params.set("userId", String(query.userId))
+    if (query.action) params.set("action", query.action)
+    if (query.page) params.set("page", String(query.page))
+    if (query.limit) params.set("limit", String(query.limit))
+    const search = params.toString()
+    return authorizedRequest<AuditLogPage>(`/audit-logs${search ? `?${search}` : ""}`)
+  },
+}
