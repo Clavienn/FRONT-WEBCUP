@@ -111,6 +111,14 @@ export const authRepository = {
     }
   },
 
+  async logoutAll(): Promise<void> {
+    try {
+      await request<void>("/auth/logout-all", { method: "POST" })
+    } finally {
+      accessToken = null
+    }
+  },
+
   clearAccessToken() {
     accessToken = null
   },

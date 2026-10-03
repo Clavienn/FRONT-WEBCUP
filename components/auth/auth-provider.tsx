@@ -1,7 +1,8 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useState } from "react"
 import {
+  AuthApiError,
   authRepository,
   type AuthUser,
   type Credentials,
@@ -14,6 +15,8 @@ interface AuthContextValue {
   signIn: (credentials: Credentials) => Promise<AuthUser>
   signUp: (data: RegistrationData) => Promise<AuthUser>
   signOut: () => Promise<void>
+  signOutEverywhere: () => Promise<void>
+  reloadUser: () => Promise<AuthUser>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -62,8 +65,31 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
     }
   }
 
+  const signOutEverywhere = async () => {
+    try {
+      await authRepository.logoutAll()
+    } finally {
+      setUser(null)
+    }
+  }
+
+  // Recharge le profil depuis /auth/me ; si l'access token a expiré, on repasse par /auth/refresh
+  const reloadUser = useCallback(async () => {
+    let sessionUser: AuthUser
+    try {
+      sessionUser = await authRepository.me()
+    } catch (error) {
+      if (!(error instanceof AuthApiError) || error.status !== 401) throw error
+      sessionUser = await authRepository.refresh()
+    }
+    setUser(sessionUser)
+    return sessionUser
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{ user, isLoading, signIn, signUp, signOut, signOutEverywhere, reloadUser }}
+    >
       {children}
     </AuthContext.Provider>
   )

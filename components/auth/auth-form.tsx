@@ -26,7 +26,7 @@ export function AuthForm() {
   const isRegistering = mode === "register"
 
   useEffect(() => {
-    if (!isLoading && user) router.replace("/personnes")
+    if (!isLoading && user) router.replace("/profil")
   }, [isLoading, router, user])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -45,7 +45,7 @@ export function AuthForm() {
       } else {
         await signIn({ email, password })
       }
-      router.replace("/personnes")
+      router.replace("/profil")
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Une erreur est survenue. Réessayez.")
     } finally {
