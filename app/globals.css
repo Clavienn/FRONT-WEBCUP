@@ -136,12 +136,6 @@
 
 .app-atmosphere {
   background-color: rgba(238, 244, 252, 0.52);
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(111, 163, 224, 0.12), transparent 55%),
-    radial-gradient(ellipse at 85% 80%, rgba(205, 174, 116, 0.08), transparent 60%),
-    linear-gradient(rgba(90, 120, 160, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(90, 120, 160, 0.035) 1px, transparent 1px);
-  background-size: auto, auto, 44px 44px, 44px 44px;
 }
 
 .ambient-clouds {
@@ -213,11 +207,6 @@
 
 .dark .app-atmosphere {
   background-color: rgba(4, 11, 22, 0.66);
-  background-image:
-    radial-gradient(ellipse at 50% 0%, rgba(83, 140, 220, 0.18), transparent 58%),
-    radial-gradient(ellipse at 80% 85%, rgba(205, 174, 116, 0.07), transparent 62%),
-    linear-gradient(rgba(228, 237, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(228, 237, 255, 0.05) 1px, transparent 1px);
 }
 
 .dark .ambient-cloud__body,
