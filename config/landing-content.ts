@@ -9,8 +9,7 @@ export const NAV_LINKS: NavLink[] = [
   { id: "accueil", href: "#accueil" },
   { id: "presentation", href: "#presentation" },
   { id: "services", href: "#services" },
-  { id: "parcours", href: "#parcours" },
-  { id: "actualites", href: "#actualites" },
+  { id: "annonces", href: "#annonces" },
   { id: "pour-qui", href: "#pour-qui" },
   { id: "engagements", href: "#engagements" },
 ]
