@@ -10,6 +10,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import type { SignupRole } from "@/repository/auth.repository"
+
+const signupRoles: { value: SignupRole; label: string; hint: string }[] = [
+  { value: "citizen", label: "Citoyen", hint: "Demandes et signalements" },
+  { value: "agent", label: "Agent", hint: "Console des agents" },
+]
 
 type AuthMode = "login" | "register"
 
@@ -21,6 +27,7 @@ export function AuthForm() {
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [role, setRole] = useState<SignupRole>("citizen")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const isRegistering = mode === "register"
@@ -39,8 +46,9 @@ export function AuthForm() {
         await signUp({
           email,
           password,
-          firstName: firstName.trim() || undefined,
-          lastName: lastName.trim() || undefined,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          role,
         })
       } else {
         await signIn({ email, password })
@@ -100,6 +108,7 @@ export function AuthForm() {
                     id="firstName"
                     autoComplete="given-name"
                     maxLength={100}
+                    required
                     value={firstName}
                     onChange={(event) => setFirstName(event.target.value)}
                   />
@@ -110,11 +119,36 @@ export function AuthForm() {
                     id="lastName"
                     autoComplete="family-name"
                     maxLength={100}
+                    required
                     value={lastName}
                     onChange={(event) => setLastName(event.target.value)}
                   />
                 </div>
               </div>
+            )}
+
+            {isRegistering && (
+              <fieldset className="space-y-2">
+                <legend className="text-sm font-medium leading-none">Je suis</legend>
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  {signupRoles.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      aria-pressed={role === option.value}
+                      onClick={() => setRole(option.value)}
+                      className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                        role === option.value
+                          ? "border-primary bg-accent text-foreground"
+                          : "border-border bg-card/60 text-muted-foreground hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="block text-sm font-semibold">{option.label}</span>
+                      <span className="block text-xs">{option.hint}</span>
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
             )}
 
             <div className="space-y-2">
