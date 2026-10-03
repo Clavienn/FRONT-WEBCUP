@@ -28,7 +28,6 @@ import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { CitizenDashboard } from "@/components/dashboard/citizen-dashboard"
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 
 const metrics = [
   { label: "En attente", icon: Clock3, tone: "text-amber-700 dark:text-amber-300" },
