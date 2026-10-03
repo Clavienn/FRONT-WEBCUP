@@ -1,14 +1,23 @@
-export type UserRole = "USER" | "ADMIN"
+export type UserRole = "citizen" | "agent" | "admin"
+
+// Rôles que l'utilisateur peut choisir à l'inscription (admin est attribué côté serveur)
+export type SignupRole = Exclude<UserRole, "admin">
 
 export interface AuthUser {
-  id: string
+  id: number
   email: string
   firstName: string | null
   lastName: string | null
-  role: UserRole
+  phone: string | null
+  address: string | null
+  roles: UserRole[]
+  permissions: string[]
   createdAt: string
   updatedAt: string
 }
+
+// Agents et admins accèdent à la console ; les citoyens à l'espace citoyen
+export const isStaff = (user: AuthUser) => user.roles.some((role) => role === "agent" || role === "admin")
 
 export interface Credentials {
   email: string
@@ -16,8 +25,9 @@ export interface Credentials {
 }
 
 export interface RegistrationData extends Credentials {
-  firstName?: string
-  lastName?: string
+  firstName: string
+  lastName: string
+  role: SignupRole
 }
 
 export interface ProfileUpdate {

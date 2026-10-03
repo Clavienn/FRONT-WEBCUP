@@ -90,8 +90,8 @@ export default function ProfilPage() {
         <div className="mx-auto max-w-2xl space-y-6">
           <div className="flex items-end justify-between gap-4">
             <div className="space-y-2">
-              <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/" />}>
-                <ArrowLeftIcon /> Accueil
+              <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/dashboard" />}>
+                <ArrowLeftIcon /> Tableau de bord
               </Button>
               <h1 className="text-2xl font-medium tracking-tight text-foreground">Mon profil</h1>
             </div>
@@ -108,8 +108,8 @@ export default function ProfilPage() {
               </Avatar>
               <div className="min-w-0">
                 <p className="truncate text-lg font-medium text-foreground">{fullName || user.email}</p>
-                <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} className="mt-1">
-                  {user.role === "ADMIN" ? "Administrateur" : "Utilisateur"}
+                <Badge variant={user.roles.includes("admin") ? "default" : "secondary"} className="mt-1">
+                  {user.roles.includes("admin") ? "Administrateur" : user.roles.includes("agent") ? "Agent" : "Citoyen"}
                 </Badge>
               </div>
             </div>

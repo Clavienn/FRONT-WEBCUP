@@ -10,6 +10,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import type { SignupRole } from "@/repository/auth.repository"
+
+const signupRoles: { value: SignupRole; label: string; hint: string }[] = [
+  { value: "citizen", label: "Citoyen", hint: "Demandes et signalements" },
+  { value: "agent", label: "Agent", hint: "Console des agents" },
+]
 
 type AuthMode = "login" | "register"
 
@@ -21,12 +27,13 @@ export function AuthForm() {
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [role, setRole] = useState<SignupRole>("citizen")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const isRegistering = mode === "register"
 
   useEffect(() => {
-    if (!isLoading && user) router.replace("/profil")
+    if (!isLoading && user) router.replace("/dashboard")
   }, [isLoading, router, user])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -39,13 +46,14 @@ export function AuthForm() {
         await signUp({
           email,
           password,
-          firstName: firstName.trim() || undefined,
-          lastName: lastName.trim() || undefined,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          role,
         })
       } else {
         await signIn({ email, password })
       }
-      router.replace("/profil")
+      router.replace("/dashboard")
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Une erreur est survenue. Réessayez.")
     } finally {
@@ -72,22 +80,22 @@ export function AuthForm() {
               <ShieldCheck className="size-5" aria-hidden="true" />
             </span>
             <div>
-              <p className="text-sm font-semibold text-foreground">DevAtoandro</p>
-              <p className="text-xs text-muted-foreground">Webcup 2026</p>
+              <p className="text-sm font-semibold tracking-[0.08em] text-foreground">TERRA NOVA</p>
+              <p className="text-xs text-muted-foreground">Console des agents</p>
             </div>
           </div>
 
           <header className="mb-7 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-              DevAtoandro Space
+              Haut Conseil de Terra Nova
             </p>
             <h1 className="text-3xl font-medium tracking-tight text-foreground">
               {isRegistering ? "Créer un compte" : "Connexion"}
             </h1>
             <p className="text-sm leading-6 text-muted-foreground">
               {isRegistering
-                ? "Renseignez vos informations pour rejoindre votre espace."
-                : "Connectez-vous à l'espace de DevAtoandro"}
+                ? "Créez votre accès à la console des agents de Terra Nova."
+                : "Connectez-vous pour accompagner les habitants de Terra Nova."}
             </p>
           </header>
 
@@ -100,6 +108,7 @@ export function AuthForm() {
                     id="firstName"
                     autoComplete="given-name"
                     maxLength={100}
+                    required
                     value={firstName}
                     onChange={(event) => setFirstName(event.target.value)}
                   />
@@ -110,11 +119,36 @@ export function AuthForm() {
                     id="lastName"
                     autoComplete="family-name"
                     maxLength={100}
+                    required
                     value={lastName}
                     onChange={(event) => setLastName(event.target.value)}
                   />
                 </div>
               </div>
+            )}
+
+            {isRegistering && (
+              <fieldset className="space-y-2">
+                <legend className="text-sm font-medium leading-none">Je suis</legend>
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  {signupRoles.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      aria-pressed={role === option.value}
+                      onClick={() => setRole(option.value)}
+                      className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
+                        role === option.value
+                          ? "border-primary bg-accent text-foreground"
+                          : "border-border bg-card/60 text-muted-foreground hover:border-primary/50"
+                      }`}
+                    >
+                      <span className="block text-sm font-semibold">{option.label}</span>
+                      <span className="block text-xs">{option.hint}</span>
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
             )}
 
             <div className="space-y-2">
