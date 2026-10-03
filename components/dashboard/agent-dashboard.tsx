@@ -7,15 +7,11 @@ import {
   Activity,
   Bell,
   Building2,
-  Cable,
   CheckCircle2,
   CircleAlert,
   CircleX,
   Clock3,
-  KeyRound,
   Megaphone,
-  RadioTower,
-  RefreshCw,
   ShieldCheck,
 } from "lucide-react"
 
@@ -118,64 +114,6 @@ export function AgentDashboard() {
                 <p className="mt-3 text-2xl font-semibold tabular-nums text-foreground">{stats ? stats[status] : "—"}</p>
               </div>
             ))}
-          </div>
-        </section>
-
-        <section aria-labelledby="api-status-title" className="space-y-4 rounded-2xl border border-border/80 bg-card/65 p-5 shadow-sm backdrop-blur-sm sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                <Cable className="size-5" aria-hidden="true" />
-              </span>
-              <div>
-                <h2 id="api-status-title" className="text-lg font-semibold">{t("agentDashboard.apiTitle")}</h2>
-                <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-                  {t("agentDashboard.apiSubtitle")}
-                </p>
-              </div>
-            </div>
-            <Badge variant="outline" className="gap-1.5 rounded-full border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200">
-              <CircleAlert className="size-3.5" aria-hidden="true" />
-              {t("agentDashboard.apiBadge")}
-            </Badge>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-xl border border-border/70 bg-background/55 p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <RadioTower className="size-4" aria-hidden="true" />
-                <p className="text-xs font-medium">{t("agentDashboard.availability")}</p>
-              </div>
-              <p className="mt-3 text-sm font-semibold text-foreground">{t("agentDashboard.availabilityValue")}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{t("agentDashboard.availabilityHint")}</p>
-            </div>
-
-            <div className="rounded-xl border border-border/70 bg-background/55 p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <KeyRound className="size-4" aria-hidden="true" />
-                <p className="text-xs font-medium">{t("agentDashboard.teamAccess")}</p>
-              </div>
-              <p className="mt-3 text-sm font-semibold text-foreground">{t("agentDashboard.teamAccessValue")}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{t("agentDashboard.teamAccessHint")}</p>
-            </div>
-
-            <div className="rounded-xl border border-border/70 bg-background/55 p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <RefreshCw className="size-4" aria-hidden="true" />
-                <p className="text-xs font-medium">{t("agentDashboard.lastSync")}</p>
-              </div>
-              <p className="mt-3 text-sm font-semibold text-foreground">—</p>
-              <p className="mt-1 text-xs text-muted-foreground">{t("agentDashboard.lastSyncHint")}</p>
-            </div>
-
-            <div className="rounded-xl border border-border/70 bg-background/55 p-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock3 className="size-4" aria-hidden="true" />
-                <p className="text-xs font-medium">{t("agentDashboard.requestWaves")}</p>
-              </div>
-              <p className="mt-3 text-sm font-semibold text-foreground">{t("agentDashboard.requestWavesValue")}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{t("agentDashboard.requestWavesHint")}</p>
-            </div>
           </div>
         </section>
 

@@ -16,7 +16,6 @@ import {
   MessageSquare,
   Moon,
   Sun,
-  RadioTower,
   KeyRound,
   ScrollText,
   ShieldCheck,
@@ -95,8 +94,9 @@ const menu: MenuGroup[] = [
     label: "sidebar.groups.agentConsole",
     items: [
       { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.messages.manage", view: "staff", newMessagesBadge: true, href: "/dashboard/agent/requests" },
+      { label: "sidebar.items.comptesCitoyens", icon: Users, permission: "agent.citizens.manage", view: "staff", href: "/dashboard/agent/citizens" },
       { label: "sidebar.items.rendezVousCitoyens", icon: CalendarClock, permission: "agent.appointments.view", view: "staff", href: "/dashboard/appointments" },
-      { label: "sidebar.items.integrationApi", icon: RadioTower, permission: "agent.dashboard.access", view: "staff", href: "/dashboard#api-status-title" },
+      { label: "sidebar.items.historiqueOperations", icon: ScrollText, permission: "agent.activity.view", view: "staff", href: "/dashboard/agent/activite" },
     ],
   },
   {
@@ -224,7 +224,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
       </SidebarContent>
 
       <SidebarFooter>
-        <SidebarGroup>
+        <SidebarGroup className="group-data-[collapsible=icon]:p-0">
           <SidebarGroupLabel>{t("sidebar.groups.settings")}</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>

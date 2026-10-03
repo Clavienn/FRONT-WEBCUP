@@ -10,6 +10,8 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { actionLabel, actionKeys, entityLabel, formatDate, isFailure } from "@/lib/audit-actions"
+import { useLanguage } from "@/components/i18n/language-provider"
 import {
   auditRepository,
   userAdminRepository,
@@ -20,60 +22,6 @@ import {
 
 // Pagination côté serveur : seules PAGE_SIZE lignes sont demandées à chaque requête
 const PAGE_SIZE = 20
-
-const actionLabels: Record<string, string> = {
-  "user.register": "Création de compte",
-  login: "Connexion",
-  "login.failed": "Échec de connexion",
-  "login.blocked": "Connexion refusée (compte désactivé)",
-  "logout.all": "Déconnexion de tous les appareils",
-  "password.change": "Changement de mot de passe",
-  "profile.update": "Modification du profil",
-  "user.activate": "Activation d’un compte",
-  "user.deactivate": "Désactivation d’un compte",
-  "role.assign": "Attribution d’un rôle",
-  "role.remove": "Retrait d’un rôle",
-  "role.create": "Création d’un rôle",
-  "role.update": "Modification d’un rôle",
-  "role.delete": "Suppression d’un rôle",
-  "role.permission.grant": "Permission ajoutée à un rôle",
-  "role.permission.revoke": "Permission retirée d’un rôle",
-  "role.permission.sync": "Permissions d’un rôle remplacées",
-  "permission.create": "Création d’une permission",
-  "permission.update": "Modification d’une permission",
-  "permission.delete": "Suppression d’une permission",
-  "service.create": "Création d’un service",
-  "service.update": "Modification d’un service",
-  "service.delete": "Suppression d’un service",
-  "announcement.create": "Création d’une annonce",
-  "announcement.update": "Modification d’une annonce",
-  "announcement.published": "Annonce publiée",
-  "announcement.archived": "Annonce archivée",
-  "announcement.draft": "Annonce repassée en brouillon",
-  "announcement.delete": "Suppression d’une annonce",
-  "contact.send": "Message envoyé",
-  "contact.new": "Message marqué nouveau",
-  "contact.read": "Message marqué lu",
-  "contact.processed": "Message marqué traité",
-}
-
-const actionLabel = (action: string) => actionLabels[action] ?? action
-
-const entityLabels: Record<string, string> = {
-  users: "Utilisateur",
-  roles: "Rôle",
-  permissions: "Permission",
-  municipal_services: "Service",
-  announcements: "Annonce",
-  contact_messages: "Message",
-}
-
-const formatDate = (value: string) =>
-  new Date(value).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "medium" })
-
-const errorMessage = (cause: unknown) => (cause instanceof Error ? cause.message : "Une erreur est survenue")
-
-const isFailure = (action: string) => action === "login.failed" || action === "login.blocked"
 
 interface Result {
   key: string
@@ -88,6 +36,7 @@ interface UserFilterValue {
 
 // Recherche d'utilisateur (nom ou e-mail) côté serveur : seuls 6 résultats sont demandés
 function UserFilter({ value, onChange }: { value: UserFilterValue | null; onChange: (value: UserFilterValue | null) => void }) {
+  const { t } = useLanguage()
   const [query, setQuery] = useState("")
   const [debounced, setDebounced] = useState("")
   const [matches, setMatches] = useState<{ query: string; users: ManagedUser[] } | null>(null)
@@ -112,7 +61,7 @@ function UserFilter({ value, onChange }: { value: UserFilterValue | null; onChan
 
   if (value) {
     return (
-      <Button variant="secondary" size="sm" onClick={() => onChange(null)} aria-label="Retirer le filtre utilisateur">
+      <Button variant="secondary" size="sm" onClick={() => onChange(null)} aria-label={t("auditLog.adminPage.clearUserFilter")}>
         <UserRound aria-hidden="true" />
         {value.label}
         <X aria-hidden="true" />
@@ -127,8 +76,8 @@ function UserFilter({ value, onChange }: { value: UserFilterValue | null; onChan
       <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
       <Input
         type="search"
-        aria-label="Filtrer par utilisateur"
-        placeholder="Filtrer par utilisateur"
+        aria-label={t("auditLog.adminPage.userFilterAria")}
+        placeholder={t("auditLog.adminPage.userFilterAria")}
         className="pl-9"
         value={query}
         onChange={(event) => {
@@ -141,9 +90,9 @@ function UserFilter({ value, onChange }: { value: UserFilterValue | null; onChan
       {open && debounced && (
         <ul role="listbox" className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-border bg-popover text-popover-foreground shadow-md">
           {results === null ? (
-            <li className="px-3 py-2 text-sm text-muted-foreground">Recherche…</li>
+            <li className="px-3 py-2 text-sm text-muted-foreground">{t("auditLog.common.searching")}</li>
           ) : results.length === 0 ? (
-            <li className="px-3 py-2 text-sm text-muted-foreground">Aucun utilisateur trouvé.</li>
+            <li className="px-3 py-2 text-sm text-muted-foreground">{t("auditLog.adminPage.noUserFound")}</li>
           ) : (
             results.map((user) => {
               const label = `${user.firstName} ${user.lastName}`.trim() || user.email
@@ -179,6 +128,7 @@ function userName(log: AuditLog) {
 }
 
 export function AuditAdmin() {
+  const { t, locale } = useLanguage()
   const [action, setAction] = useState("")
   // Filtre par utilisateur : posé en cliquant sur un nom dans le tableau
   const [userFilter, setUserFilter] = useState<{ id: number; label: string } | null>(null)
@@ -195,11 +145,13 @@ export function AuditAdmin() {
     auditRepository
       .list({ action: action || undefined, userId: userFilter?.id, page, limit: PAGE_SIZE })
       .then((response) => mounted && setResult({ key, data: response }))
-      .catch((cause) => mounted && setResult({ key, error: errorMessage(cause) }))
+      .catch((cause) =>
+        mounted && setResult({ key, error: cause instanceof Error ? cause.message : t("auditLog.common.errorLoad") }),
+      )
     return () => {
       mounted = false
     }
-  }, [key, action, userFilter, page])
+  }, [key, action, userFilter, page, t])
 
   const reload = () => setReloadKey((value) => value + 1)
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.limit)) : 1
@@ -208,21 +160,21 @@ export function AuditAdmin() {
     <>
       <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm font-medium text-primary">Administration</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">Journal d’audit</h1>
+          <p className="text-sm font-medium text-primary">{t("auditLog.adminPage.eyebrow")}</p>
+          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("auditLog.adminPage.title")}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Historique des actions effectuées par les utilisateurs, du plus récent au plus ancien.
+            {t("auditLog.adminPage.description")}
           </p>
         </div>
         <Button variant="outline" onClick={reload} disabled={!current} className="w-fit">
           {current ? <RefreshCw aria-hidden="true" /> : <Spinner />}
-          Actualiser
+          {t("auditLog.common.refresh")}
         </Button>
       </section>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <NativeSelect
-          aria-label="Filtrer par action"
+          aria-label={t("auditLog.adminPage.filterAria")}
           className="w-full sm:w-72"
           value={action}
           onChange={(event) => {
@@ -230,10 +182,10 @@ export function AuditAdmin() {
             setPage(1)
           }}
         >
-          <NativeSelectOption value="">Toutes les actions</NativeSelectOption>
-          {Object.entries(actionLabels).map(([code, label]) => (
+          <NativeSelectOption value="">{t("auditLog.adminPage.allActions")}</NativeSelectOption>
+          {Object.keys(actionKeys).map((code) => (
             <NativeSelectOption key={code} value={code}>
-              {label}
+              {actionLabel(code, t)}
             </NativeSelectOption>
           ))}
         </NativeSelect>
@@ -248,7 +200,7 @@ export function AuditAdmin() {
 
         {data && (
           <p className="text-sm text-muted-foreground sm:ml-auto" aria-live="polite">
-            {data.total} action{data.total > 1 ? "s" : ""}
+            {t(data.total > 1 ? "auditLog.adminPage.countMany" : "auditLog.adminPage.countOne", { count: data.total })}
           </p>
         )}
       </div>
@@ -259,7 +211,7 @@ export function AuditAdmin() {
             <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
             {current.error}
           </span>
-          <Button variant="outline" size="sm" onClick={reload}>Réessayer</Button>
+          <Button variant="outline" size="sm" onClick={reload}>{t("auditLog.common.retry")}</Button>
         </div>
       ) : !data ? (
         <Skeleton className="h-96 rounded-2xl" />
@@ -268,18 +220,18 @@ export function AuditAdmin() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Utilisateur</TableHead>
-                <TableHead>Action</TableHead>
-                <TableHead className="hidden md:table-cell">Cible</TableHead>
-                <TableHead className="hidden lg:table-cell">Adresse IP</TableHead>
+                <TableHead>{t("auditLog.common.date")}</TableHead>
+                <TableHead>{t("auditLog.adminPage.userColumn")}</TableHead>
+                <TableHead>{t("auditLog.adminPage.actionColumn")}</TableHead>
+                <TableHead className="hidden md:table-cell">{t("auditLog.adminPage.targetColumn")}</TableHead>
+                <TableHead className="hidden lg:table-cell">{t("auditLog.adminPage.ipColumn")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.logs.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
-                    Aucune action enregistrée pour ce filtre.
+                    {t("auditLog.adminPage.empty")}
                   </TableCell>
                 </TableRow>
               )}
@@ -288,14 +240,14 @@ export function AuditAdmin() {
                 return (
                   <TableRow key={log.id}>
                     <TableCell className="whitespace-nowrap text-xs tabular-nums text-muted-foreground">
-                      {formatDate(log.createdAt)}
+                      {formatDate(log.createdAt, locale)}
                     </TableCell>
                     <TableCell>
                       {name && log.user ? (
                         <button
                           type="button"
                           className="cursor-pointer text-left hover:underline"
-                          title="Filtrer sur cet utilisateur"
+                          title={t("auditLog.adminPage.filterOnUser")}
                           onClick={() => {
                             setUserFilter({ id: log.user!.id, label: name })
                             setPage(1)
@@ -306,23 +258,25 @@ export function AuditAdmin() {
                         </button>
                       ) : (
                         <span className="text-sm text-muted-foreground">
-                          {log.userId ? `Compte #${log.userId} (supprimé)` : "Anonyme"}
+                          {log.userId
+                            ? t("auditLog.adminPage.deletedAccount", { id: log.userId })
+                            : t("auditLog.adminPage.anonymous")}
                         </span>
                       )}
                     </TableCell>
                     <TableCell>
                       {isFailure(log.action) ? (
                         <Badge variant="outline" className="border-destructive/30 bg-destructive/5 text-destructive">
-                          {actionLabel(log.action)}
+                          {actionLabel(log.action, t)}
                         </Badge>
                       ) : (
-                        <span className="text-sm">{actionLabel(log.action)}</span>
+                        <span className="text-sm">{actionLabel(log.action, t)}</span>
                       )}
                       <span className="block font-mono text-xs text-muted-foreground">{log.action}</span>
                     </TableCell>
                     <TableCell className="hidden text-sm md:table-cell">
                       {log.entityType
-                        ? `${entityLabels[log.entityType] ?? log.entityType}${log.entityId ? ` #${log.entityId}` : ""}`
+                        ? `${entityLabel(log.entityType, t)}${log.entityId ? ` #${log.entityId}` : ""}`
                         : "—"}
                     </TableCell>
                     <TableCell className="hidden font-mono text-xs lg:table-cell">{log.ipAddress ?? "—"}</TableCell>
@@ -335,18 +289,18 @@ export function AuditAdmin() {
       )}
 
       {data && totalPages > 1 && (
-        <nav aria-label="Pagination" className="flex items-center justify-center gap-3">
+        <nav aria-label={t("auditLog.common.pagination")} className="flex items-center justify-center gap-3">
           <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(1)}>
-            Début
+            {t("auditLog.common.first")}
           </Button>
           <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-            Précédent
+            {t("auditLog.common.previous")}
           </Button>
           <span className="text-sm text-muted-foreground">
-            Page {page} sur {totalPages}
+            {t("auditLog.common.pageOf", { page, total: totalPages })}
           </span>
           <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-            Suivant
+            {t("auditLog.common.next")}
           </Button>
         </nav>
       )}
