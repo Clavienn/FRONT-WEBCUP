@@ -207,17 +207,30 @@ function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
 interface AgentRequestsPanelProps {
   // Prévient le dashboard qu'il doit recalculer ses compteurs par statut
   onChanged?: () => void
+  // Filtre de départ : « à traiter » sur le dashboard, « toutes » sur la page dédiée
+  initialStatus?: RequestStatus | "all"
+  // Nombre de demandes chargées par requête (pagination côté serveur)
+  pageSize?: number
+  // Masque le titre quand la page fournit déjà le sien
+  hideHeading?: boolean
 }
 
 /** File des demandes citoyennes : l'agent filtre, prend en charge, fait évoluer l'état. */
-export function AgentRequestsPanel({ onChanged }: AgentRequestsPanelProps = {}) {
+export function AgentRequestsPanel({
+  onChanged,
+  initialStatus = "pending",
+  pageSize = 20,
+  hideHeading = false,
+}: AgentRequestsPanelProps = {}) {
   const { t } = useLanguage()
   const { user } = useAuth()
   const [state, setState] = useState<LoadState>("loading")
   const [requests, setRequests] = useState<AgentRequest[]>([])
   const [error, setError] = useState("")
-  const [status, setStatus] = useState<RequestStatus | "all">("pending")
+  const [status, setStatus] = useState<RequestStatus | "all">(initialStatus)
   const [mineOnly, setMineOnly] = useState(false)
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
 
   // Same rationale as the citizen panel: the initial state is already "loading", and a
   // synchronous setState in the effect body triggers a cascading render. Re-fetches
@@ -225,9 +238,10 @@ export function AgentRequestsPanel({ onChanged }: AgentRequestsPanelProps = {}) 
   const load = useCallback(() => {
     if (!user) return
     citizenRequestRepository
-      .listAll({ status, mine: mineOnly || undefined })
-      .then((page) => {
-        setRequests(page.requests)
+      .listAll({ status, mine: mineOnly || undefined, page, limit: pageSize })
+      .then((result) => {
+        setRequests(result.requests)
+        setTotal(result.total)
         setError("")
         setState("ready")
         onChanged?.()
@@ -236,7 +250,7 @@ export function AgentRequestsPanel({ onChanged }: AgentRequestsPanelProps = {}) 
         setError(cause instanceof Error ? cause.message : "")
         setState("error")
       })
-  }, [mineOnly, status, user, onChanged])
+  }, [mineOnly, status, page, pageSize, user, onChanged])
 
   useEffect(() => {
     load()
@@ -249,27 +263,48 @@ export function AgentRequestsPanel({ onChanged }: AgentRequestsPanelProps = {}) 
 
   if (!user) return null
 
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+
   const filterLabel = (value: RequestStatus | "all") =>
     value === "all" ? t("agentRequests.filterAll") : t(`agentRequests.filter${requestStatusKey(value)}`)
 
   return (
     <section aria-labelledby="agent-requests-title" className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 id="agent-requests-title" className="text-lg font-semibold">
+        {hideHeading ? (
+          <h2 id="agent-requests-title" className="sr-only">
             {t("agentRequests.title")}
           </h2>
-          <p className="text-sm text-muted-foreground">{t("agentRequests.subtitle")}</p>
-        </div>
+        ) : (
+          <div>
+            <h2 id="agent-requests-title" className="text-lg font-semibold">
+              {t("agentRequests.title")}
+            </h2>
+            <p className="text-sm text-muted-foreground">{t("agentRequests.subtitle")}</p>
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-2">
-          <NativeSelect value={status} onChange={(event) => setStatus(event.target.value as RequestStatus | "all")}>
+          <NativeSelect
+            value={status}
+            onChange={(event) => {
+              setStatus(event.target.value as RequestStatus | "all")
+              setPage(1)
+            }}
+          >
             {FILTERS.map((value) => (
               <NativeSelectOption key={value} value={value}>
                 {filterLabel(value)}
               </NativeSelectOption>
             ))}
           </NativeSelect>
-          <Button variant={mineOnly ? "default" : "outline"} size="sm" onClick={() => setMineOnly((on) => !on)}>
+          <Button
+            variant={mineOnly ? "default" : "outline"}
+            size="sm"
+            onClick={() => {
+              setMineOnly((on) => !on)
+              setPage(1)
+            }}
+          >
             {t("agentRequests.mineOnly")}
           </Button>
           <Button variant="ghost" size="icon" onClick={refresh} aria-label={t("agentRequests.refreshLabel")}>
@@ -304,11 +339,27 @@ export function AgentRequestsPanel({ onChanged }: AgentRequestsPanelProps = {}) 
         )}
 
         {state === "ready" && requests.length > 0 && (
-          <ul className="space-y-3">
-            {requests.map((request) => (
-              <RequestRow key={request.id} request={request} currentUserId={user.id} onUpdated={refresh} />
-            ))}
-          </ul>
+          <>
+            <p className="mb-3 text-xs text-muted-foreground">{t("agentRequests.totalLabel", { count: total })}</p>
+            <ul className="space-y-3">
+              {requests.map((request) => (
+                <RequestRow key={request.id} request={request} currentUserId={user.id} onUpdated={refresh} />
+              ))}
+            </ul>
+            {totalPages > 1 && (
+              <nav aria-label={t("agentRequests.paginationLabel")} className="mt-4 flex items-center justify-center gap-3">
+                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+                  {t("agentRequests.previousLabel")}
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  {t("agentRequests.pageLabel", { page, pages: totalPages })}
+                </span>
+                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+                  {t("agentRequests.nextLabel")}
+                </Button>
+              </nav>
+            )}
+          </>
         )}
       </div>
     </section>
