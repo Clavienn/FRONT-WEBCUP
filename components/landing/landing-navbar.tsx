@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Menu, X, Globe } from "lucide-react"
 
 import { NAV_LINKS, SITE_NAME } from "@/config/landing-content"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { useActiveSection } from "@/hooks/use-active-section"
 import { cn } from "@/lib/utils"
 
@@ -13,7 +14,7 @@ const SECTION_IDS = NAV_LINKS.map((link) => link.id)
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [lang, setLang] = useState<"FR" | "EN">("FR")
+  const { locale, setLocale, t } = useLanguage()
   const activeId = useActiveSection(SECTION_IDS)
   const firstDrawerLinkRef = useRef<HTMLAnchorElement | null>(null)
 
@@ -51,7 +52,7 @@ export function LandingNavbar() {
           {NAV_LINKS.map((link) => (
             <li key={link.id}>
               <a href={link.href} className="tn-navlink" data-active={activeId === link.id}>
-                {link.label}
+                {t(`nav.${link.id}`)}
               </a>
             </li>
           ))}
@@ -60,19 +61,19 @@ export function LandingNavbar() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setLang((current) => (current === "FR" ? "EN" : "FR"))}
+            onClick={() => setLocale(locale === "fr" ? "en" : "fr")}
             className="inline-flex items-center gap-1.5 rounded-[var(--tn-radius-sm)] border border-[var(--tn-border)] px-2.5 py-1.5 text-xs font-medium tracking-widest text-[var(--tn-text-muted)] transition-colors hover:border-[var(--tn-border-strong)] hover:text-[var(--tn-text)]"
-            aria-label={`Changer la langue, actuellement ${lang === "FR" ? "français" : "anglais"}`}
+            aria-label={t("langToggle.ariaLabel")}
           >
             <Globe className="size-3.5" aria-hidden="true" />
-            {lang}
+            {locale.toUpperCase()}
           </button>
 
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
             className="inline-flex size-9 items-center justify-center rounded-[var(--tn-radius-sm)] border border-[var(--tn-border)] text-[var(--tn-text)] transition-colors hover:border-[var(--tn-border-strong)]"
-            aria-label="Ouvrir le menu de navigation"
+            aria-label={t("navbar.openMenu")}
             aria-expanded={drawerOpen}
             aria-controls="tn-nav-drawer"
           >
@@ -87,7 +88,7 @@ export function LandingNavbar() {
         data-open={drawerOpen}
         role="dialog"
         aria-modal="true"
-        aria-label="Menu de navigation"
+        aria-label={t("navbar.menuLabel")}
         aria-hidden={!drawerOpen}
       >
         <div className="flex h-full flex-col px-6 py-8">
@@ -97,7 +98,7 @@ export function LandingNavbar() {
               type="button"
               onClick={() => setDrawerOpen(false)}
               className="inline-flex size-9 items-center justify-center rounded-[var(--tn-radius-sm)] border border-[var(--tn-border)] text-[var(--tn-text)]"
-              aria-label="Fermer le menu de navigation"
+              aria-label={t("navbar.closeMenu")}
               tabIndex={drawerOpen ? 0 : -1}
             >
               <X className="size-4" aria-hidden="true" />
@@ -117,7 +118,7 @@ export function LandingNavbar() {
                   activeId === link.id && "text-[var(--tn-text)]"
                 )}
               >
-                {link.label}
+                {t(`nav.${link.id}`)}
               </a>
             ))}
           </nav>

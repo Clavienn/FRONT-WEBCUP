@@ -3,6 +3,7 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { LifeBuoy, Send } from "lucide-react"
 
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -29,6 +30,7 @@ interface DragState {
 const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL?.trim()
 
 export function SupportBubble() {
+  const { t } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState("")
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
@@ -82,7 +84,7 @@ export function SupportBubble() {
   }
 
   const mailtoHref = SUPPORT_EMAIL
-    ? `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Aide sur la plateforme Terra Nova")}&body=${encodeURIComponent(message.trim())}`
+    ? `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(t("supportBubble.mailSubject"))}&body=${encodeURIComponent(message.trim())}`
     : undefined
 
   return (
@@ -92,8 +94,8 @@ export function SupportBubble() {
         size="icon-lg"
         className={`fixed z-40 size-12 rounded-full border border-primary/20 bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition-transform hover:scale-105 touch-none cursor-grab active:cursor-grabbing ${position ? "" : "right-5 bottom-5"}`}
         style={position ? { left: position.x, top: position.y } : undefined}
-        aria-label="Ouvrir l’aide et contacter le support"
-        title="Aide et support · glisser pour déplacer"
+        aria-label={t("supportBubble.openAriaLabel")}
+        title={t("supportBubble.dragTitle")}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
@@ -106,26 +108,26 @@ export function SupportBubble() {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Besoin d’aide ?</DialogTitle>
+            <DialogTitle>{t("supportBubble.dialogTitle")}</DialogTitle>
             <DialogDescription>
-              Contactez le support ou l’administrateur au sujet de la plateforme Terra Nova.
+              {t("supportBubble.dialogDescription")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid gap-2">
-            <Label htmlFor="support-message">Votre message</Label>
+            <Label htmlFor="support-message">{t("supportBubble.messageLabel")}</Label>
             <Textarea
               id="support-message"
               value={message}
               onChange={(event) => setMessage(event.target.value)}
-              placeholder="Décrivez brièvement le problème rencontré..."
+              placeholder={t("supportBubble.messagePlaceholder")}
               maxLength={2000}
               rows={5}
             />
             <p className="text-xs text-muted-foreground">
               {SUPPORT_EMAIL
-                ? `Le message sera préparé dans votre application e-mail pour ${SUPPORT_EMAIL}.`
-                : "L’adresse du support n’est pas encore configurée."}
+                ? t("supportBubble.emailConfigured", { email: SUPPORT_EMAIL })
+                : t("supportBubble.emailNotConfigured")}
             </p>
           </div>
 
@@ -133,12 +135,12 @@ export function SupportBubble() {
             {mailtoHref ? (
               <Button nativeButton={false} render={<a href={mailtoHref} />} disabled={!message.trim()}>
                 <Send aria-hidden="true" />
-                Contacter le support
+                {t("supportBubble.submit")}
               </Button>
             ) : (
               <Button disabled>
                 <Send aria-hidden="true" />
-                Contacter le support
+                {t("supportBubble.submit")}
               </Button>
             )}
           </DialogFooter>

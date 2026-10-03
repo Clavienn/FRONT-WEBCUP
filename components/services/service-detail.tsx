@@ -6,24 +6,16 @@ import { useSearchParams } from "next/navigation"
 import { ArrowLeft, ArrowRight, CalendarClock, CircleAlert, Hash } from "lucide-react"
 
 import { ServiceIcon } from "@/components/services/service-icon"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AuthApiError } from "@/repository/auth.repository"
 import { serviceRepository, type MunicipalService } from "@/repository/service.repository"
 
-const BACK_LINK = (
-  <Link
-    href="/dashboard/services"
-    className="inline-flex items-center gap-2 text-sm font-medium text-secondary-foreground transition-colors hover:text-primary"
-  >
-    <ArrowLeft className="size-4" aria-hidden="true" />
-    Tous les services
-  </Link>
-)
-
 const formatDate = (value: string) => new Date(value).toLocaleDateString("fr-FR", { dateStyle: "long" })
 
 export function ServiceDetail() {
+  const { t } = useLanguage()
   const params = useSearchParams()
   const id = Number(params.get("id"))
   const isValidId = Number.isInteger(id) && id > 0
@@ -33,6 +25,16 @@ export function ServiceDetail() {
   const [error, setError] = useState("")
   // Id dont la réponse (succès ou erreur) a été reçue : évite d'afficher l'ancien service pendant un changement d'id
   const [loadedId, setLoadedId] = useState<number | null>(null)
+
+  const backLink = (
+    <Link
+      href="/dashboard/services"
+      className="inline-flex items-center gap-2 text-sm font-medium text-secondary-foreground transition-colors hover:text-primary"
+    >
+      <ArrowLeft className="size-4" aria-hidden="true" />
+      {t("serviceDetail.backLink")}
+    </Link>
+  )
 
   useEffect(() => {
     if (!isValidId) return
@@ -50,10 +52,10 @@ export function ServiceDetail() {
         if (!mounted) return
         setError(
           cause instanceof AuthApiError && cause.status === 404
-            ? "Ce service est introuvable ou n’est plus disponible."
+            ? t("serviceDetail.notFound")
             : cause instanceof Error
               ? cause.message
-              : "Chargement impossible"
+              : t("serviceDetail.loadError")
         )
         setLoadedId(id)
       })
@@ -61,15 +63,16 @@ export function ServiceDetail() {
     return () => {
       mounted = false
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-fetch uniquement sur changement d'id
   }, [id, isValidId])
 
   if (!isValidId || (loadedId === id && error)) {
     return (
       <div className="space-y-6">
-        {BACK_LINK}
+        {backLink}
         <p role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
           <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          {isValidId ? error : "Identifiant de service invalide."}
+          {isValidId ? error : t("serviceDetail.invalidId")}
         </p>
       </div>
     )
@@ -78,7 +81,7 @@ export function ServiceDetail() {
   if (!service || loadedId !== id) {
     return (
       <div className="space-y-6">
-        {BACK_LINK}
+        {backLink}
         <Skeleton className="h-48 rounded-2xl" />
         <Skeleton className="h-32 rounded-2xl" />
       </div>
@@ -87,7 +90,7 @@ export function ServiceDetail() {
 
   return (
     <div className="space-y-8">
-      {BACK_LINK}
+      {backLink}
 
       <header className="flex flex-col gap-5 rounded-2xl border border-border/80 bg-card/75 p-6 shadow-sm backdrop-blur-sm sm:flex-row sm:items-start sm:p-8">
         <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-accent text-accent-foreground">
@@ -95,8 +98,8 @@ export function ServiceDetail() {
         </span>
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-medium text-primary">Service municipal</p>
-            {!service.isActive && <Badge variant="outline">Désactivé</Badge>}
+            <p className="text-sm font-medium text-primary">{t("serviceDetail.eyebrow")}</p>
+            {!service.isActive && <Badge variant="outline">{t("serviceDetail.disabledBadge")}</Badge>}
           </div>
           <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">{service.name}</h1>
         </div>
@@ -104,26 +107,26 @@ export function ServiceDetail() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
         <section aria-labelledby="service-about" className="rounded-2xl border border-border/80 bg-card/70 p-6 shadow-sm backdrop-blur-sm">
-          <h2 id="service-about" className="text-lg font-semibold">Pour quels besoins ?</h2>
+          <h2 id="service-about" className="text-lg font-semibold">{t("serviceDetail.aboutHeading")}</h2>
           <p className="mt-3 whitespace-pre-line text-sm leading-7 text-muted-foreground">
-            {service.description || "Aucune description n’est disponible pour ce service."}
+            {service.description || t("serviceDetail.noDescription")}
           </p>
         </section>
 
         <aside aria-labelledby="service-infos" className="space-y-3 rounded-2xl border border-border/80 bg-card/70 p-6 shadow-sm backdrop-blur-sm">
-          <h2 id="service-infos" className="text-sm font-semibold">Informations pratiques</h2>
+          <h2 id="service-infos" className="text-sm font-semibold">{t("serviceDetail.infoHeading")}</h2>
           <dl className="space-y-3 text-sm">
             <div className="flex items-start gap-2">
               <Hash className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
               <div>
-                <dt className="text-xs text-muted-foreground">Référence</dt>
+                <dt className="text-xs text-muted-foreground">{t("serviceDetail.reference")}</dt>
                 <dd className="font-mono">{service.code}</dd>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <CalendarClock className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
               <div>
-                <dt className="text-xs text-muted-foreground">Dernière mise à jour</dt>
+                <dt className="text-xs text-muted-foreground">{t("serviceDetail.lastUpdate")}</dt>
                 <dd>{formatDate(service.updatedAt)}</dd>
               </div>
             </div>
@@ -133,7 +136,7 @@ export function ServiceDetail() {
 
       {others.length > 0 && (
         <section aria-labelledby="other-services" className="space-y-3">
-          <h2 id="other-services" className="text-lg font-semibold">Ce n’est pas ce que vous cherchez ?</h2>
+          <h2 id="other-services" className="text-lg font-semibold">{t("serviceDetail.otherServicesHeading")}</h2>
           <ul className="grid gap-3 md:grid-cols-3">
             {others.map((other) => (
               <li key={other.id}>

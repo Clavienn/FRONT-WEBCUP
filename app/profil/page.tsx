@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { ArrowLeftIcon, CalendarIcon, LogOutIcon, MailIcon, MonitorSmartphoneIcon, UserIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { DashboardFrame } from "@/components/dashboard/dashboard-shell"
 import { roleLabel } from "@/repository/auth.repository"
 import { PasswordForm } from "@/components/profile/password-form"
@@ -29,18 +30,19 @@ import {
 const formatDate = (value: string) =>
   new Date(value).toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short" })
 
-const notifyError = (err: unknown) =>
-  toast.add({
-    title: "Erreur",
-    description: err instanceof Error ? err.message : "Une erreur est survenue",
-    type: "error",
-  })
-
 export default function ProfilPage() {
   const router = useRouter()
   const { user, isLoading, reloadUser, signOut, signOutEverywhere } = useAuth()
+  const { t } = useLanguage()
   const [signingOut, setSigningOut] = useState<"one" | "all" | null>(null)
   const [confirmAll, setConfirmAll] = useState(false)
+
+  const notifyError = (err: unknown) =>
+    toast.add({
+      title: t("profilePage.errorTitle"),
+      description: err instanceof Error ? err.message : t("profilePage.errorFallback"),
+      type: "error",
+    })
 
   // Pas de session : retour à la connexion
   useEffect(() => {
@@ -79,11 +81,11 @@ export default function ProfilPage() {
     user.email[0].toUpperCase()
 
   const details = [
-    { icon: MailIcon, label: "Adresse e-mail", value: user.email },
-    { icon: UserIcon, label: "Prénom", value: user.firstName || "—" },
-    { icon: UserIcon, label: "Nom", value: user.lastName || "—" },
-    { icon: CalendarIcon, label: "Membre depuis", value: formatDate(user.createdAt) },
-    { icon: CalendarIcon, label: "Dernière mise à jour", value: formatDate(user.updatedAt) },
+    { icon: MailIcon, label: t("profilePage.fields.email"), value: user.email },
+    { icon: UserIcon, label: t("profilePage.fields.firstName"), value: user.firstName || "—" },
+    { icon: UserIcon, label: t("profilePage.fields.lastName"), value: user.lastName || "—" },
+    { icon: CalendarIcon, label: t("profilePage.fields.memberSince"), value: formatDate(user.createdAt) },
+    { icon: CalendarIcon, label: t("profilePage.fields.lastUpdate"), value: formatDate(user.updatedAt) },
   ]
 
   return (
@@ -92,13 +94,13 @@ export default function ProfilPage() {
           <div className="flex items-end justify-between gap-4">
             <div className="space-y-2">
               <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/dashboard" />}>
-                <ArrowLeftIcon /> Tableau de bord
+                <ArrowLeftIcon /> {t("profilePage.backToDashboard")}
               </Button>
-              <h1 className="text-2xl font-medium tracking-tight text-foreground">Mon profil</h1>
+              <h1 className="text-2xl font-medium tracking-tight text-foreground">{t("profilePage.title")}</h1>
             </div>
             <Button variant="destructive" onClick={() => handleSignOut("one")} disabled={signingOut !== null}>
               {signingOut === "one" ? <Spinner /> : <LogOutIcon />}
-              Se déconnecter
+              {t("profilePage.signOut")}
             </Button>
           </div>
 
@@ -110,7 +112,7 @@ export default function ProfilPage() {
               <div className="min-w-0">
                 <p className="truncate text-lg font-medium text-foreground">{fullName || user.email}</p>
                 <Badge variant={user.roles.includes("admin") ? "default" : "secondary"} className="mt-1">
-                  {roleLabel(user)}
+                  {t(`roles.${roleLabel(user)}`)}
                 </Badge>
               </div>
             </div>
@@ -128,8 +130,8 @@ export default function ProfilPage() {
 
           <section className="rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm">
             <div className="mb-5">
-              <h2 className="font-medium text-foreground">Modifier le profil</h2>
-              <p className="text-sm text-muted-foreground">Mettez à jour votre nom et votre adresse e-mail.</p>
+              <h2 className="font-medium text-foreground">{t("profilePage.editTitle")}</h2>
+              <p className="text-sm text-muted-foreground">{t("profilePage.editSubtitle")}</p>
             </div>
             {/* key : réinitialise le formulaire quand le profil est rechargé ou enregistré */}
             <ProfileForm key={`${user.id}-${user.updatedAt}`} user={user} />
@@ -137,9 +139,9 @@ export default function ProfilPage() {
 
           <section className="rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm">
             <div className="mb-5">
-              <h2 className="font-medium text-foreground">Mot de passe</h2>
+              <h2 className="font-medium text-foreground">{t("profilePage.passwordTitle")}</h2>
               <p className="text-sm text-muted-foreground">
-                Les autres appareils seront déconnectés après le changement.
+                {t("profilePage.passwordSubtitle")}
               </p>
             </div>
             <PasswordForm />
@@ -147,14 +149,14 @@ export default function ProfilPage() {
 
           <section className="flex flex-col gap-3 rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="font-medium text-foreground">Sessions</p>
+              <p className="font-medium text-foreground">{t("profilePage.sessionsTitle")}</p>
               <p className="text-sm text-muted-foreground">
-                Déconnecte ce compte sur tous les appareils où il est connecté.
+                {t("profilePage.sessionsSubtitle")}
               </p>
             </div>
             <Button variant="outline" onClick={() => setConfirmAll(true)} disabled={signingOut !== null}>
               {signingOut === "all" ? <Spinner /> : <MonitorSmartphoneIcon />}
-              Déconnecter partout
+              {t("profilePage.signOutEverywhere")}
             </Button>
           </section>
         </div>
@@ -162,13 +164,13 @@ export default function ProfilPage() {
         <AlertDialog open={confirmAll} onOpenChange={setConfirmAll}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Se déconnecter de tous les appareils ?</AlertDialogTitle>
+              <AlertDialogTitle>{t("profilePage.confirmDialog.title")}</AlertDialogTitle>
               <AlertDialogDescription>
-                Toutes vos sessions actives seront fermées, y compris celle-ci.
+                {t("profilePage.confirmDialog.description")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogCancel>{t("profilePage.confirmDialog.cancel")}</AlertDialogCancel>
               <AlertDialogAction
                 variant="destructive"
                 onClick={() => {
@@ -176,7 +178,7 @@ export default function ProfilPage() {
                   handleSignOut("all")
                 }}
               >
-                Tout déconnecter
+                {t("profilePage.confirmDialog.confirm")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

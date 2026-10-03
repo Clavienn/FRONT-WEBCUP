@@ -5,12 +5,14 @@ import Link from "next/link"
 import { ArrowRight, CircleAlert, Search } from "lucide-react"
 
 import { ServiceIcon } from "@/components/services/service-icon"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { serviceRepository, type MunicipalService } from "@/repository/service.repository"
 
 export function ServicesList() {
+  const { t } = useLanguage()
   const [services, setServices] = useState<MunicipalService[] | null>(null)
   const [error, setError] = useState("")
   const [query, setQuery] = useState("")
@@ -20,10 +22,11 @@ export function ServicesList() {
     serviceRepository
       .list()
       .then((data) => mounted && setServices(data))
-      .catch((cause) => mounted && setError(cause instanceof Error ? cause.message : "Chargement impossible"))
+      .catch((cause) => mounted && setError(cause instanceof Error ? cause.message : t("servicesList.loadError")))
     return () => {
       mounted = false
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chargement unique au montage ; t() n'a pas besoin de redéclencher le fetch
   }, [])
 
   const filtered = useMemo(() => {
@@ -38,18 +41,18 @@ export function ServicesList() {
     <>
       <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm font-medium text-primary">Haut Conseil de Terra Nova</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">Services municipaux</h1>
+          <p className="text-sm font-medium text-primary">{t("servicesList.eyebrow")}</p>
+          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("servicesList.title")}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Découvrez les services de Terra Nova et trouvez celui qui répond à votre besoin. Sélectionnez un service pour accéder à ses informations.
+            {t("servicesList.subtitle")}
           </p>
         </div>
         <div className="relative w-full sm:w-72">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <Input
             type="search"
-            aria-label="Rechercher un service"
-            placeholder="Rechercher un service"
+            aria-label={t("servicesList.searchAriaLabel")}
+            placeholder={t("servicesList.searchPlaceholder")}
             className="pl-9"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -70,7 +73,7 @@ export function ServicesList() {
         </div>
       ) : filtered.length === 0 ? (
         <p className="rounded-2xl border border-border/80 bg-card/70 p-8 text-center text-sm text-muted-foreground">
-          {query ? "Aucun service ne correspond à votre recherche." : "Aucun service disponible pour le moment."}
+          {query ? t("servicesList.noResultsQuery") : t("servicesList.noResults")}
         </p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -88,10 +91,10 @@ export function ServicesList() {
                 </div>
                 <h2 className="mt-4 text-base font-semibold">{service.name}</h2>
                 <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
-                  {service.description || "Aucune description."}
+                  {service.description || t("servicesList.noDescription")}
                 </p>
                 <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-                  Voir les informations
+                  {t("servicesList.seeInfo")}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </span>
               </Link>

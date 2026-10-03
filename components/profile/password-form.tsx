@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react"
 import { CircleAlert, KeyRoundIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -12,6 +13,7 @@ import { toast } from "@/components/ui/toast"
 
 export function PasswordForm() {
   const { changePassword } = useAuth()
+  const { t } = useLanguage()
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -22,11 +24,11 @@ export function PasswordForm() {
     event.preventDefault()
     setError("")
     if (newPassword !== confirmPassword) {
-      setError("Les deux mots de passe ne correspondent pas.")
+      setError(t("passwordForm.errorMismatch"))
       return
     }
     if (newPassword === currentPassword) {
-      setError("Le nouveau mot de passe doit être différent de l’actuel.")
+      setError(t("passwordForm.errorSameAsOld"))
       return
     }
 
@@ -37,12 +39,12 @@ export function PasswordForm() {
       setNewPassword("")
       setConfirmPassword("")
       toast.add({
-        title: "Mot de passe modifié",
-        description: "Vos autres sessions ont été déconnectées.",
+        title: t("passwordForm.successTitle"),
+        description: t("passwordForm.successDescription"),
         type: "success",
       })
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue. Réessayez.")
+      setError(err instanceof Error ? err.message : t("passwordForm.errorGeneric"))
     } finally {
       setSaving(false)
     }
@@ -51,7 +53,7 @@ export function PasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="currentPassword">Mot de passe actuel</Label>
+        <Label htmlFor="currentPassword">{t("passwordForm.currentPassword")}</Label>
         <Input
           id="currentPassword"
           type="password"
@@ -64,7 +66,7 @@ export function PasswordForm() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="newPassword">Nouveau mot de passe</Label>
+          <Label htmlFor="newPassword">{t("passwordForm.newPassword")}</Label>
           <Input
             id="newPassword"
             type="password"
@@ -74,10 +76,10 @@ export function PasswordForm() {
             onChange={(event) => setNewPassword(event.target.value)}
             required
           />
-          <p className="text-xs text-muted-foreground">8 caractères minimum.</p>
+          <p className="text-xs text-muted-foreground">{t("passwordForm.minLengthHint")}</p>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirmation</Label>
+          <Label htmlFor="confirmPassword">{t("passwordForm.confirmPassword")}</Label>
           <Input
             id="confirmPassword"
             type="password"
@@ -100,7 +102,7 @@ export function PasswordForm() {
       <div className="flex justify-end">
         <Button type="submit" disabled={saving}>
           {saving ? <Spinner /> : <KeyRoundIcon />}
-          Changer le mot de passe
+          {t("passwordForm.submit")}
         </Button>
       </div>
     </form>
