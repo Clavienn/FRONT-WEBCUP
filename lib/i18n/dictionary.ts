@@ -89,6 +89,17 @@ const fr = {
     empty: "Aucune annonce du Haut Conseil pour le moment. Revenez bientôt.",
   },
 
+  projectsSection: {
+    title: "Les derniers projets de la ville",
+    error: "Les projets sont momentanément indisponibles. Merci de réessayer plus tard.",
+    seeProject: "Voir le projet",
+    status: {
+      planned: "À venir",
+      ongoing: "En cours",
+      completed: "Terminé",
+    },
+  },
+
   audiences: {
     title: "Une plateforme pensée pour chacun",
     groups: {
@@ -174,6 +185,7 @@ const fr = {
       accueil: "Accueil",
       servicesMunicipaux: "Services municipaux",
       lieuxUtiles: "Lieux utiles",
+      projets: "Projets",
       annonces: "Annonces",
       monProfil: "Mon profil",
       lightMode: "Mode clair",
@@ -190,6 +202,7 @@ const fr = {
       historiqueOperations: "Historique des opérations",
       gererEtablissements: "Gérer les établissements",
       gererServices: "Gérer les services",
+      gererProjets: "Gérer les projets",
       messagesHabitants: "Messages des habitants",
       utilisateurs: "Utilisateurs",
       roles: "Rôles",
@@ -263,6 +276,17 @@ const fr = {
       establishmentCreate: "Création d’un établissement",
       establishmentUpdate: "Modification d’un établissement",
       establishmentDelete: "Suppression d’un établissement",
+      projectCreate: "Création d’un projet",
+      projectUpdate: "Modification d’un projet",
+      projectDelete: "Suppression d’un projet",
+      projectParticipantAdd: "Personne associée à un projet",
+      projectParticipantRemove: "Personne retirée d’un projet",
+      projectEntityAdd: "Entité externe associée à un projet",
+      projectEntityRemove: "Entité externe retirée d’un projet",
+      projectCommentCreate: "Avis déposé sur un projet",
+      projectCommentDelete: "Avis supprimé (modération)",
+      externalEntityCreate: "Création d’une entité externe",
+      externalEntityDelete: "Suppression d’une entité externe",
     },
     entities: {
       user: "Utilisateur",
@@ -271,6 +295,9 @@ const fr = {
       municipalService: "Service",
       service: "Service",
       establishment: "Établissement",
+      project: "Projet",
+      projectComment: "Avis sur un projet",
+      externalEntity: "Entité externe",
       announcement: "Annonce",
       contactMessage: "Message",
       contactMessagesRoute: "Message",
@@ -306,6 +333,7 @@ const fr = {
       groupRbac: "Rôles et permissions",
       groupServices: "Services municipaux",
       groupEstablishments: "Établissements (carte)",
+      groupProjects: "Projets de la ville",
       groupAccounts: "Comptes et sessions",
     },
     adminPage: {
@@ -421,6 +449,7 @@ const fr = {
     title: "Bienvenue sur Terra Nova",
     titleNamed: "Bienvenue sur Terra Nova, {{name}}",
     description: "Votre espace citoyen est prêt. Voici trois façons simples de commencer.",
+    descriptionStaff: "Votre console est prête. Voici trois façons simples de commencer.",
     profile: {
       title: "Compléter votre profil",
       description: "Ajoutez votre téléphone et votre adresse pour être joint plus facilement.",
@@ -432,6 +461,10 @@ const fr = {
     request: {
       title: "Faire une démarche ou une demande",
       description: "Déposez une demande à la ville et suivez son traitement.",
+    },
+    queue: {
+      title: "Traiter les demandes citoyennes",
+      description: "Consultez la file des demandes déposées par les habitants et faites-les avancer.",
     },
     later: "Explorer plus tard",
   },
@@ -489,6 +522,11 @@ const fr = {
     filterResolved: "Acceptées",
     filterRejected: "Refusées",
     mineOnly: "Mes demandes",
+    totalLabel: "{{count}} demande(s)",
+    paginationLabel: "Pagination",
+    previousLabel: "Précédent",
+    nextLabel: "Suivant",
+    pageLabel: "Page {{page}} sur {{pages}}",
     refreshLabel: "Actualiser",
     emptyTitle: "Aucune demande à traiter",
     emptyDescription: "Les demandes déposées par les habitants apparaissent ici.",
@@ -762,6 +800,23 @@ const fr = {
     errorFallback: "Une erreur est survenue",
   },
 
+  deleteAccount: {
+    title: "Supprimer mon compte",
+    subtitle: "Cette action est définitive et retire vos données personnelles.",
+    trigger: "Supprimer mon compte",
+    dialogTitle: "Supprimer définitivement votre compte ?",
+    dialogDescription: "Cette action est irréversible. Confirmez avec votre mot de passe actuel.",
+    consequences: [
+      "Votre compte et vos accès sont supprimés immédiatement.",
+      "Vos demandes, rendez-vous et notifications sont effacés.",
+      "Vous ne pourrez plus vous reconnecter avec cette adresse e-mail.",
+    ],
+    passwordLabel: "Mot de passe actuel",
+    confirm: "Supprimer définitivement",
+    cancel: "Annuler",
+    errorGeneric: "Une erreur est survenue. Réessayez.",
+  },
+
   passwordForm: {
     currentPassword: "Mot de passe actuel",
     newPassword: "Nouveau mot de passe",
@@ -792,6 +847,7 @@ const fr = {
 
   authForm: {
     backToHome: "Retour à l'accueil",
+    accountDeleted: "Votre compte et vos données ont été supprimés.",
     brandTagline: "Console des agents",
     kicker: "Haut Conseil de Terra Nova",
     titleLogin: "Connexion",
@@ -848,6 +904,28 @@ const fr = {
     submitError: "Impossible d'envoyer votre demande.",
   },
 
+  serviceReviews: {
+    title: "Avis des citoyens",
+    count: "{{count}} avis",
+    noReviews: "Aucun avis pour le moment.",
+    rateButton: "Donner mon avis",
+    reviewedBadge: "Vous avez donné votre avis",
+    reviewedShort: "Avis envoyé",
+    dialogTitle: "Votre avis sur « {{name}} »",
+    dialogDescription: "Votre demande a été traitée : dites-nous comment cela s'est passé. Votre avis sera visible des autres citoyens.",
+    ratingLabel: "Note",
+    starsAria: "{{count}} sur 5",
+    ratingRequired: "Choisissez une note de 1 à 5.",
+    commentLabel: "Commentaire",
+    commentPlaceholder: "Racontez votre expérience avec ce service…",
+    submit: "Envoyer mon avis",
+    cancel: "Annuler",
+    sendError: "Impossible d'envoyer votre avis.",
+    success: "Merci, votre avis a été publié.",
+    loadMore: "Voir plus d'avis",
+    averageAria: "Note moyenne : {{value}} sur 5",
+  },
+
   servicesList: {
     eyebrow: "Haut Conseil de Terra Nova",
     title: "Services municipaux",
@@ -896,6 +974,43 @@ const fr = {
   themeToggle: {
     activateLight: "Activer le mode clair",
     activateDark: "Activer le mode sombre",
+  },
+
+  projectsList: {
+    eyebrow: "Haut Conseil de Terra Nova",
+    title: "Projets de la ville",
+    subtitle: "Les projets en cours à Terra Nova. Consultez-les et donnez votre avis.",
+    noDescription: "Aucune description.",
+    noResults: "Aucun projet pour le moment.",
+    loadError: "Chargement impossible",
+    progressLabel: "Avancement",
+    status: {
+      planned: "À venir",
+      ongoing: "En cours",
+      completed: "Terminé",
+    },
+  },
+
+  projectDetail: {
+    backLink: "Tous les projets",
+    eyebrow: "Projet municipal",
+    proposedBy: "Proposé par {{name}}",
+    aboutHeading: "Le projet",
+    noDescription: "Aucune description n'est disponible pour ce projet.",
+    participantsHeading: "Personnes associées",
+    noParticipants: "Aucune personne associée pour le moment.",
+    entitiesHeading: "Entités externes",
+    noEntities: "Aucune entité externe associée.",
+    commentsHeading: "{{count}} avis",
+    commentsEmpty: "Aucun avis pour le moment. Soyez le premier à réagir.",
+    commentPlaceholder: "Donnez votre avis sur ce projet…",
+    commentSubmit: "Envoyer mon avis",
+    commentRequired: "Votre avis ne peut pas être vide.",
+    commentError: "Impossible d'enregistrer votre avis pour le moment.",
+    anonymous: "Utilisateur",
+    notFound: "Ce projet est introuvable.",
+    invalidId: "Identifiant de projet invalide.",
+    loadError: "Chargement impossible",
   },
 }
 
@@ -984,6 +1099,17 @@ const en = {
     empty: "No announcements from the High Council yet. Check back soon.",
   },
 
+  projectsSection: {
+    title: "The city's latest projects",
+    error: "Projects are temporarily unavailable. Please try again later.",
+    seeProject: "See the project",
+    status: {
+      planned: "Planned",
+      ongoing: "Ongoing",
+      completed: "Completed",
+    },
+  },
+
   audiences: {
     title: "A platform designed for everyone",
     groups: {
@@ -1067,6 +1193,7 @@ const en = {
       accueil: "Home",
       servicesMunicipaux: "Municipal services",
       lieuxUtiles: "Useful places",
+      projets: "Projects",
       annonces: "Announcements",
       monProfil: "My profile",
       lightMode: "Light mode",
@@ -1083,6 +1210,7 @@ const en = {
       historiqueOperations: "Activity history",
       gererEtablissements: "Manage facilities",
       gererServices: "Manage services",
+      gererProjets: "Manage projects",
       messagesHabitants: "Resident messages",
       utilisateurs: "Users",
       roles: "Roles",
@@ -1156,6 +1284,17 @@ const en = {
       establishmentCreate: "Facility created",
       establishmentUpdate: "Facility updated",
       establishmentDelete: "Facility deleted",
+      projectCreate: "Project created",
+      projectUpdate: "Project updated",
+      projectDelete: "Project deleted",
+      projectParticipantAdd: "Person added to a project",
+      projectParticipantRemove: "Person removed from a project",
+      projectEntityAdd: "External entity added to a project",
+      projectEntityRemove: "External entity removed from a project",
+      projectCommentCreate: "Opinion posted on a project",
+      projectCommentDelete: "Opinion deleted (moderation)",
+      externalEntityCreate: "External entity created",
+      externalEntityDelete: "External entity deleted",
     },
     entities: {
       user: "User",
@@ -1164,6 +1303,9 @@ const en = {
       municipalService: "Service",
       service: "Service",
       establishment: "Facility",
+      project: "Project",
+      projectComment: "Project opinion",
+      externalEntity: "External entity",
       announcement: "Announcement",
       contactMessage: "Message",
       contactMessagesRoute: "Message",
@@ -1199,6 +1341,7 @@ const en = {
       groupRbac: "Roles and permissions",
       groupServices: "Municipal services",
       groupEstablishments: "Facilities (map)",
+      groupProjects: "City projects",
       groupAccounts: "Accounts and sessions",
     },
     adminPage: {
@@ -1311,6 +1454,7 @@ const en = {
     title: "Welcome to Terra Nova",
     titleNamed: "Welcome to Terra Nova, {{name}}",
     description: "Your citizen space is ready. Here are three simple ways to get started.",
+    descriptionStaff: "Your console is ready. Here are three simple ways to get started.",
     profile: {
       title: "Complete your profile",
       description: "Add your phone number and address so the city can reach you more easily.",
@@ -1322,6 +1466,10 @@ const en = {
     request: {
       title: "Submit a request",
       description: "Send a request to the city and follow how it is handled.",
+    },
+    queue: {
+      title: "Handle citizen requests",
+      description: "Review the queue of requests submitted by residents and move them forward.",
     },
     later: "Explore later",
   },
@@ -1378,6 +1526,11 @@ const en = {
     filterResolved: "Accepted",
     filterRejected: "Refused",
     mineOnly: "My requests",
+    totalLabel: "{{count}} request(s)",
+    paginationLabel: "Pagination",
+    previousLabel: "Previous",
+    nextLabel: "Next",
+    pageLabel: "Page {{page}} of {{pages}}",
     refreshLabel: "Refresh",
     emptyTitle: "No request to handle",
     emptyDescription: "Requests submitted by residents appear here.",
@@ -1649,6 +1802,23 @@ const en = {
     errorFallback: "An error occurred",
   },
 
+  deleteAccount: {
+    title: "Delete my account",
+    subtitle: "This action is permanent and removes your personal data.",
+    trigger: "Delete my account",
+    dialogTitle: "Permanently delete your account?",
+    dialogDescription: "This action cannot be undone. Confirm with your current password.",
+    consequences: [
+      "Your account and access are removed immediately.",
+      "Your requests, appointments and notifications are erased.",
+      "You will no longer be able to sign in with this email address.",
+    ],
+    passwordLabel: "Current password",
+    confirm: "Delete permanently",
+    cancel: "Cancel",
+    errorGeneric: "An error occurred. Please try again.",
+  },
+
   passwordForm: {
     currentPassword: "Current password",
     newPassword: "New password",
@@ -1679,6 +1849,7 @@ const en = {
 
   authForm: {
     backToHome: "Back to home",
+    accountDeleted: "Your account and data have been deleted.",
     brandTagline: "Agent console",
     kicker: "High Council of Terra Nova",
     titleLogin: "Sign in",
@@ -1735,6 +1906,28 @@ const en = {
     submitError: "Your request could not be sent.",
   },
 
+  serviceReviews: {
+    title: "Citizen reviews",
+    count: "{{count}} review(s)",
+    noReviews: "No reviews yet.",
+    rateButton: "Leave a review",
+    reviewedBadge: "You have left a review",
+    reviewedShort: "Review sent",
+    dialogTitle: "Your review of \"{{name}}\"",
+    dialogDescription: "Your request has been processed: tell us how it went. Your review will be visible to other citizens.",
+    ratingLabel: "Rating",
+    starsAria: "{{count}} out of 5",
+    ratingRequired: "Choose a rating from 1 to 5.",
+    commentLabel: "Comment",
+    commentPlaceholder: "Tell us about your experience with this service…",
+    submit: "Send my review",
+    cancel: "Cancel",
+    sendError: "Your review could not be sent.",
+    success: "Thank you, your review has been published.",
+    loadMore: "Show more reviews",
+    averageAria: "Average rating: {{value}} out of 5",
+  },
+
   servicesList: {
     eyebrow: "High Council of Terra Nova",
     title: "Municipal services",
@@ -1782,6 +1975,43 @@ const en = {
   themeToggle: {
     activateLight: "Switch to light mode",
     activateDark: "Switch to dark mode",
+  },
+
+  projectsList: {
+    eyebrow: "High Council of Terra Nova",
+    title: "City projects",
+    subtitle: "Ongoing projects in Terra Nova. Have a look and share your opinion.",
+    noDescription: "No description.",
+    noResults: "No project yet.",
+    loadError: "Couldn't load",
+    progressLabel: "Progress",
+    status: {
+      planned: "Planned",
+      ongoing: "Ongoing",
+      completed: "Completed",
+    },
+  },
+
+  projectDetail: {
+    backLink: "All projects",
+    eyebrow: "Municipal project",
+    proposedBy: "Proposed by {{name}}",
+    aboutHeading: "The project",
+    noDescription: "No description is available for this project.",
+    participantsHeading: "People involved",
+    noParticipants: "No one associated yet.",
+    entitiesHeading: "External entities",
+    noEntities: "No external entity associated.",
+    commentsHeading: "{{count}} opinions",
+    commentsEmpty: "No opinion yet. Be the first to react.",
+    commentPlaceholder: "Share your opinion on this project…",
+    commentSubmit: "Send my opinion",
+    commentRequired: "Your opinion can't be empty.",
+    commentError: "Couldn't save your opinion right now.",
+    anonymous: "User",
+    notFound: "This project can't be found.",
+    invalidId: "Invalid project identifier.",
+    loadError: "Couldn't load",
   },
 }
 

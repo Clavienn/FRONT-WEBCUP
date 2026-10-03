@@ -41,6 +41,12 @@ export interface ProfileUpdate {
   address?: string | null
 }
 
+// Réponse de GET /auth/me/welcome : le serveur décide si l'accueil est proposé (moins de 2 sessions ouvertes)
+export interface WelcomeStatus {
+  showWelcome: boolean
+  sessionCount: number
+}
+
 export interface PasswordChange {
   currentPassword: string
   newPassword: string
@@ -148,7 +154,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   const headers = new Headers(init.headers)
-  if (init.body && !headers.has("Content-Type")) {
+  // FormData (upload de fichier) : laisser fetch poser son propre Content-Type avec la boundary
+  if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json")
   }
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`)
@@ -231,6 +238,8 @@ export const authRepository = {
     return normalizeAuthUser(await authorizedRequest<unknown>("/auth/me"))
   },
 
+  welcomeStatus: () => authorizedRequest<WelcomeStatus>("/auth/me/welcome"),
+
   async updateProfile(data: ProfileUpdate) {
     return normalizeAuthUser(
       await authorizedRequest<unknown>("/auth/me", { method: "PATCH", body: JSON.stringify(data) })
@@ -262,6 +271,17 @@ export const authRepository = {
     } finally {
       accessToken = null
     }
+  },
+
+  // Suppression définitive du compte. Le token n'est lâché qu'en cas de succès : sur un refus
+  // (mot de passe erroné) la session est toujours valide et doit rester utilisable pour
+  // que l'utilisateur puisse réessayer.
+  async deleteAccount(password: string): Promise<void> {
+    await authorizedRequest<void>("/auth/me", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+    })
+    accessToken = null
   },
 
   clearAccessToken() {

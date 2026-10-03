@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, CircleAlert, ShieldCheck } from "lucide-react"
+import { ArrowRight, CircleAlert, CircleCheck, ShieldCheck } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
 import { LegalDocumentDialog } from "@/components/legal/legal-document-dialog"
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { isPasswordStrong, PasswordRequirements } from "@/components/auth/password-requirements"
+import { ACCOUNT_DELETED_KEY } from "@/components/profile/delete-account-section"
 import type { SignupRole } from "@/repository/auth.repository"
 
 const signupRoles: SignupRole[] = ["citizen", "agent"]
@@ -36,7 +37,17 @@ export function AuthForm() {
   const [role, setRole] = useState<SignupRole>("citizen")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  // Lu dans l'initialiseur et non dans un effet : le rendu de React peut s'exécuter deux fois en
+  // StrictMode, mais le drapeau n'est effacé que par l'effet ci-dessous, donc le message reste.
+  const [accountDeleted] = useState(
+    () => typeof window !== "undefined" && window.sessionStorage.getItem(ACCOUNT_DELETED_KEY) === "1"
+  )
   const isRegistering = mode === "register"
+
+  // Le drapeau ne vaut que pour l'arrivée sur la page : le retirer évite de le revoir plus tard.
+  useEffect(() => {
+    if (accountDeleted) window.sessionStorage.removeItem(ACCOUNT_DELETED_KEY)
+  }, [accountDeleted])
 
   useEffect(() => {
     if (!isLoading && user) router.replace("/dashboard")
@@ -92,6 +103,16 @@ export function AuthForm() {
           ]}
           className="mb-6"
         />
+
+        {accountDeleted && (
+          <p
+            role="status"
+            className="mb-6 flex items-start gap-2 rounded-xl border border-primary/30 bg-accent px-4 py-3 text-sm text-foreground"
+          >
+            <CircleCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+            <span>{t("authForm.accountDeleted")}</span>
+          </p>
+        )}
 
         <div className="rounded-2xl border border-border/80 bg-card/85 p-6 shadow-[0_16px_48px_rgba(30,55,90,0.08)] backdrop-blur-xl sm:p-8">
           <div className="mb-8 flex items-center gap-3">

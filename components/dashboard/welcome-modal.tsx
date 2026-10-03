@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { ClipboardPlus, Landmark, UserRoundCog, type LucideIcon } from "lucide-react"
+import { ClipboardPlus, Inbox, Landmark, UserRoundCog, type LucideIcon } from "lucide-react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
@@ -14,9 +14,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { isStaff, type AuthUser } from "@/repository/auth.repository"
+import { authRepository, isStaff, type AuthUser } from "@/repository/auth.repository"
 
 // Une clé par utilisateur : deux comptes sur le même navigateur voient chacun la modale une fois.
+// C'est un garde-fou en plus du serveur, qui ne compte que les sessions ouvertes (voir WelcomeModal).
 const storageKey = (userId: number) => `terra-nova-welcome-seen:${userId}`
 
 // localStorage peut lever (navigation privée, stockage bloqué) : dans ce cas on n'affiche rien
@@ -38,42 +39,62 @@ function markSeen(userId: number) {
 }
 
 interface WelcomeAction {
-  key: "profile" | "services" | "request"
+  key: "profile" | "services" | "request" | "queue"
   icon: LucideIcon
   href: string
   // Permission requise ; absente = toujours proposée
   permission?: string
+  // Vue du dashboard où la cible existe ; absente = les deux. L'ancre "Mes démarches" n'existe que
+  // dans la vue citoyenne : proposer la même cible à un agent l'enverrait sur une page sans effet.
+  view?: "citizen" | "staff"
 }
 
 const ACTIONS: WelcomeAction[] = [
   { key: "profile", icon: UserRoundCog, href: "/profil" },
   { key: "services", icon: Landmark, href: "/dashboard/services", permission: "citizen.services.view" },
-  { key: "request", icon: ClipboardPlus, href: "/dashboard#recent-requests-title", permission: "citizen.requests.create" },
+  { key: "request", icon: ClipboardPlus, href: "/dashboard#recent-requests-title", permission: "citizen.requests.create", view: "citizen" },
+  { key: "queue", icon: Inbox, href: "/dashboard/agent/requests", permission: "agent.requests.view", view: "staff" },
 ]
 
 /**
- * Accueil de l'espace citoyen, affiché une seule fois par utilisateur : trois premiers pas.
+ * Accueil du dashboard, affiché une seule fois par utilisateur : trois premiers pas. Les citoyens,
+ * les agents et les administrateurs le voient ; seule la 3e action change (déposer une demande
+ * pour un citoyen, ouvrir la file des demandes pour le personnel).
+ *
+ * Deux conditions, toutes deux nécessaires :
+ *  1. le serveur répond showWelcome (moins de 2 sessions ouvertes pour ce compte) ;
+ *  2. cet utilisateur ne l'a pas déjà vue sur ce navigateur. Sans cela, se déconnecter puis se
+ *     reconnecter repasse le compte à 1 session et la modale reviendrait à chaque connexion.
  * Il est marqué comme vu dès son affichage, pas à sa fermeture : recharger la page ou le
- * fermer avec Échap ne le fait pas réapparaître. Réservé aux citoyens (les agents et
- * administrateurs ont une console, pas ces trois démarches).
+ * fermer avec Échap ne le fait pas réapparaître. Si le serveur ne répond pas, rien n'est affiché.
  */
 export function WelcomeModal({ user }: Readonly<{ user: AuthUser }>) {
   const { t } = useLanguage()
-  const eligible = !isStaff(user)
-  // Calculé à la création : ce composant n'est monté qu'une fois l'utilisateur connu (le cadre du
-  // dashboard affiche un spinner avant), donc jamais rendu côté serveur et sans écart d'hydratation.
-  const [open, setOpen] = useState(() => eligible && !alreadySeen(user.id))
+  const staff = isStaff(user)
+  const [open, setOpen] = useState(false)
 
-  // Marqué comme vu dès l'affichage : fermer, recharger ou naviguer ne le fait pas revenir.
-  // L'effet ne fait qu'écrire dans le stockage du navigateur (système externe), aucun setState.
   useEffect(() => {
-    if (open) markSeen(user.id)
-  }, [open, user.id])
-
-  if (!eligible) return null
+    if (alreadySeen(user.id)) return
+    let cancelled = false
+    authRepository
+      .welcomeStatus()
+      .then(({ showWelcome }) => {
+        if (cancelled || !showWelcome) return
+        markSeen(user.id)
+        setOpen(true)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [user.id])
 
   const name = user.firstName?.trim() || ""
-  const actions = ACTIONS.filter((action) => !action.permission || user.permissions.includes(action.permission))
+  const actions = ACTIONS.filter(
+    (action) =>
+      (!action.view || action.view === (staff ? "staff" : "citizen")) &&
+      (!action.permission || user.permissions.includes(action.permission))
+  )
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -82,7 +103,9 @@ export function WelcomeModal({ user }: Readonly<{ user: AuthUser }>) {
           <DialogTitle>
             {name ? t("welcomeModal.titleNamed", { name }) : t("welcomeModal.title")}
           </DialogTitle>
-          <DialogDescription>{t("welcomeModal.description")}</DialogDescription>
+          <DialogDescription>
+            {t(staff ? "welcomeModal.descriptionStaff" : "welcomeModal.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <ul className="grid gap-3">

@@ -129,6 +129,8 @@ export interface AuditLogPage {
 export interface PlatformActivityLog extends Omit<AuditLog, "ipAddress" | "user"> {
   user: { id: number; firstName: string; lastName: string } | null
   technical: boolean
+  // E-mail du compte visé quand l'opération porte sur un utilisateur
+  targetEmail: string | null
 }
 
 export interface PlatformActivityPage {
