@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -33,6 +33,7 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
@@ -40,6 +41,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { isStaff, roleLabel, type AuthUser } from "@/repository/auth.repository"
+import { contactMessageRepository } from "@/repository/contactMessage.repository"
 
 type DashboardView = "citizen" | "staff"
 
@@ -49,6 +51,8 @@ interface MenuItem {
   // Permission RBAC requise ; absente = tout utilisateur connecté
   permission?: string
   adminOnly?: boolean
+  // Pastille avec le nombre de messages de citoyens non traités
+  newMessagesBadge?: boolean
   // Vue du dashboard où la cible existe (les ancres n'existent que dans leur vue)
   view?: DashboardView
   // Sans href, l'entrée est affichée désactivée (page pas encore disponible)
@@ -88,7 +92,7 @@ const menu: MenuGroup[] = [
     label: "Administration",
     items: [
       { label: "Gérer les services", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
-      { label: "Messages de support", icon: MessageSquare, adminOnly: true, href: "/dashboard/admin/messages" },
+      { label: "Messages des habitants", icon: MessageSquare, adminOnly: true, newMessagesBadge: true, href: "/dashboard/admin/messages" },
       { label: "Utilisateurs et rôles", icon: Users, permission: "admin.users.manage" },
       { label: "Permissions", icon: Settings2, permission: "admin.users.manage" },
     ],
@@ -122,6 +126,22 @@ function AppSidebar({ user }: { user: AuthUser }) {
   const view: DashboardView = isStaff(user) ? "staff" : "citizen"
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
 
+  // Messages "nouveaux" de la boîte de réception (admin) : compteur de la pastille du menu
+  const [newMessages, setNewMessages] = useState(0)
+  const canReadInbox = user.roles.includes("admin") && user.permissions.includes("agent.messages.manage")
+  useEffect(() => {
+    if (!canReadInbox) return
+    let mounted = true
+    contactMessageRepository
+      .listInbox({ status: "new", limit: 1 })
+      .then((inbox) => mounted && setNewMessages(inbox.counts.new))
+      .catch(() => undefined)
+    return () => {
+      mounted = false
+    }
+    // Recomptage à chaque navigation (ex. après avoir traité un message)
+  }, [canReadInbox, pathname])
+
   const handleSignOut = async () => {
     await signOut().catch(() => undefined)
     router.replace("/connexion")
@@ -152,7 +172,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
             <SidebarMenu>
-              {group.items.map(({ label, icon: Icon, href }) => (
+              {group.items.map(({ label, icon: Icon, href, newMessagesBadge }) => (
                 <SidebarMenuItem key={label}>
                   {href ? (
                     <SidebarMenuButton
@@ -169,6 +189,9 @@ function AppSidebar({ user }: { user: AuthUser }) {
                       <span>{label}</span>
                       <Badge variant="outline" className="ml-auto text-[10px]">Bientôt</Badge>
                     </SidebarMenuButton>
+                  )}
+                  {newMessagesBadge && newMessages > 0 && (
+                    <SidebarMenuBadge aria-label={`${newMessages} nouveaux messages`}>{newMessages}</SidebarMenuBadge>
                   )}
                 </SidebarMenuItem>
               ))}
