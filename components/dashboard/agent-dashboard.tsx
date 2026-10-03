@@ -97,7 +97,7 @@ export function AgentDashboard() {
   const roleLabel = user.roles.includes("admin") ? "Administrateur" : "Agent de service"
 
   return (
-    <DashboardShell user={user}>
+    <>
         <section className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm font-medium text-primary">Haut Conseil de Terra Nova</p>
@@ -281,6 +281,6 @@ export function AgentDashboard() {
           <Building2 className="size-3.5" aria-hidden="true" />
           Plateforme centrale de Terra Nova
         </footer>
-    </DashboardShell>
+    </>
   )
 }

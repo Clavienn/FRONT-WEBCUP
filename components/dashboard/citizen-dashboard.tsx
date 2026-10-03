@@ -4,7 +4,6 @@ import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clo
 import type { AuthUser } from "@/repository/auth.repository"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 
 const requestStates = [
   { label: "À traiter", icon: Clock3, tone: "text-amber-700 dark:text-amber-300" },
@@ -40,7 +39,7 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
 
   return (
-    <DashboardShell user={user}>
+    <>
         <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm font-medium text-primary">La première ville d’un nouveau monde</p>
@@ -168,6 +167,6 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
           <Building2 className="size-3.5" aria-hidden="true" />
           Plateforme centrale de Terra Nova
         </footer>
-    </DashboardShell>
+    </>
   )
 }

@@ -94,7 +94,7 @@ const isAccessTokenError = (error: unknown) =>
   error instanceof AuthApiError && error.status === 401 && /token d'accès/i.test(error.message)
 
 // Requête protégée : si l'access token a expiré, on passe une fois par /auth/refresh puis on rejoue
-async function authorizedRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function authorizedRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
   try {
     return await request<T>(path, init)
   } catch (error) {
