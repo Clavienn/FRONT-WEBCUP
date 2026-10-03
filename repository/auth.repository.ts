@@ -42,8 +42,86 @@ export interface PasswordChange {
 }
 
 interface AuthResponse {
-  user: AuthUser
+  user: unknown
   accessToken: string
+}
+
+function normalizeRole(value: unknown): UserRole | null {
+  const rawCode =
+    typeof value === "string"
+      ? value
+      : value && typeof value === "object"
+        ? (value as { code?: unknown; role?: unknown; name?: unknown }).code ??
+          (value as { role?: unknown }).role ??
+          (value as { name?: unknown }).name
+        : null
+
+  if (typeof rawCode !== "string") return null
+
+  const code = rawCode.toLowerCase().trim().replace(/[\s_-]+/g, "")
+  if (["citizen", "resident", "user"].includes(code)) return "citizen"
+  if (["agent", "municipalagent", "staff"].includes(code)) return "agent"
+  if (["admin", "administrator"].includes(code)) return "admin"
+  return null
+}
+
+function nullableString(value: unknown): string | null {
+  return typeof value === "string" && value.length > 0 ? value : null
+}
+
+export function normalizeAuthUser(value: unknown): AuthUser {
+  if (!value || typeof value !== "object") {
+    throw new Error("La réponse d’authentification ne contient pas de profil valide.")
+  }
+
+  const data = value as Record<string, unknown>
+  const rawRoles = Array.isArray(data.roles)
+    ? data.roles
+    : data.roles !== undefined
+      ? [data.roles]
+      : data.role !== undefined
+        ? [data.role]
+        : []
+  const roles = [...new Set(rawRoles.map(normalizeRole).filter((role): role is UserRole => role !== null))]
+
+  if (roles.length === 0) {
+    throw new Error("Le serveur n’a renvoyé aucun rôle reconnu pour ce compte.")
+  }
+
+  const id = Number(data.id)
+  if (!Number.isSafeInteger(id) || id < 1) {
+    throw new Error("Le serveur a renvoyé un identifiant de compte invalide.")
+  }
+
+  const rawPermissions = Array.isArray(data.permissions) ? data.permissions : []
+
+  return {
+    id,
+    email: typeof data.email === "string" ? data.email : "",
+    firstName: nullableString(data.firstName ?? data.first_name),
+    lastName: nullableString(data.lastName ?? data.last_name),
+    phone: nullableString(data.phone),
+    address: nullableString(data.address),
+    roles,
+    permissions: rawPermissions
+      .map((permission) => {
+        if (typeof permission === "string") return permission
+        if (permission && typeof permission === "object") {
+          const code = (permission as { code?: unknown }).code
+          return typeof code === "string" ? code : null
+        }
+        return null
+      })
+      .filter((permission): permission is string => permission !== null),
+    createdAt: String(data.createdAt ?? data.created_at ?? ""),
+    updatedAt: String(data.updatedAt ?? data.updated_at ?? ""),
+  }
+}
+
+export function roleLabel(user: AuthUser) {
+  if (user.roles.includes("admin")) return "Administrateur"
+  if (user.roles.includes("agent")) return "Agent de service"
+  return "Citoyen"
 }
 
 export class AuthApiError extends Error {
@@ -109,8 +187,9 @@ async function authenticate(path: string, data: Credentials | RegistrationData):
     method: "POST",
     body: JSON.stringify(data),
   })
+  const user = normalizeAuthUser(session.user)
   accessToken = session.accessToken
-  return session.user
+  return user
 }
 
 export const authRepository = {
@@ -125,8 +204,9 @@ export const authRepository = {
 
     try {
       const session = await refreshRequest
+      const user = normalizeAuthUser(session.user)
       accessToken = session.accessToken
-      return session.user
+      return user
     } catch (error) {
       accessToken = null
       throw error
@@ -135,10 +215,15 @@ export const authRepository = {
     }
   },
 
-  me: () => authorizedRequest<AuthUser>("/auth/me"),
+  async me() {
+    return normalizeAuthUser(await authorizedRequest<unknown>("/auth/me"))
+  },
 
-  updateProfile: (data: ProfileUpdate) =>
-    authorizedRequest<AuthUser>("/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
+  async updateProfile(data: ProfileUpdate) {
+    return normalizeAuthUser(
+      await authorizedRequest<unknown>("/auth/me", { method: "PATCH", body: JSON.stringify(data) })
+    )
+  },
 
   // Le backend révoque les autres sessions et renvoie de nouveaux tokens pour celle-ci
   async changePassword(data: PasswordChange): Promise<AuthUser> {
@@ -146,8 +231,9 @@ export const authRepository = {
       method: "PATCH",
       body: JSON.stringify(data),
     })
+    const user = normalizeAuthUser(session.user)
     accessToken = session.accessToken
-    return session.user
+    return user
   },
 
   async logout(): Promise<void> {

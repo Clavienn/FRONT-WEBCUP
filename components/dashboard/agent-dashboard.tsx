@@ -21,7 +21,7 @@ import {
 } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
-import { isStaff } from "@/repository/auth.repository"
+import { isStaff, roleLabel } from "@/repository/auth.repository"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -93,7 +93,7 @@ export function AgentDashboard() {
   }
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
-  const roleLabel = user.roles.includes("admin") ? "Administrateur" : "Agent de service"
+  const currentRoleLabel = roleLabel(user)
 
   return (
     <>
@@ -241,7 +241,7 @@ export function AgentDashboard() {
                   <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                 </div>
               </div>
-              <Badge variant="secondary" className="mt-4">{roleLabel}</Badge>
+              <Badge variant="secondary" className="mt-4">{currentRoleLabel}</Badge>
             </section>
 
             <section aria-labelledby="announcements-title" className="rounded-xl border border-border/80 bg-card/75 p-5 shadow-sm backdrop-blur-sm">
