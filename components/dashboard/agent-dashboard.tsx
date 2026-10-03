@@ -7,12 +7,16 @@ import {
   Activity,
   Bell,
   Building2,
+  Cable,
   CheckCircle2,
   CircleAlert,
   CircleX,
   ClipboardList,
   Clock3,
+  KeyRound,
   Megaphone,
+  RadioTower,
+  RefreshCw,
   ShieldCheck,
 } from "lucide-react"
 
@@ -84,7 +88,7 @@ export function AgentDashboard() {
     <main className="app-atmosphere min-h-screen px-4 pb-12 pt-20 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-5">
-          <Link href="/dashboard" className="flex min-w-0 items-center gap-3" aria-label="Terra Nova, tableau de bord">
+          <Link href="/" className="flex min-w-0 items-center gap-3" aria-label="Terra Nova, tableau de bord">
             <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Building2 className="size-5" aria-hidden="true" />
             </span>
@@ -143,6 +147,64 @@ export function AgentDashboard() {
                 <p className="mt-3 text-2xl font-semibold tabular-nums text-foreground">—</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section aria-labelledby="api-status-title" className="space-y-4 rounded-2xl border border-border/80 bg-card/65 p-5 shadow-sm backdrop-blur-sm sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                <Cable className="size-5" aria-hidden="true" />
+              </span>
+              <div>
+                <h2 id="api-status-title" className="text-lg font-semibold">Intégration API Terra Nova</h2>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+                  État de la liaison entre la console agent et le flux officiel des demandes.
+                </p>
+              </div>
+            </div>
+            <Badge variant="outline" className="gap-1.5 rounded-full border-amber-500/30 bg-amber-500/10 text-amber-800 dark:text-amber-200">
+              <CircleAlert className="size-3.5" aria-hidden="true" />
+              Maquette · à connecter
+            </Badge>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-border/70 bg-background/55 p-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <RadioTower className="size-4" aria-hidden="true" />
+                <p className="text-xs font-medium">Disponibilité</p>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-foreground">En attente de configuration</p>
+              <p className="mt-1 text-xs text-muted-foreground">Aucune requête de contrôle exécutée</p>
+            </div>
+
+            <div className="rounded-xl border border-border/70 bg-background/55 p-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <KeyRound className="size-4" aria-hidden="true" />
+                <p className="text-xs font-medium">Accès équipe</p>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-foreground">Clé API requise</p>
+              <p className="mt-1 text-xs text-muted-foreground">À configurer côté serveur</p>
+            </div>
+
+            <div className="rounded-xl border border-border/70 bg-background/55 p-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <RefreshCw className="size-4" aria-hidden="true" />
+                <p className="text-xs font-medium">Dernière synchronisation</p>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-foreground">—</p>
+              <p className="mt-1 text-xs text-muted-foreground">En attente du premier échange</p>
+            </div>
+
+            <div className="rounded-xl border border-border/70 bg-background/55 p-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Clock3 className="size-4" aria-hidden="true" />
+                <p className="text-xs font-medium">Vagues de demandes</p>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-foreground">Publication horaire</p>
+              <p className="mt-1 text-xs text-muted-foreground">Surveillance à prévoir après connexion</p>
+            </div>
           </div>
         </section>
 
