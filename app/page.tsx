@@ -23,7 +23,7 @@ function Page() {
           nativeButton={false}
           render={<Link href="/connexion" />}
         >
-          <Compass /> Accéder à la console
+          <Compass /> Explorer
         </Button>
       </header>
 
