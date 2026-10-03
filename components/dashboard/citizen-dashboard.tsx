@@ -1,16 +1,5 @@
 import Link from "next/link"
-import {
-  Bell,
-  Building2,
-  CheckCircle2,
-  CircleAlert,
-  CircleX,
-  ClipboardList,
-  Clock3,
-  FilePlus2,
-  MapPinned,
-  Megaphone,
-} from "lucide-react"
+import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clock3, FilePlus2, MapPinned, Megaphone,} from "lucide-react"
 
 import type { AuthUser } from "@/repository/auth.repository"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -53,7 +42,7 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
     <main className="app-atmosphere min-h-screen px-4 pb-12 pt-20 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-5">
-          <Link href="/dashboard" className="flex min-w-0 items-center gap-3" aria-label="Terra Nova, espace citoyen">
+          <Link href="/" className="flex min-w-0 items-center gap-3" aria-label="Terra Nova, espace citoyen">
             <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <Building2 className="size-5" aria-hidden="true" />
             </span>
