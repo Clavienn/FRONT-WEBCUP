@@ -8,9 +8,6 @@ function Page() {
     <div className="app-atmosphere flex min-h-screen flex-col text-foreground">
       {/* Hero Section */}
       <header className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-        <p className="mb-4 text-xs font-semibold tracking-[0.16em] text-muted-foreground">
-          24H BY WEBCUP
-        </p>
         <h1 className="text-5xl font-medium tracking-tight text-primary md:text-7xl">
           TERRA NOVA
         </h1>
