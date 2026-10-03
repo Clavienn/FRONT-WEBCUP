@@ -233,6 +233,19 @@ function SlotRow({ appointment, onChanged }: SlotRowProps) {
     }
   }
 
+  const handleReopen = async () => {
+    setBusy(true)
+    try {
+      await appointmentRepository.reopenSlot(appointment.id)
+      toast.add({ title: t("agentAppointments.reopened"), type: "success" })
+      onChanged()
+    } catch (cause) {
+      toast.add({ title: cause instanceof Error ? cause.message : t("agentAppointments.updateError"), type: "error" })
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <li className="rounded-xl border border-border/80 bg-background/55 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -262,7 +275,7 @@ function SlotRow({ appointment, onChanged }: SlotRowProps) {
         </Badge>
       </div>
 
-      {appointment.status !== "cancelled" && (
+      {appointment.status !== "cancelled" ? (
         <div className="mt-3 flex flex-wrap gap-2">
           <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setCancelOpen(true)}>
             {t("agentAppointments.cancelLabel")}
@@ -272,6 +285,13 @@ function SlotRow({ appointment, onChanged }: SlotRowProps) {
               {t("agentAppointments.deleteLabel")}
             </Button>
           )}
+        </div>
+      ) : (
+        <div className="mt-3">
+          <Button variant="outline" size="sm" disabled={busy} onClick={handleReopen}>
+            {busy && <Spinner />}
+            {t("agentAppointments.reopenLabel")}
+          </Button>
         </div>
       )}
 
