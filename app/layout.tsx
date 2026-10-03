@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DevAtoandro | Webcup 2026",
-  description: "Espace de gestion DevAtoandro pour Webcup 2026.",
+  title: "Terra Nova | Console des agents",
+  description: "Plateforme centrale des services de Terra Nova.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

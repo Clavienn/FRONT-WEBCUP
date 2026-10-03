@@ -26,7 +26,7 @@ export function AuthForm() {
   const isRegistering = mode === "register"
 
   useEffect(() => {
-    if (!isLoading && user) router.replace("/profil")
+    if (!isLoading && user) router.replace("/dashboard")
   }, [isLoading, router, user])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -45,7 +45,7 @@ export function AuthForm() {
       } else {
         await signIn({ email, password })
       }
-      router.replace("/profil")
+      router.replace("/dashboard")
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Une erreur est survenue. Réessayez.")
     } finally {
@@ -72,22 +72,22 @@ export function AuthForm() {
               <ShieldCheck className="size-5" aria-hidden="true" />
             </span>
             <div>
-              <p className="text-sm font-semibold text-foreground">DevAtoandro</p>
-              <p className="text-xs text-muted-foreground">Webcup 2026</p>
+              <p className="text-sm font-semibold tracking-[0.08em] text-foreground">TERRA NOVA</p>
+              <p className="text-xs text-muted-foreground">Console des agents</p>
             </div>
           </div>
 
           <header className="mb-7 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-              DevAtoandro Space
+              Haut Conseil de Terra Nova
             </p>
             <h1 className="text-3xl font-medium tracking-tight text-foreground">
               {isRegistering ? "Créer un compte" : "Connexion"}
             </h1>
             <p className="text-sm leading-6 text-muted-foreground">
               {isRegistering
-                ? "Renseignez vos informations pour rejoindre votre espace."
-                : "Connectez-vous à l'espace de DevAtoandro"}
+                ? "Créez votre accès à la console des agents de Terra Nova."
+                : "Connectez-vous pour accompagner les habitants de Terra Nova."}
             </p>
           </header>
 

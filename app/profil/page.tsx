@@ -90,8 +90,8 @@ export default function ProfilPage() {
         <div className="mx-auto max-w-2xl space-y-6">
           <div className="flex items-end justify-between gap-4">
             <div className="space-y-2">
-              <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/" />}>
-                <ArrowLeftIcon /> Accueil
+              <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/dashboard" />}>
+                <ArrowLeftIcon /> Tableau de bord
               </Button>
               <h1 className="text-2xl font-medium tracking-tight text-foreground">Mon profil</h1>
             </div>
