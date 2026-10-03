@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react"
 import { SaveIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,6 +14,7 @@ import type { AuthUser } from "@/repository/auth.repository"
 
 export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
   const { updateProfile } = useAuth()
+  const { t } = useLanguage()
   const [firstName, setFirstName] = useState(user.firstName ?? "")
   const [lastName, setLastName] = useState(user.lastName ?? "")
   const [email, setEmail] = useState(user.email)
@@ -33,11 +35,11 @@ export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
         firstName: firstName.trim() || null,
         lastName: lastName.trim() || null,
       })
-      toast.add({ title: "Profil mis à jour", type: "success" })
+      toast.add({ title: t("profileForm.successTitle"), type: "success" })
     } catch (err) {
       toast.add({
-        title: "Erreur",
-        description: err instanceof Error ? err.message : "Une erreur est survenue",
+        title: t("profileForm.errorTitle"),
+        description: err instanceof Error ? err.message : t("profileForm.errorFallback"),
         type: "error",
       })
     } finally {
@@ -49,7 +51,7 @@ export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="firstName">Prénom</Label>
+          <Label htmlFor="firstName">{t("profileForm.firstName")}</Label>
           <Input
             id="firstName"
             autoComplete="given-name"
@@ -59,7 +61,7 @@ export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="lastName">Nom</Label>
+          <Label htmlFor="lastName">{t("profileForm.lastName")}</Label>
           <Input
             id="lastName"
             autoComplete="family-name"
@@ -71,7 +73,7 @@ export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Adresse e-mail</Label>
+        <Label htmlFor="email">{t("profileForm.email")}</Label>
         <Input
           id="email"
           type="email"
@@ -86,7 +88,7 @@ export function ProfileForm({ user }: Readonly<{ user: AuthUser }>) {
       <div className="flex justify-end">
         <Button type="submit" disabled={saving || !hasChanges}>
           {saving ? <Spinner /> : <SaveIcon />}
-          Enregistrer
+          {t("profileForm.save")}
         </Button>
       </div>
     </form>

@@ -5,11 +5,10 @@ import { useMotionValueEvent } from "framer-motion"
 
 import { useScrollProgress } from "@/components/landing/scroll-sequence"
 import { useCountUp } from "@/hooks/use-count-up"
-import type { StatItem } from "@/config/landing-content"
 
 const START_THRESHOLD = 0.4
 
-export function Counter({ value, suffix, label }: StatItem) {
+export function Counter({ value, suffix, label }: { value: number; suffix?: string; label: string }) {
   const progress = useScrollProgress()
   const [started, setStarted] = useState(() => progress.get() >= START_THRESHOLD)
 
