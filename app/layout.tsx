@@ -39,10 +39,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="isolate min-h-full flex flex-col">
         <SiteChrome>
           <div className="relative z-10 flex min-h-full flex-1 flex-col">
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+              <SupportBubble />
+            </AuthProvider>
           </div>
         </SiteChrome>
-        <SupportBubble />
       </body>
     </html>
   );

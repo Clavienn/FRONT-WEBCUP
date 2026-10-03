@@ -48,6 +48,7 @@ interface MenuItem {
   icon: LucideIcon
   // Permission RBAC requise ; absente = tout utilisateur connecté
   permission?: string
+  adminOnly?: boolean
   // Vue du dashboard où la cible existe (les ancres n'existent que dans leur vue)
   view?: DashboardView
   // Sans href, l'entrée est affichée désactivée (page pas encore disponible)
@@ -87,6 +88,7 @@ const menu: MenuGroup[] = [
     label: "Administration",
     items: [
       { label: "Gérer les services", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
+      { label: "Messages de support", icon: MessageSquare, adminOnly: true, href: "/dashboard/admin/messages" },
       { label: "Utilisateurs et rôles", icon: Users, permission: "admin.users.manage" },
       { label: "Permissions", icon: Settings2, permission: "admin.users.manage" },
     ],
@@ -101,6 +103,7 @@ function visibleMenu(user: AuthUser, view: DashboardView): MenuGroup[] {
       items: group.items.filter(
         (item) =>
           (!item.view || item.view === view) &&
+          (!item.adminOnly || user.roles.includes("admin")) &&
           (!item.permission || user.permissions.includes(item.permission))
       ),
     }))
@@ -250,6 +253,19 @@ export function RequirePermission({ permission, children }: Readonly<{ permissio
       <ShieldAlert className="size-6 text-muted-foreground" aria-hidden="true" />
       <p className="font-medium">Accès refusé</p>
       <p className="text-sm text-muted-foreground">Votre rôle ne donne pas accès à cette page.</p>
+    </div>
+  )
+}
+
+export function RequireAdmin({ children }: Readonly<{ children: React.ReactNode }>) {
+  const { user } = useAuth()
+  if (user?.roles.includes("admin")) return <>{children}</>
+
+  return (
+    <div className="flex min-h-64 flex-col items-center justify-center gap-2 rounded-2xl border border-border/80 bg-card/70 p-8 text-center">
+      <ShieldAlert className="size-6 text-muted-foreground" aria-hidden="true" />
+      <p className="font-medium">Accès réservé à l’administration</p>
+      <p className="text-sm text-muted-foreground">Votre compte ne dispose pas du rôle administrateur.</p>
     </div>
   )
 }
