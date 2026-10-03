@@ -1,38 +1,45 @@
-import React from 'react';
-import Link from 'next/link';
-import { Compass } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import "./terra-nova.css"
 
-function Page() {
+import { MotionConfig } from "framer-motion"
+
+import { LandingNavbar } from "@/components/landing/landing-navbar"
+import { VoyageSection } from "@/components/landing/voyage-section"
+import { ServicesSection } from "@/components/landing/services-section"
+import { HowItWorksSection } from "@/components/landing/how-it-works-section"
+import { AnnouncementsSection } from "@/components/landing/announcements-section"
+import { AudiencesSection } from "@/components/landing/audiences-section"
+import { CommitmentsSection } from "@/components/landing/commitments-section"
+import { CtaSection } from "@/components/landing/cta-section"
+import { LandingFooter } from "@/components/landing/landing-footer"
+import { ScrollNavDots } from "@/components/landing/scroll-nav-dots"
+import { SocialRail } from "@/components/landing/social-rail"
+
+export default function Page() {
   return (
-    <div className="app-atmosphere flex min-h-screen flex-col text-foreground">
-      {/* Hero Section */}
-      <header className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
-        <h1 className="text-5xl font-medium tracking-tight text-primary md:text-7xl">
-          TERRA NOVA
-        </h1>
-        <p className="mt-5 text-2xl font-medium text-foreground md:text-4xl">
-          La première ville d’un nouveau monde
-        </p>
-        <p className="mt-4 max-w-xl text-base leading-7 text-muted-foreground">
-          La plateforme centrale pour accéder aux services de la ville, s’informer et signaler un problème.
-        </p>
-        <Button
-          size="lg"
-          className="mt-10 h-11 rounded-xl px-5 shadow-sm shadow-blue-900/10"
-          nativeButton={false}
-          render={<Link href="/connexion" />}
-        >
-          <Compass /> Explorer
-        </Button>
-      </header>
+    <MotionConfig reducedMotion="user">
+      <div className="terra-landing">
+        <a href="#contenu" className="tn-skip-link">
+          Aller au contenu
+        </a>
 
-      {/* Footer */}
-      <footer className="border-t border-border/70 py-8 text-center text-sm text-muted-foreground">
-        <p>&copy; 2026 Terra Nova - Webcup</p>
-      </footer>
-    </div>
-  );
+        <div className="tn-grid-overlay" aria-hidden="true" />
+
+        <LandingNavbar />
+        <ScrollNavDots />
+        <SocialRail />
+
+        <main id="contenu">
+          <VoyageSection />
+          <ServicesSection />
+          <HowItWorksSection />
+          <AnnouncementsSection />
+          <AudiencesSection />
+          <CommitmentsSection />
+          <CtaSection />
+        </main>
+
+        <LandingFooter />
+      </div>
+    </MotionConfig>
+  )
 }
-
-export default Page;
