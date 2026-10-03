@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { ArrowLeftIcon, CalendarIcon, LogOutIcon, MailIcon, MonitorSmartphoneIcon, UserIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { roleLabel } from "@/repository/auth.repository"
 import { PasswordForm } from "@/components/profile/password-form"
 import { ProfileForm } from "@/components/profile/profile-form"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -109,7 +110,7 @@ export default function ProfilPage() {
               <div className="min-w-0">
                 <p className="truncate text-lg font-medium text-foreground">{fullName || user.email}</p>
                 <Badge variant={user.roles.includes("admin") ? "default" : "secondary"} className="mt-1">
-                  {user.roles.includes("admin") ? "Administrateur" : user.roles.includes("agent") ? "Agent" : "Citoyen"}
+                  {roleLabel(user)}
                 </Badge>
               </div>
             </div>

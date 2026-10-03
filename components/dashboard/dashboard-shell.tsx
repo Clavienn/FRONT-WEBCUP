@@ -39,7 +39,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { isStaff, type AuthUser } from "@/repository/auth.repository"
+import { isStaff, roleLabel, type AuthUser } from "@/repository/auth.repository"
 
 type DashboardView = "citizen" | "staff"
 
@@ -106,12 +106,6 @@ function visibleMenu(user: AuthUser, view: DashboardView): MenuGroup[] {
       ),
     }))
     .filter((group) => group.items.length > 0)
-}
-
-export function roleLabel(user: AuthUser) {
-  if (user.roles.includes("admin")) return "Administrateur"
-  if (user.roles.includes("agent")) return "Agent de service"
-  return "Citoyen"
 }
 
 function initials(user: AuthUser) {

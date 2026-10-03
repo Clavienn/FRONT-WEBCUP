@@ -42,6 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <AuthProvider>{children}</AuthProvider>
           </div>
         </SiteChrome>
+        <SupportBubble />
       </body>
     </html>
   );
