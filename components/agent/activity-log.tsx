@@ -188,9 +188,16 @@ export function ActivityLog() {
                       {showCode && <span className="block font-mono text-xs text-muted-foreground">{log.action}</span>}
                     </TableCell>
                     <TableCell className="hidden text-sm md:table-cell">
-                      {log.entityType
-                        ? `${entityLabel(log.entityType, t)}${log.entityId ? ` #${log.entityId}` : ""}`
-                        : "—"}
+                      {log.entityType ? (
+                        <>
+                          {`${entityLabel(log.entityType, t)}${log.entityId ? ` #${log.entityId}` : ""}`}
+                          {log.targetEmail && (
+                            <span className="block break-all text-xs text-muted-foreground">{log.targetEmail}</span>
+                          )}
+                        </>
+                      ) : (
+                        "—"
+                      )}
                     </TableCell>
                   </TableRow>
                 )

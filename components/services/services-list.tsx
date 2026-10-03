@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, CircleAlert, Search } from "lucide-react"
+import { ArrowRight, CircleAlert, MessageSquareText, Search, BadgeCheck } from "lucide-react"
 
 import { ServiceIcon } from "@/components/services/service-icon"
+import { StarDisplay } from "@/components/services/star-rating"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -93,6 +94,28 @@ export function ServicesList() {
                 <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
                   {service.description || t("servicesList.noDescription")}
                 </p>
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                  {service.averageRating !== null && (
+                    <StarDisplay
+                      value={service.averageRating}
+                      label={t("serviceReviews.averageAria", { value: service.averageRating })}
+                      className="[&_svg]:size-3.5"
+                    />
+                  )}
+                  <span className="inline-flex items-center gap-1">
+                    <MessageSquareText className="size-3.5" aria-hidden="true" />
+                    {t("serviceReviews.count", { count: service.reviewsCount })}
+                  </span>
+                  {service.reviewedByMe && (
+                    <span
+                      className="inline-flex items-center gap-1 font-medium text-emerald-700 dark:text-emerald-300"
+                      title={t("serviceReviews.reviewedBadge")}
+                    >
+                      <BadgeCheck className="size-3.5" aria-hidden="true" />
+                      <span className="sr-only">{t("serviceReviews.reviewedBadge")}</span>
+                    </span>
+                  )}
+                </div>
                 <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
                   {t("servicesList.seeInfo")}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />

@@ -60,6 +60,8 @@ interface MenuItem {
   // Permission RBAC requise ; absente = tout utilisateur connecté
   permission?: string
   adminOnly?: boolean
+  // Masqué pour les admins (qui ont la version complète dans le groupe Administration)
+  agentOnly?: boolean
   // Pastille avec le nombre de messages de citoyens non traités
   newMessagesBadge?: boolean
   // Vue du dashboard où la cible existe (les ancres n'existent que dans leur vue)
@@ -94,10 +96,10 @@ const menu: MenuGroup[] = [
   {
     label: "sidebar.groups.agentConsole",
     items: [
-      { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.messages.manage", view: "staff", newMessagesBadge: true, href: "/dashboard/agent/requests" },
+      { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard/agent/requests" },
       { label: "sidebar.items.comptesCitoyens", icon: Users, permission: "agent.citizens.manage", view: "staff", href: "/dashboard/agent/citizens" },
       { label: "sidebar.items.rendezVousCitoyens", icon: CalendarClock, permission: "agent.appointments.view", view: "staff", href: "/dashboard/appointments" },
-      { label: "sidebar.items.historiqueOperations", icon: ScrollText, permission: "agent.activity.view", view: "staff", href: "/dashboard/agent/activite" },
+      { label: "sidebar.items.historiqueOperations", icon: ScrollText, permission: "agent.activity.view", view: "staff", agentOnly: true, href: "/dashboard/agent/activite" },
     ],
   },
   {
@@ -122,6 +124,7 @@ function visibleMenu(user: AuthUser, view: DashboardView): MenuGroup[] {
         (item) =>
           (!item.view || item.view === view) &&
           (!item.adminOnly || user.roles.includes("admin")) &&
+          (!item.agentOnly || !user.roles.includes("admin")) &&
           (!item.permission || user.permissions.includes(item.permission))
       ),
     }))

@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { ArrowLeft, ArrowRight, CalendarClock, CircleAlert, Hash } from "lucide-react"
+import { ArrowLeft, ArrowRight, BadgeCheck, CalendarClock, CircleAlert, Hash } from "lucide-react"
 
 import { ServiceIcon } from "@/components/services/service-icon"
+import { ServiceReviews } from "@/components/services/service-reviews"
+import { StarDisplay } from "@/components/services/star-rating"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -102,6 +104,18 @@ export function ServiceDetail() {
             {!service.isActive && <Badge variant="outline">{t("serviceDetail.disabledBadge")}</Badge>}
           </div>
           <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">{service.name}</h1>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+            {service.averageRating !== null && (
+              <StarDisplay value={service.averageRating} label={t("serviceReviews.averageAria", { value: service.averageRating })} />
+            )}
+            <span>{t("serviceReviews.count", { count: service.reviewsCount })}</span>
+            {service.reviewedByMe && (
+              <span className="inline-flex items-center gap-1 font-medium text-emerald-700 dark:text-emerald-300">
+                <BadgeCheck className="size-4" aria-hidden="true" />
+                {t("serviceReviews.reviewedBadge")}
+              </span>
+            )}
+          </div>
         </div>
       </header>
 
@@ -133,6 +147,8 @@ export function ServiceDetail() {
           </dl>
         </aside>
       </div>
+
+      <ServiceReviews serviceId={service.id} />
 
       {others.length > 0 && (
         <section aria-labelledby="other-services" className="space-y-3">
