@@ -5,6 +5,7 @@ import "./terra-nova.css"
 import { MotionConfig } from "framer-motion"
 
 import { useLanguage } from "@/components/i18n/language-provider"
+import { Breadcrumb } from "@/components/navigation/breadcrumb"
 import { LandingNavbar } from "@/components/landing/landing-navbar"
 import { VoyageSection } from "@/components/landing/voyage-section"
 import { ServicesSection } from "@/components/landing/services-section"
@@ -34,6 +35,9 @@ export default function Page() {
         <SocialRail />
 
         <main id="contenu">
+          <div className="mx-auto max-w-7xl px-5 pt-3 sm:px-8 lg:px-12">
+            <Breadcrumb items={[{ label: t("nav.accueil") }]} tone="landing" />
+          </div>
           <VoyageSection />
           <ServicesSection />
           <HowItWorksSection />

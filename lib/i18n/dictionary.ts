@@ -15,6 +15,11 @@ const fr = {
     "pour-qui": "Pour qui ?",
     engagements: "Engagements",
   },
+  breadcrumbs: {
+    ariaLabel: "Fil d’Ariane",
+    login: "Connexion",
+    announcementDetail: "Détail de l’annonce",
+  },
   navbar: {
     openMenu: "Ouvrir le menu de navigation",
     closeMenu: "Fermer le menu de navigation",
@@ -829,6 +834,7 @@ const fr = {
   },
 
   serviceDetail: {
+    breadcrumb: "Détail du service",
     backLink: "Tous les services",
     disabledBadge: "Désactivé",
     eyebrow: "Service municipal",
@@ -859,6 +865,11 @@ const en = {
     annonces: "Announcements",
     "pour-qui": "Who it's for",
     engagements: "Commitments",
+  },
+  breadcrumbs: {
+    ariaLabel: "Breadcrumb",
+    login: "Sign in",
+    announcementDetail: "Announcement details",
   },
   navbar: {
     openMenu: "Open navigation menu",
@@ -1665,6 +1676,7 @@ const en = {
   },
 
   serviceDetail: {
+    breadcrumb: "Service details",
     backLink: "All services",
     disabledBadge: "Disabled",
     eyebrow: "Municipal service",
