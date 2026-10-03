@@ -50,35 +50,12 @@ const fr = {
     },
   },
 
-  servicesSection: { title: "Tout ce dont vous avez besoin, en un seul endroit" },
-  services: {
-    cards: {
-      "services-ville": {
-        title: "Accéder aux services de la ville",
-        description:
-          "Démarches, ressources et infrastructures municipales réunies en un seul espace, accessible à tout habitant.",
-      },
-      informer: {
-        title: "S'informer",
-        description:
-          "Suivez les décisions et annonces officielles du Haut Conseil ainsi que la vie de votre quartier.",
-      },
-      communiquer: {
-        title: "Communiquer",
-        description:
-          "Échangez avec les autres habitants et les services municipaux au sein d'un même réseau civique.",
-      },
-      signaler: {
-        title: "Signaler un problème",
-        description:
-          "Remontez une panne, un incident ou un besoin de votre quartier directement aux équipes compétentes.",
-      },
-      simplifier: {
-        title: "Simplifier le quotidien",
-        description:
-          "Des outils pensés pour vous faire gagner du temps sur les démarches les plus courantes de la vie à Terra Nova.",
-      },
-    },
+  servicesSection: {
+    title: "Tout ce dont vous avez besoin, en un seul endroit",
+    showMore: "Voir plus de services",
+    showLess: "Voir moins de services",
+    error: "Les services de la ville sont momentanément indisponibles. Merci de réessayer plus tard.",
+    empty: "Aucun service n'est publié pour le moment. Revenez bientôt.",
   },
 
   howItWorks: {
@@ -225,21 +202,11 @@ const fr = {
     recentEmptyDescription:
       "La liste sera renseignée lorsque les demandes de citoyens seront disponibles depuis l'API Terra Nova.",
     servicesTitle: "Services de la ville",
-    servicesSubtitle: "Les services seront accessibles au fil de leur mise en ligne.",
-    services: {
-      demandes: {
-        title: "Demandes de service",
-        description: "Accédez aux démarches proposées par les services de la ville.",
-      },
-      signaler: {
-        title: "Signaler un problème",
-        description: "Faites remonter une situation qui nécessite l'attention de la ville.",
-      },
-      communiques: {
-        title: "Communiqués",
-        description: "Retrouvez les informations publiées par le Haut Conseil.",
-      },
-    },
+    servicesSubtitle: "Ce que vous pouvez faire dès maintenant sur Terra Nova.",
+    servicesSeeAll: "Voir tous les services",
+    servicesNoDescription: "Aucune description.",
+    servicesEmpty: "Aucun service n'est disponible pour le moment.",
+    servicesError: "Impossible de charger les services.",
     profileTitle: "Mon profil",
     manageLink: "Gérer",
     roleBadge: "Citoyen",
@@ -604,30 +571,12 @@ const en = {
     },
   },
 
-  servicesSection: { title: "Everything you need, in one place" },
-  services: {
-    cards: {
-      "services-ville": {
-        title: "Access city services",
-        description: "Procedures, resources and municipal infrastructure gathered in one place, open to every resident.",
-      },
-      informer: {
-        title: "Stay informed",
-        description: "Follow the High Council's official decisions and announcements, and news from your district.",
-      },
-      communiquer: {
-        title: "Communicate",
-        description: "Exchange with other residents and municipal services on a single civic network.",
-      },
-      signaler: {
-        title: "Report a problem",
-        description: "Report a breakdown, incident, or need in your district directly to the teams responsible.",
-      },
-      simplifier: {
-        title: "Simplify daily life",
-        description: "Tools designed to save you time on the most common procedures of life in Terra Nova.",
-      },
-    },
+  servicesSection: {
+    title: "Everything you need, in one place",
+    showMore: "Show more services",
+    showLess: "Show fewer services",
+    error: "The city's services are temporarily unavailable. Please try again later.",
+    empty: "No service is published yet. Check back soon.",
   },
 
   howItWorks: {
@@ -771,21 +720,11 @@ const en = {
     recentEmptyTitle: "Your requests will appear here",
     recentEmptyDescription: "This list will populate once citizen requests are available from the Terra Nova API.",
     servicesTitle: "City services",
-    servicesSubtitle: "Services will become available as they go live.",
-    services: {
-      demandes: {
-        title: "Service requests",
-        description: "Access the procedures offered by the city's services.",
-      },
-      signaler: {
-        title: "Report a problem",
-        description: "Flag a situation that needs the city's attention.",
-      },
-      communiques: {
-        title: "Announcements",
-        description: "Find the information published by the High Council.",
-      },
-    },
+    servicesSubtitle: "What you can do right now on Terra Nova.",
+    servicesSeeAll: "See all services",
+    servicesNoDescription: "No description.",
+    servicesEmpty: "No service is available yet.",
+    servicesError: "The services could not be loaded.",
     profileTitle: "My profile",
     manageLink: "Manage",
     roleBadge: "Citizen",
