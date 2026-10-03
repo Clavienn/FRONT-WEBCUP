@@ -25,6 +25,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
+import { CitizenDashboard } from "@/components/dashboard/citizen-dashboard"
 
 const metrics = [
   { label: "En attente", icon: Clock3, tone: "text-amber-700 dark:text-amber-300" },
@@ -79,6 +80,10 @@ export function AgentDashboard() {
         <Spinner />
       </main>
     )
+  }
+
+  if (user.role === "USER") {
+    return <CitizenDashboard user={user} />
   }
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email

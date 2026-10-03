@@ -109,7 +109,7 @@ export default function ProfilPage() {
               <div className="min-w-0">
                 <p className="truncate text-lg font-medium text-foreground">{fullName || user.email}</p>
                 <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} className="mt-1">
-                  {user.role === "ADMIN" ? "Administrateur" : "Utilisateur"}
+                  {user.role === "ADMIN" ? "Administrateur" : "Citoyen"}
                 </Badge>
               </div>
             </div>
