@@ -54,6 +54,9 @@ export const actionKeys: Record<string, string> = {
   "service.create": "auditLog.actions.serviceCreate",
   "service.update": "auditLog.actions.serviceUpdate",
   "service.delete": "auditLog.actions.serviceDelete",
+  "establishment.create": "auditLog.actions.establishmentCreate",
+  "establishment.update": "auditLog.actions.establishmentUpdate",
+  "establishment.delete": "auditLog.actions.establishmentDelete",
 };
 
 // entityType -> clé de dictionnaire. Deux formes coexistent : les audits métier citent la table
@@ -63,6 +66,7 @@ export const entityKeys: Record<string, string> = {
   roles: "auditLog.entities.role",
   permissions: "auditLog.entities.permission",
   municipal_services: "auditLog.entities.municipalService",
+  establishments: "auditLog.entities.establishment",
   services: "auditLog.entities.service",
   announcements: "auditLog.entities.announcement",
   contact_messages: "auditLog.entities.contactMessage",
@@ -105,6 +109,7 @@ export const ACTION_GROUPS: { prefixes: string[]; labelKey: string }[] = [
   { prefixes: ["contact."], labelKey: "auditLog.agentPage.groupMessages" },
   { prefixes: ["role.", "permission."], labelKey: "auditLog.agentPage.groupRbac" },
   { prefixes: ["service."], labelKey: "auditLog.agentPage.groupServices" },
+  { prefixes: ["establishment."], labelKey: "auditLog.agentPage.groupEstablishments" },
 ];
 
 export const DEFAULT_GROUP_KEY = "auditLog.agentPage.groupAccounts";

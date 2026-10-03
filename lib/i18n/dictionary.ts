@@ -159,6 +159,7 @@ const fr = {
     items: {
       accueil: "Accueil",
       servicesMunicipaux: "Services municipaux",
+      lieuxUtiles: "Lieux utiles",
       annonces: "Annonces",
       monProfil: "Mon profil",
       lightMode: "Mode clair",
@@ -173,6 +174,7 @@ const fr = {
       comptesCitoyens: "Comptes citoyens",
       rendezVousCitoyens: "Rendez-vous citoyens",
       historiqueOperations: "Historique des opérations",
+      gererEtablissements: "Gérer les établissements",
       gererServices: "Gérer les services",
       messagesHabitants: "Messages des habitants",
       utilisateurs: "Utilisateurs",
@@ -244,6 +246,9 @@ const fr = {
       serviceCreate: "Création d’un service",
       serviceUpdate: "Modification d’un service",
       serviceDelete: "Suppression d’un service",
+      establishmentCreate: "Création d’un établissement",
+      establishmentUpdate: "Modification d’un établissement",
+      establishmentDelete: "Suppression d’un établissement",
     },
     entities: {
       user: "Utilisateur",
@@ -251,6 +256,7 @@ const fr = {
       permission: "Permission",
       municipalService: "Service",
       service: "Service",
+      establishment: "Établissement",
       announcement: "Annonce",
       contactMessage: "Message",
       contactMessagesRoute: "Message",
@@ -285,6 +291,7 @@ const fr = {
       groupMessages: "Messages des habitants",
       groupRbac: "Rôles et permissions",
       groupServices: "Services municipaux",
+      groupEstablishments: "Établissements (carte)",
       groupAccounts: "Comptes et sessions",
     },
     adminPage: {
@@ -495,6 +502,7 @@ const fr = {
     empty: "Aucune notification pour le moment.",
     errorLoad: "Impossible de charger les notifications.",
     markAllRead: "Tout marquer comme lu",
+    viewRequest: "Voir la demande",
   },
 
   agentAppointments: {
@@ -828,6 +836,21 @@ const fr = {
     loadError: "Chargement impossible",
   },
 
+  establishmentsFinder: {
+    eyebrow: "Haut Conseil de Terra Nova",
+    title: "Lieux utiles",
+    subtitle: "Hôpitaux, urgences et autres lieux utiles de Terra Nova.",
+    searchAriaLabel: "Rechercher un lieu",
+    searchPlaceholder: "Nom ou adresse",
+    filterAriaLabel: "Filtrer par service",
+    allServices: "Tous",
+    open: "Ouvert",
+    closed: "Fermé",
+    noResultsQuery: "Aucun lieu ne correspond à votre recherche.",
+    noResults: "Aucun lieu disponible pour le moment.",
+    loadError: "Chargement impossible",
+  },
+
   serviceDetail: {
     backLink: "Tous les services",
     disabledBadge: "Désactivé",
@@ -1002,6 +1025,7 @@ const en = {
     items: {
       accueil: "Home",
       servicesMunicipaux: "Municipal services",
+      lieuxUtiles: "Useful places",
       annonces: "Announcements",
       monProfil: "My profile",
       lightMode: "Light mode",
@@ -1016,6 +1040,7 @@ const en = {
       comptesCitoyens: "Citizen accounts",
       rendezVousCitoyens: "Citizen appointments",
       historiqueOperations: "Activity history",
+      gererEtablissements: "Manage facilities",
       gererServices: "Manage services",
       messagesHabitants: "Resident messages",
       utilisateurs: "Users",
@@ -1087,6 +1112,9 @@ const en = {
       serviceCreate: "Service created",
       serviceUpdate: "Service updated",
       serviceDelete: "Service deleted",
+      establishmentCreate: "Facility created",
+      establishmentUpdate: "Facility updated",
+      establishmentDelete: "Facility deleted",
     },
     entities: {
       user: "User",
@@ -1094,6 +1122,7 @@ const en = {
       permission: "Permission",
       municipalService: "Service",
       service: "Service",
+      establishment: "Facility",
       announcement: "Announcement",
       contactMessage: "Message",
       contactMessagesRoute: "Message",
@@ -1128,6 +1157,7 @@ const en = {
       groupMessages: "Resident messages",
       groupRbac: "Roles and permissions",
       groupServices: "Municipal services",
+      groupEstablishments: "Facilities (map)",
       groupAccounts: "Accounts and sessions",
     },
     adminPage: {
@@ -1334,6 +1364,7 @@ const en = {
     empty: "No notification yet.",
     errorLoad: "The notifications could not be loaded.",
     markAllRead: "Mark all as read",
+    viewRequest: "View the request",
   },
 
   agentAppointments: {
@@ -1661,6 +1692,21 @@ const en = {
     noResults: "No service available yet.",
     noDescription: "No description.",
     seeInfo: "See details",
+    loadError: "Couldn't load",
+  },
+
+  establishmentsFinder: {
+    eyebrow: "High Council of Terra Nova",
+    title: "Useful places",
+    subtitle: "Hospitals, emergency services and other useful places in Terra Nova.",
+    searchAriaLabel: "Search for a place",
+    searchPlaceholder: "Name or address",
+    filterAriaLabel: "Filter by service",
+    allServices: "All",
+    open: "Open",
+    closed: "Closed",
+    noResultsQuery: "No place matches your search.",
+    noResults: "No place available yet.",
     loadError: "Couldn't load",
   },
 
