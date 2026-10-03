@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { ArrowRight, CircleAlert, ShieldCheck } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { PasswordInput } from "@/components/auth/password-input"
 import { Breadcrumb } from "@/components/navigation/breadcrumb"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
@@ -173,9 +174,9 @@ export function AuthForm() {
 
             <div className="space-y-2">
               <Label htmlFor="password">{t("authForm.password")}</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
+                fieldLabel={t("authForm.password")}
                 autoComplete={isRegistering ? "new-password" : "current-password"}
                 minLength={isRegistering ? 8 : undefined}
                 aria-invalid={isRegistering && password.length > 0 && !isPasswordStrong(password)}

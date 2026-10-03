@@ -776,6 +776,11 @@ const fr = {
     special: "Un caractère spécial (hors espace)",
   },
 
+  passwordVisibility: {
+    show: "Afficher le mot de passe du champ {{field}}",
+    hide: "Masquer le mot de passe du champ {{field}}",
+  },
+
   authForm: {
     backToHome: "Retour à l'accueil",
     brandTagline: "Console des agents",
@@ -1640,6 +1645,11 @@ const en = {
     uppercase: "An uppercase letter",
     number: "A number",
     special: "A special character (not a space)",
+  },
+
+  passwordVisibility: {
+    show: "Show password for {{field}}",
+    hide: "Hide password for {{field}}",
   },
 
   authForm: {
