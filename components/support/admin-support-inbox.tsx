@@ -101,7 +101,15 @@ function MessageCard({
   )
 }
 
-export function AdminSupportInbox() {
+export function AdminSupportInbox({
+  eyebrow = "Administration",
+  title = "Messages des habitants",
+  description = "Consultez les messages envoyés aux services municipaux et suivez leur traitement.",
+}: {
+  eyebrow?: string
+  title?: string
+  description?: string
+}) {
   const [status, setStatus] = useState<ContactStatus | "all">("all")
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
@@ -154,10 +162,10 @@ export function AdminSupportInbox() {
     <div className="space-y-6">
       <section className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-medium text-primary">Administration</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">Messages des habitants</h1>
+          <p className="text-sm font-medium text-primary">{eyebrow}</p>
+          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{title}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Consultez les messages envoyés aux services municipaux et suivez leur traitement.
+            {description}
           </p>
         </div>
         <Button variant="outline" onClick={reload} disabled={!current}>
