@@ -1,5 +1,5 @@
+//FRONT-WEBCUP\components\ambient-clouds.tsx
 "use client"
-
 import { useEffect, useState, type CSSProperties } from "react"
 
 interface Cloud {
@@ -21,7 +21,7 @@ function createCloud(id: number): Cloud {
       "--cloud-height": `${randomBetween(120, 250)}px`,
       "--cloud-duration": `${duration}ms`,
       "--cloud-delay": `${-randomBetween(0, duration)}ms`,
-      "--cloud-opacity": (randomBetween(80, 100) / 100).toFixed(2),
+      "--cloud-opacity": (randomBetween(90, 100) / 100).toFixed(2),
       "--cloud-shape": `${randomBetween(35, 65)}% ${randomBetween(35, 65)}% ${randomBetween(35, 65)}% ${randomBetween(35, 65)}% / ${randomBetween(35, 65)}% ${randomBetween(35, 65)}% ${randomBetween(35, 65)}% ${randomBetween(35, 65)}%`,
       "--puff-one-x": `${randomBetween(5, 25)}%`,
       "--puff-one-y": `${randomBetween(-30, 0)}%`,

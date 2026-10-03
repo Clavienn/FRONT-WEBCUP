@@ -158,7 +158,7 @@
   width: var(--cloud-width);
   height: var(--cloud-height);
   opacity: var(--cloud-opacity);
-  filter: blur(30px);
+  filter: blur(10px);
   animation: cloud-drift var(--cloud-duration) linear var(--cloud-delay) infinite;
   will-change: transform;
 }
@@ -167,7 +167,8 @@
 .ambient-cloud__puff {
   position: absolute;
   display: block;
-  background: radial-gradient(ellipse at 48% 48%, rgba(158, 141, 222, 0.72), rgba(178, 169, 230, 0.48) 48%, rgba(196, 190, 237, 0.08) 78%, transparent 100%);
+  /* Opacité augmentée pour plus de visibilité */
+  background: radial-gradient(ellipse at 48% 48%, rgba(158, 141, 222, 0.95), rgba(178, 169, 230, 0.75) 48%, rgba(196, 190, 237, 0.2) 78%, transparent 100%);
 }
 
 .ambient-cloud__body {
