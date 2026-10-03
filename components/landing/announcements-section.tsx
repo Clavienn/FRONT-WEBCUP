@@ -94,7 +94,7 @@ export function AnnouncementsSection() {
     <section id="annonces" className="tn-section" aria-labelledby="annonces-title">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
         <Reveal>
-          <h2 id="actualites-title" className="tn-section-title tn-display max-w-2xl">
+          <h2 id="annonces-title" className="tn-section-title tn-display max-w-2xl">
             {t("announcements.title")}
           </h2>
         </Reveal>
