@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "@/components/ui/toast"
+import { isPasswordStrong, PasswordRequirements } from "@/components/auth/password-requirements"
 
 export function PasswordForm() {
   const { changePassword } = useAuth()
@@ -25,6 +26,10 @@ export function PasswordForm() {
     setError("")
     if (newPassword !== confirmPassword) {
       setError(t("passwordForm.errorMismatch"))
+      return
+    }
+    if (!isPasswordStrong(newPassword)) {
+      setError(t("passwordForm.errorWeakPassword"))
       return
     }
     if (newPassword === currentPassword) {
@@ -72,11 +77,13 @@ export function PasswordForm() {
             type="password"
             autoComplete="new-password"
             minLength={8}
+            aria-invalid={newPassword.length > 0 && !isPasswordStrong(newPassword)}
+            aria-describedby="password-requirements"
             value={newPassword}
             onChange={(event) => setNewPassword(event.target.value)}
             required
           />
-          <p className="text-xs text-muted-foreground">{t("passwordForm.minLengthHint")}</p>
+          <PasswordRequirements password={newPassword} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="confirmPassword">{t("passwordForm.confirmPassword")}</Label>
@@ -100,7 +107,7 @@ export function PasswordForm() {
       )}
 
       <div className="flex justify-end">
-        <Button type="submit" disabled={saving}>
+        <Button type="submit" disabled={saving || !isPasswordStrong(newPassword)}>
           {saving ? <Spinner /> : <KeyRoundIcon />}
           {t("passwordForm.submit")}
         </Button>
