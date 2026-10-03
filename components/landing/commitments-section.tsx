@@ -24,7 +24,7 @@ export function CommitmentsSection() {
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 sm:grid-cols-3">
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
           {COMMITMENTS_CONTENT.items.map((item, index) => {
             const Icon = ICONS[item.icon]
             return (
