@@ -13,7 +13,8 @@ import {
   Megaphone,
   MessageSquare,
   RadioTower,
-  Settings2,
+  KeyRound,
+  ShieldCheck,
   UserRound,
   Users,
   type LucideIcon,
@@ -95,8 +96,9 @@ const menu: MenuGroup[] = [
     items: [
       { label: "sidebar.items.gererServices", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
       { label: "sidebar.items.messagesHabitants", icon: MessageSquare, adminOnly: true, newMessagesBadge: true, href: "/dashboard/admin/messages" },
-      { label: "sidebar.items.utilisateursRoles", icon: Users, permission: "admin.users.manage" },
-      { label: "sidebar.items.permissions", icon: Settings2, permission: "admin.users.manage" },
+      { label: "sidebar.items.utilisateurs", icon: Users, permission: "admin.users.manage", href: "/dashboard/admin/users" },
+      { label: "sidebar.items.roles", icon: ShieldCheck, permission: "admin.users.manage", href: "/dashboard/admin/roles" },
+      { label: "sidebar.items.permissions", icon: KeyRound, permission: "admin.users.manage", href: "/dashboard/admin/permissions" },
     ],
   },
 ]

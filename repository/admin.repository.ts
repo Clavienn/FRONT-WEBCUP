@@ -1,0 +1,104 @@
+import { authorizedRequest } from "@/repository/auth.repository"
+
+// ── Utilisateurs ─────────────────────────────────────────────
+export interface ManagedUser {
+  id: number
+  email: string
+  firstName: string
+  lastName: string
+  phone: string | null
+  address: string | null
+  isActive: boolean
+  lastLoginAt: string | null
+  createdAt: string
+  roles?: string[]
+}
+
+export interface UserPage {
+  users: ManagedUser[]
+  page: number
+  limit: number
+  total: number
+}
+
+// ── Rôles et permissions ─────────────────────────────────────
+export interface Role {
+  id: number
+  code: string
+  label: string
+  level: number
+  isSystem: boolean
+  permissions?: string[]
+  usersCount?: number
+}
+
+export interface Permission {
+  id: number
+  code: string
+  label: string
+  module: string
+  roles?: string[]
+}
+
+export interface RoleInput {
+  label: string
+  level: number
+}
+
+export interface PermissionInput {
+  label: string
+  module: string
+}
+
+const json = (method: string, data: unknown): RequestInit => ({ method, body: JSON.stringify(data) })
+
+export const userAdminRepository = {
+  list(query: { q?: string; page?: number; limit?: number } = {}) {
+    const params = new URLSearchParams()
+    if (query.q) params.set("q", query.q)
+    if (query.page) params.set("page", String(query.page))
+    if (query.limit) params.set("limit", String(query.limit))
+    const search = params.toString()
+    return authorizedRequest<UserPage>(`/users${search ? `?${search}` : ""}`)
+  },
+
+  setStatus: (id: number, isActive: boolean) =>
+    authorizedRequest<ManagedUser>(`/users/${id}/status`, json("PATCH", { isActive })),
+
+  assignRole: (id: number, role: string) =>
+    authorizedRequest<{ roles: string[] }>(`/users/${id}/roles`, json("POST", { role })),
+
+  removeRole: (id: number, role: string) =>
+    authorizedRequest<{ roles: string[] }>(`/users/${id}/roles/${encodeURIComponent(role)}`, { method: "DELETE" }),
+}
+
+export const roleRepository = {
+  list: () => authorizedRequest<Role[]>("/roles"),
+
+  create: (data: RoleInput & { code: string }) => authorizedRequest<Role>("/roles", json("POST", data)),
+
+  update: (id: number, data: Partial<RoleInput>) => authorizedRequest<Role>(`/roles/${id}`, json("PATCH", data)),
+
+  remove: (id: number) => authorizedRequest<void>(`/roles/${id}`, { method: "DELETE" }),
+
+  // Remplace l'ensemble des permissions du rôle par exactement la liste donnée (codes)
+  setPermissions: (id: number, permissions: string[]) =>
+    authorizedRequest<{ permissions: Permission[] }>(`/roles/${id}/permissions`, json("PUT", { permissions })),
+}
+
+export const permissionRepository = {
+  list: () => authorizedRequest<Permission[]>("/permissions"),
+
+  // Détail avec les rôles qui possèdent la permission
+  get: (id: number) => authorizedRequest<Permission>(`/permissions/${id}`),
+
+  create: (data: PermissionInput & { code: string }) =>
+    authorizedRequest<Permission>("/permissions", json("POST", data)),
+
+  update: (id: number, data: Partial<PermissionInput>) =>
+    authorizedRequest<Permission>(`/permissions/${id}`, json("PATCH", data)),
+
+  // force: détache d'abord la permission des rôles qui la possèdent
+  remove: (id: number, force = false) =>
+    authorizedRequest<void>(`/permissions/${id}${force ? "?force=true" : ""}`, { method: "DELETE" }),
+}
