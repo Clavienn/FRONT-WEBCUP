@@ -108,8 +108,8 @@ export default function ProfilPage() {
               </Avatar>
               <div className="min-w-0">
                 <p className="truncate text-lg font-medium text-foreground">{fullName || user.email}</p>
-                <Badge variant={user.role === "ADMIN" ? "default" : "secondary"} className="mt-1">
-                  {user.role === "ADMIN" ? "Administrateur" : "Citoyen"}
+                <Badge variant={user.roles.includes("admin") ? "default" : "secondary"} className="mt-1">
+                  {user.roles.includes("admin") ? "Administrateur" : user.roles.includes("agent") ? "Agent" : "Citoyen"}
                 </Badge>
               </div>
             </div>
