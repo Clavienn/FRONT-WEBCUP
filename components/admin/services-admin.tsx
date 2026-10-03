@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { CircleAlert, Pencil, Plus, Trash2 } from "lucide-react"
 
-import { ServiceIcon } from "@/components/services/service-icon"
+import { ServiceIcon, serviceIcons } from "@/components/services/service-icon"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -176,7 +176,7 @@ function ServiceForm({
                 placeholder="heart-pulse"
               />
             </div>
-            <p className="text-xs text-muted-foreground">Nom d’une icône Lucide (lucide.dev/icons).</p>
+            <p className="text-xs text-muted-foreground">Icônes : {Object.keys(serviceIcons).join(", ")}.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="service-order">Ordre d’affichage</Label>

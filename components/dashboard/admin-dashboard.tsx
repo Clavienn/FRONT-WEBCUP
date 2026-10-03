@@ -16,7 +16,6 @@ import {
 
 import type { AuthUser } from "@/repository/auth.repository"
 import { Badge } from "@/components/ui/badge"
-import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 
 const adminMetrics = [
   { label: "Demandes reçues", icon: ClipboardList, source: "Flux Terra Nova" },
@@ -42,7 +41,7 @@ export function AdminDashboard({ user }: { user: AuthUser }) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
 
   return (
-    <DashboardShell user={user}>
+    <>
       <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <p className="text-sm font-medium text-primary">Haut Conseil de Terra Nova</p>
@@ -222,6 +221,6 @@ export function AdminDashboard({ user }: { user: AuthUser }) {
           </section>
         </aside>
       </div>
-    </DashboardShell>
+    </>
   )
 }
