@@ -68,7 +68,6 @@ export default function ProfilPage() {
   if (isLoading || !user) {
     return (
       <div className="grid min-h-screen place-items-center">
-      <div className="grid min-h-screen place-items-center">
         <Spinner />
       </div>
     )
