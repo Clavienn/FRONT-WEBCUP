@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
-import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clock3, FilePlus2, MapPinned, Megaphone,} from "lucide-react"
+import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clock3, Megaphone } from "lucide-react"
 
 import type { AuthUser } from "@/repository/auth.repository"
 import { useLanguage } from "@/components/i18n/language-provider"
@@ -12,8 +12,11 @@ import {
   type RequestStatus,
   type RequestStatusCounts,
 } from "@/repository/citizenRequest.repository"
+import { serviceRepository, type MunicipalService } from "@/repository/service.repository"
+import { ServiceIcon } from "@/components/services/service-icon"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const requestStates: { key: string; status: RequestStatus; icon: typeof Clock3; tone: string }[] = [
   { key: "toProcess", status: "pending", icon: Clock3, tone: "text-amber-700 dark:text-amber-300" },
@@ -22,11 +25,9 @@ const requestStates: { key: string; status: RequestStatus; icon: typeof Clock3; 
   { key: "refused", status: "rejected", icon: CircleX, tone: "text-destructive" },
 ]
 
-const citizenServices = [
-  { key: "demandes", icon: FilePlus2 },
-  { key: "signaler", icon: MapPinned },
-  { key: "communiques", icon: Megaphone },
-]
+// Un habitant doit voir d'emblée ce qu'il peut faire ici : les services réels passent
+// donc avant ses propres démarches, limités aux 3 premiers pour garder la page lisible.
+const SERVICES_SHOWN = 3
 
 function getInitials(user: AuthUser) {
   const initials = `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.trim()
@@ -45,6 +46,20 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
     loadStats()
   }, [loadStats])
 
+  const [services, setServices] = useState<MunicipalService[] | null>(null)
+  const [servicesError, setServicesError] = useState("")
+  useEffect(() => {
+    let mounted = true
+    serviceRepository
+      .list()
+      .then((data) => mounted && setServices(data))
+      .catch(() => mounted && setServicesError(t("citizenDashboard.servicesError")))
+    return () => {
+      mounted = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chargement unique au montage
+  }, [])
+
   return (
     <>
         <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -61,6 +76,48 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
             <Building2 className="size-3.5 text-primary" aria-hidden="true" />
             {t("citizenDashboard.badge")}
           </Badge>
+        </section>
+
+        <section aria-labelledby="services-title" className="space-y-4">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 id="services-title" className="text-lg font-semibold">{t("citizenDashboard.servicesTitle")}</h2>
+              <p className="text-sm text-muted-foreground">{t("citizenDashboard.servicesSubtitle")}</p>
+            </div>
+            <Link href="/dashboard/services" className="text-xs font-medium text-primary underline-offset-4 hover:underline">
+              {t("citizenDashboard.servicesSeeAll")}
+            </Link>
+          </div>
+
+          {servicesError ? (
+            <p role="alert" className="text-sm text-destructive">{servicesError}</p>
+          ) : !services ? (
+            <div className="grid gap-3 md:grid-cols-3">
+              {Array.from({ length: SERVICES_SHOWN }, (_, index) => (
+                <Skeleton key={index} className="h-32 rounded-xl" />
+              ))}
+            </div>
+          ) : services.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("citizenDashboard.servicesEmpty")}</p>
+          ) : (
+            <div className="grid gap-3 md:grid-cols-3">
+              {services.slice(0, SERVICES_SHOWN).map((service) => (
+                <Link
+                  key={service.id}
+                  href={`/dashboard/services/detail?id=${service.id}`}
+                  className="group block h-full rounded-xl border border-border/80 bg-card/70 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+                >
+                  <span className="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground">
+                    <ServiceIcon name={service.icon} className="size-4" />
+                  </span>
+                  <h3 className="mt-4 text-sm font-semibold">{service.name}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
+                    {service.description || t("citizenDashboard.servicesNoDescription")}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
 
         <section aria-labelledby="citizen-requests-title" className="space-y-3">
@@ -86,24 +143,6 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-8">
             <CitizenRequestsPanel onChanged={loadStats} />
-
-            <section aria-labelledby="services-title" className="space-y-4">
-              <div>
-                <h2 id="services-title" className="text-lg font-semibold">{t("citizenDashboard.servicesTitle")}</h2>
-                <p className="text-sm text-muted-foreground">{t("citizenDashboard.servicesSubtitle")}</p>
-              </div>
-              <div className="grid gap-3 md:grid-cols-3">
-                {citizenServices.map(({ key, icon: Icon }) => (
-                  <article key={key} className="rounded-xl border border-border/80 bg-card/70 p-4 shadow-sm backdrop-blur-sm">
-                    <span className="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground">
-                      <Icon className="size-4" aria-hidden="true" />
-                    </span>
-                    <h3 className="mt-4 text-sm font-semibold">{t(`citizenDashboard.services.${key}.title`)}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{t(`citizenDashboard.services.${key}.description`)}</p>
-                  </article>
-                ))}
-              </div>
-            </section>
           </div>
 
           <aside className="space-y-4">
