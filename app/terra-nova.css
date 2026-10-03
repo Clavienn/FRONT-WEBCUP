@@ -289,7 +289,7 @@
   text-transform: uppercase;
   letter-spacing: 0.02em;
   line-height: 1.04;
-  font-size: clamp(2.4rem, 7.2vw, 5.5rem);
+  font-size: 4rem;
 }
 
 .tn-title-accent {
@@ -426,14 +426,14 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.01em;
-  font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  font-size: 2.5rem;
 }
 
 /* Stats */
 
 .tn-stat-value {
   font-weight: 700;
-  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  font-size: 2.5rem;
   color: var(--tn-text);
   font-variant-numeric: tabular-nums;
 }
