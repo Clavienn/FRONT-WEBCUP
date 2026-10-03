@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
-import { CircleAlert, ClipboardList, RefreshCw } from "lucide-react"
+import { BadgeCheck, CircleAlert, ClipboardList, RefreshCw, Star } from "lucide-react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
 import { NewRequestForm } from "@/components/requests/new-request-form"
+import { ReviewDialog } from "@/components/services/review-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "@/components/ui/toast"
 import {
   citizenRequestRepository,
   requestStatusKey,
@@ -16,6 +18,7 @@ import {
   type CitizenRequestDetail,
   type RequestStatus,
 } from "@/repository/citizenRequest.repository"
+import { serviceRepository } from "@/repository/service.repository"
 
 type LoadState = "loading" | "error" | "ready"
 
@@ -110,6 +113,20 @@ export function CitizenRequestsPanel({ onChanged, requestsHref }: CitizenRequest
   const [formOpen, setFormOpen] = useState(false)
   const [openId, setOpenId] = useState<number | null>(null)
   const [error, setError] = useState("")
+  // Services déjà notés par le citoyen : un seul avis par service, le bouton disparaît ensuite
+  const [reviewedServiceIds, setReviewedServiceIds] = useState<Set<number>>(new Set())
+  const [reviewing, setReviewing] = useState<{ id: number; name: string } | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    serviceRepository
+      .myReviews()
+      .then((mine) => !cancelled && setReviewedServiceIds(new Set(mine.map((review) => review.serviceId))))
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // load ne remet pas l'etat a "loading" : l'etat initial l'est deja, et un setState
 // synchrone dans le corps de l'effet declenche un rendu en cascade. Les rechargements
@@ -252,6 +269,25 @@ const load = useCallback(() => {
                       </Button>
                     )}
 
+                    {request.status === "resolved" && request.service && (
+                      reviewedServiceIds.has(request.service.id) ? (
+                        <p className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                          <BadgeCheck className="size-4" aria-hidden="true" />
+                          {t("serviceReviews.reviewedShort")}
+                        </p>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2 ml-2"
+                          onClick={() => setReviewing({ id: request.service!.id, name: request.service!.name })}
+                        >
+                          <Star aria-hidden="true" />
+                          {t("serviceReviews.rateButton")}
+                        </Button>
+                      )
+                    )}
+
                     {expanded && <RequestTimeline requestId={request.id} />}
                   </li>
                 )
@@ -260,6 +296,15 @@ const load = useCallback(() => {
           </>
         )}
       </div>
+      <ReviewDialog
+        service={reviewing}
+        onClose={() => setReviewing(null)}
+        onSubmitted={(review) => {
+          setReviewedServiceIds((current) => new Set(current).add(review.serviceId))
+          setReviewing(null)
+          toast.add({ title: t("serviceReviews.success"), type: "success" })
+        }}
+      />
     </section>
   )
 }

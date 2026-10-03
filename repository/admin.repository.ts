@@ -123,6 +123,23 @@ export interface AuditLogPage {
   total: number
 }
 
+// Reflète exactement la projection platformActivityView : ni ipAddress ni e-mail, l'agent voit
+// l'auteur par son identité seule (même contrat que agentRequestView côté API). `technical` est
+// classé par le serveur : le front ne recalcule pas ce qu'est une trace de requête.
+export interface PlatformActivityLog extends Omit<AuditLog, "ipAddress" | "user"> {
+  user: { id: number; firstName: string; lastName: string } | null
+  technical: boolean
+  // E-mail du compte visé quand l'opération porte sur un utilisateur
+  targetEmail: string | null
+}
+
+export interface PlatformActivityPage {
+  logs: PlatformActivityLog[]
+  page: number
+  limit: number
+  total: number
+}
+
 export const auditRepository = {
   list(query: { userId?: number; action?: string; page?: number; limit?: number } = {}) {
     const params = new URLSearchParams()
@@ -132,5 +149,16 @@ export const auditRepository = {
     if (query.limit) params.set("limit", String(query.limit))
     const search = params.toString()
     return authorizedRequest<AuditLogPage>(`/audit-logs${search ? `?${search}` : ""}`)
+  },
+
+  // Flux d'activité de la console agent : mêmes filtres, mais sans IP ni tri par utilisateur
+  platformActivity(query: { action?: string; technical?: boolean; page?: number; limit?: number } = {}) {
+    const params = new URLSearchParams()
+    if (query.action) params.set("action", query.action)
+    if (query.technical) params.set("technical", "include")
+    if (query.page) params.set("page", String(query.page))
+    if (query.limit) params.set("limit", String(query.limit))
+    const search = params.toString()
+    return authorizedRequest<PlatformActivityPage>(`/audit-logs/activity${search ? `?${search}` : ""}`)
   },
 }

@@ -101,7 +101,7 @@ export function AnnouncementsSection() {
 
         <div className="mt-10" aria-live="polite">
           {status === "loading" && (
-            <ul className="grid gap-4 sm:grid-cols-3">
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[0, 1, 2].map((index) => (
                 <li key={index} className="tn-skeleton h-36" aria-hidden="true" />
               ))}

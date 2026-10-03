@@ -1,11 +1,12 @@
 "use client"
 
 import { useEffect, useState, type FormEvent } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, ArrowRight, CircleAlert, ShieldCheck } from "lucide-react"
+import { ArrowRight, CircleAlert, ShieldCheck } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { PasswordInput } from "@/components/auth/password-input"
+import { Breadcrumb } from "@/components/navigation/breadcrumb"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -74,10 +75,13 @@ export function AuthForm() {
   return (
     <main className="app-atmosphere grid min-h-screen place-items-center px-4 py-10">
       <section className="w-full max-w-110">
-        <Link href="/" className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-secondary-foreground transition-colors hover:text-primary">
-          <ArrowLeft className="size-4" aria-hidden="true" />
-          {t("authForm.backToHome")}
-        </Link>
+        <Breadcrumb
+          items={[
+            { label: t("nav.accueil"), href: "/" },
+            { label: t("breadcrumbs.login") },
+          ]}
+          className="mb-6"
+        />
 
         <div className="rounded-2xl border border-border/80 bg-card/85 p-6 shadow-[0_16px_48px_rgba(30,55,90,0.08)] backdrop-blur-xl sm:p-8">
           <div className="mb-8 flex items-center gap-3">
@@ -170,9 +174,9 @@ export function AuthForm() {
 
             <div className="space-y-2">
               <Label htmlFor="password">{t("authForm.password")}</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
+                fieldLabel={t("authForm.password")}
                 autoComplete={isRegistering ? "new-password" : "current-password"}
                 minLength={isRegistering ? 8 : undefined}
                 aria-invalid={isRegistering && password.length > 0 && !isPasswordStrong(password)}

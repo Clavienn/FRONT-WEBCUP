@@ -581,3 +581,65 @@
   border-top: 1px solid var(--tn-border);
   background: var(--tn-bg-elevated);
 }
+
+@media (max-width: 639px) {
+  .tn-section {
+    padding-block: var(--tn-space-16);
+  }
+
+  .tn-card {
+    padding: var(--tn-space-6);
+  }
+}
+
+@media (max-width: 379px) {
+  .tn-title {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-height: 700px) {
+  .tn-section {
+    padding-block: var(--tn-space-12);
+  }
+
+  .tn-callout,
+  .tn-rail {
+    display: none;
+  }
+
+  .tn-scrollseq__chapter {
+    padding-block: var(--tn-space-4);
+  }
+
+  .tn-scrollseq__chapter--hero {
+    gap: var(--tn-space-3);
+  }
+
+  .tn-scrollseq__chapter--hero .tn-title {
+    margin-top: var(--tn-space-2);
+  }
+
+  .tn-scrollseq__chapter--hero .tn-lead {
+    margin-top: var(--tn-space-3);
+  }
+
+  .tn-scrollseq__chapter--hero .tn-hero-actions {
+    margin-top: var(--tn-space-4);
+  }
+
+  .tn-scrollseq__chapter--story {
+    justify-content: flex-start;
+  }
+
+  .tn-scrollseq__chapter--story > div {
+    margin-top: var(--tn-space-4);
+  }
+}
+
+@media (max-height: 500px) {
+  .tn-scrollseq__chapter {
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+}

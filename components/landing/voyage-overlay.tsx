@@ -53,17 +53,17 @@ export function VoyageOverlay() {
 
       <motion.div
         style={{ opacity: heroOpacity, y: heroY, visibility: heroVisibility }}
-        className="mx-auto flex h-full w-full max-w-7xl flex-col justify-center gap-10 px-5 py-24 sm:px-8 lg:px-12"
+        className="tn-scrollseq__chapter tn-scrollseq__chapter--hero mx-auto flex h-full w-full max-w-7xl flex-col justify-center gap-5 overflow-y-auto px-5 py-5 sm:gap-8 sm:px-8 sm:py-12 lg:gap-10 lg:px-12 lg:py-24"
       >
         <div className="max-w-2xl">
           <p className="tn-kicker">{t("hero.kicker")}</p>
-          <h1 className="tn-title tn-display mt-6">
+          <h1 className="tn-title tn-display mt-3 sm:mt-6">
             <span className="tn-title-accent">{firstLetter}</span>
             {restOfTitle.join("")}
           </h1>
-          <p className="tn-lead mt-8">{t("hero.tagline")}</p>
+          <p className="tn-lead mt-4 text-sm leading-relaxed sm:mt-8 sm:text-base">{t("hero.tagline")}</p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-4">
+          <div className="tn-hero-actions mt-6 flex flex-wrap items-center gap-3 sm:mt-10 sm:gap-4">
             <Link href={HERO_CONTENT.primaryCta.href} className="tn-btn tn-btn--primary">
               {t("hero.primaryCta")}
             </Link>
@@ -73,7 +73,7 @@ export function VoyageOverlay() {
           </div>
         </div>
 
-        <div className="tn-glass-panel flex max-w-sm flex-wrap gap-x-6 gap-y-3 px-6 py-5 sm:ml-auto">
+        <div className="tn-glass-panel flex max-w-sm flex-wrap gap-x-4 gap-y-2 px-4 py-3 sm:ml-auto sm:gap-x-6 sm:gap-y-3 sm:px-6 sm:py-5">
           {heroKeywords.map((keyword) => (
             <span
               key={keyword}
@@ -88,22 +88,22 @@ export function VoyageOverlay() {
       {/* Chapitre 2 — Notre histoire */}
       <motion.div
         style={{ opacity: histoireOpacity, y: histoireY, visibility: histoireVisibility }}
-        className="absolute inset-0 mx-auto flex h-full w-full max-w-7xl flex-col justify-center px-5 sm:px-8 lg:px-12"
+        className="tn-scrollseq__chapter tn-scrollseq__chapter--story absolute inset-0 mx-auto flex h-full w-full max-w-7xl flex-col justify-center overflow-y-auto px-5 py-6 sm:px-8 sm:py-10 lg:px-12"
       >
         <h2 className="tn-section-title tn-display max-w-2xl">
           {t("presentation.title")}
         </h2>
 
-        <div className="mt-10 grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
-          <div className="space-y-5">
+        <div className="mt-5 grid gap-6 lg:mt-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+          <div className="space-y-3 sm:space-y-5">
             {presentationParagraphs.map((paragraph) => (
-              <p key={paragraph.slice(0, 24)} className="text-[var(--tn-text-muted)] leading-relaxed">
+              <p key={paragraph.slice(0, 24)} className="leading-relaxed text-[var(--tn-text-muted)]">
                 {paragraph}
               </p>
             ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-4 sm:gap-8">
             {PRESENTATION_CONTENT.stats.map((stat) => (
               <Counter key={stat.id} value={stat.value} suffix={stat.suffix} label={statLabels[stat.id]} />
             ))}

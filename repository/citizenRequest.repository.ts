@@ -94,6 +94,9 @@ export interface AgentQuery {
   status?: RequestStatus | "all"
   assignedTo?: number
   mine?: boolean
+  // Pagination côté serveur (limit plafonné à 100 par l'API)
+  page?: number
+  limit?: number
 }
 
 const json = (method: string, data: unknown): RequestInit => ({ method, body: JSON.stringify(data) })
@@ -124,7 +127,7 @@ function create(input: NewRequestInput): Promise<CitizenRequest> {
 /** File agent : filtres par statut, par agent, ou file personally suivie. */
 function listAll(query_: AgentQuery): Promise<RequestPage<AgentRequest>> {
   return authorizedRequest<RequestPage<AgentRequest>>(
-    `/requests${query({ status: query_.status, assignedTo: query_.assignedTo, mine: query_.mine })}`
+    `/requests${query({ status: query_.status, assignedTo: query_.assignedTo, mine: query_.mine, page: query_.page, limit: query_.limit })}`
   )
 }
 

@@ -8,6 +8,7 @@ import {
   CalendarClock,
   Globe,
   Landmark,
+  MapPin,
   ShieldAlert,
   ClipboardList,
   Home,
@@ -16,7 +17,6 @@ import {
   MessageSquare,
   Moon,
   Sun,
-  RadioTower,
   KeyRound,
   ScrollText,
   ShieldCheck,
@@ -33,6 +33,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { WelcomeModal } from "@/components/dashboard/welcome-modal"
+import { PageBreadcrumb } from "@/components/navigation/page-breadcrumb"
 import { Toaster } from "@/components/ui/toast"
 import {
   Sidebar,
@@ -61,6 +62,8 @@ interface MenuItem {
   // Permission RBAC requise ; absente = tout utilisateur connecté
   permission?: string
   adminOnly?: boolean
+  // Masqué pour les admins (qui ont la version complète dans le groupe Administration)
+  agentOnly?: boolean
   // Pastille avec le nombre de messages de citoyens non traités
   newMessagesBadge?: boolean
   // Vue du dashboard où la cible existe (les ancres n'existent que dans leur vue)
@@ -80,6 +83,7 @@ const menu: MenuGroup[] = [
     items: [
       { label: "sidebar.items.accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
       { label: "sidebar.items.servicesMunicipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
+      { label: "sidebar.items.lieuxUtiles", icon: MapPin, permission: "citizen.establishments.view", href: "/dashboard/lieux-utiles" },
       { label: "sidebar.items.annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
       { label: "sidebar.items.monProfil", icon: UserRound, href: "/profil" },
     ],
@@ -95,9 +99,10 @@ const menu: MenuGroup[] = [
   {
     label: "sidebar.groups.agentConsole",
     items: [
-      { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.messages.manage", view: "staff", newMessagesBadge: true, href: "/dashboard/agent/requests" },
+      { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard/agent/requests" },
+      { label: "sidebar.items.comptesCitoyens", icon: Users, permission: "agent.citizens.manage", view: "staff", href: "/dashboard/agent/citizens" },
       { label: "sidebar.items.rendezVousCitoyens", icon: CalendarClock, permission: "agent.appointments.view", view: "staff", href: "/dashboard/appointments" },
-      { label: "sidebar.items.integrationApi", icon: RadioTower, permission: "agent.dashboard.access", view: "staff", href: "/dashboard#api-status-title" },
+      { label: "sidebar.items.historiqueOperations", icon: ScrollText, permission: "agent.activity.view", view: "staff", agentOnly: true, href: "/dashboard/agent/activite" },
     ],
   },
   {
@@ -122,6 +127,7 @@ function visibleMenu(user: AuthUser, view: DashboardView): MenuGroup[] {
         (item) =>
           (!item.view || item.view === view) &&
           (!item.adminOnly || user.roles.includes("admin")) &&
+          (!item.agentOnly || !user.roles.includes("admin")) &&
           (!item.permission || user.permissions.includes(item.permission))
       ),
     }))
@@ -225,7 +231,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
       </SidebarContent>
 
       <SidebarFooter>
-        <SidebarGroup>
+        <SidebarGroup className="group-data-[collapsible=icon]:p-0">
           <SidebarGroupLabel>{t("sidebar.groups.settings")}</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -282,7 +288,10 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
             <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
             {user.permissions.includes("citizen.notifications.view") && <NotificationBell />}
           </div>
-          <div className="mx-auto max-w-7xl space-y-8 pt-2">{children}</div>
+          <div className="mx-auto max-w-7xl space-y-8 pt-2">
+            <PageBreadcrumb />
+            {children}
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

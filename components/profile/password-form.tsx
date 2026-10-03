@@ -3,10 +3,10 @@
 import { useState, type FormEvent } from "react"
 import { CircleAlert, KeyRoundIcon } from "lucide-react"
 
+import { PasswordInput } from "@/components/auth/password-input"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { toast } from "@/components/ui/toast"
@@ -59,9 +59,9 @@ export function PasswordForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="currentPassword">{t("passwordForm.currentPassword")}</Label>
-        <Input
+        <PasswordInput
           id="currentPassword"
-          type="password"
+          fieldLabel={t("passwordForm.currentPassword")}
           autoComplete="current-password"
           value={currentPassword}
           onChange={(event) => setCurrentPassword(event.target.value)}
@@ -72,9 +72,9 @@ export function PasswordForm() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="newPassword">{t("passwordForm.newPassword")}</Label>
-          <Input
+          <PasswordInput
             id="newPassword"
-            type="password"
+            fieldLabel={t("passwordForm.newPassword")}
             autoComplete="new-password"
             minLength={8}
             aria-invalid={newPassword.length > 0 && !isPasswordStrong(newPassword)}
@@ -87,9 +87,9 @@ export function PasswordForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="confirmPassword">{t("passwordForm.confirmPassword")}</Label>
-          <Input
+          <PasswordInput
             id="confirmPassword"
-            type="password"
+            fieldLabel={t("passwordForm.confirmPassword")}
             autoComplete="new-password"
             minLength={8}
             value={confirmPassword}

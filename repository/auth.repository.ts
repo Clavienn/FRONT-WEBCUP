@@ -41,6 +41,12 @@ export interface ProfileUpdate {
   address?: string | null
 }
 
+// Réponse de GET /auth/me/welcome : le serveur décide si l'accueil est proposé (moins de 2 sessions ouvertes)
+export interface WelcomeStatus {
+  showWelcome: boolean
+  sessionCount: number
+}
+
 export interface PasswordChange {
   currentPassword: string
   newPassword: string
@@ -230,6 +236,8 @@ export const authRepository = {
   async me() {
     return normalizeAuthUser(await authorizedRequest<unknown>("/auth/me"))
   },
+
+  welcomeStatus: () => authorizedRequest<WelcomeStatus>("/auth/me/welcome"),
 
   async updateProfile(data: ProfileUpdate) {
     return normalizeAuthUser(
