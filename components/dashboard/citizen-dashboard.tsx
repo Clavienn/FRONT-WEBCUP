@@ -4,6 +4,7 @@ import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clo
 import type { AuthUser } from "@/repository/auth.repository"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 
 const requestStates = [
   { label: "À traiter", icon: Clock3, tone: "text-amber-700 dark:text-amber-300" },
@@ -39,34 +40,7 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
 
   return (
-    <main className="app-atmosphere min-h-screen px-4 pb-12 pt-20 text-foreground sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-5">
-          <Link href="/" className="flex min-w-0 items-center gap-3" aria-label="Terra Nova, espace citoyen">
-            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-              <Building2 className="size-5" aria-hidden="true" />
-            </span>
-            <span className="min-w-0">
-              <span className="block truncate text-sm font-semibold tracking-[0.08em]">TERRA NOVA</span>
-              <span className="block text-xs text-muted-foreground">Espace citoyen</span>
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <div className="hidden text-right sm:block">
-              <p className="max-w-48 truncate text-sm font-medium">{fullName}</p>
-              <p className="text-xs text-muted-foreground">Citoyen</p>
-            </div>
-            <Link href="/profil" aria-label={`Ouvrir le profil de ${fullName}`} title="Mon profil">
-              <Avatar className="size-10 ring-2 ring-background transition-shadow hover:ring-primary/50">
-                <AvatarFallback className="bg-accent font-semibold text-accent-foreground">
-                  {getInitials(user)}
-                </AvatarFallback>
-              </Avatar>
-            </Link>
-          </div>
-        </header>
-
+    <DashboardShell user={user}>
         <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-sm font-medium text-primary">La première ville d’un nouveau monde</p>
@@ -194,7 +168,6 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
           <Building2 className="size-3.5" aria-hidden="true" />
           Plateforme centrale de Terra Nova
         </footer>
-      </div>
-    </main>
+    </DashboardShell>
   )
 }
