@@ -32,7 +32,7 @@ export const SERVICES: ServiceCardData[] = [
     description:
       "Suivez les décisions et annonces officielles du Haut Conseil ainsi que la vie de votre quartier.",
     icon: "news",
-    href: "#actualites",
+    href: "#annonces",
   },
   {
     id: "communiquer",
