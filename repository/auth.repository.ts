@@ -148,7 +148,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   const headers = new Headers(init.headers)
-  if (init.body && !headers.has("Content-Type")) {
+  // FormData (upload de fichier) : laisser fetch poser son propre Content-Type avec la boundary
+  if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json")
   }
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`)
@@ -262,6 +263,17 @@ export const authRepository = {
     } finally {
       accessToken = null
     }
+  },
+
+  // Suppression définitive du compte. Le token n'est lâché qu'en cas de succès : sur un refus
+  // (mot de passe erroné) la session est toujours valide et doit rester utilisable pour
+  // que l'utilisateur puisse réessayer.
+  async deleteAccount(password: string): Promise<void> {
+    await authorizedRequest<void>("/auth/me", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+    })
+    accessToken = null
   },
 
   clearAccessToken() {
