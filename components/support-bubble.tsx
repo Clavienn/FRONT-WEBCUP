@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
-import { supportRepository, type SupportReceipt } from "@/repository/support.repository"
+import { contactMessageRepository, type ContactReceipt } from "@/repository/contactMessage.repository"
 
 interface DragState {
   pointerId: number
@@ -38,7 +38,7 @@ export function SupportBubble() {
   const [message, setMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState("")
-  const [receipt, setReceipt] = useState<SupportReceipt | null>(null)
+  const [receipt, setReceipt] = useState<ContactReceipt | null>(null)
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
   const dragState = useRef<DragState | null>(null)
   const suppressClick = useRef(false)
@@ -97,7 +97,7 @@ export function SupportBubble() {
     setError("")
     setIsSending(true)
     try {
-      setReceipt(await supportRepository.create({ subject: subject.trim(), message: message.trim() }))
+      setReceipt(await contactMessageRepository.send({ subject: subject.trim(), message: message.trim() }))
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Impossible d’envoyer votre demande.")
     } finally {
@@ -135,8 +135,8 @@ export function SupportBubble() {
                 <DialogDescription>{receipt.confirmation}</DialogDescription>
               </DialogHeader>
               <div className="rounded-xl border border-border/70 bg-muted/40 p-4">
-                <p className="text-sm font-medium">{receipt.conversation.subject}</p>
-                <p className="mt-1 text-xs text-muted-foreground">Référence #{receipt.conversation.id}</p>
+                <p className="text-sm font-medium">{receipt.contactMessage.subject}</p>
+                <p className="mt-1 text-xs text-muted-foreground">Référence #{receipt.contactMessage.id}</p>
               </div>
               <DialogFooter>
                 <Button type="button" onClick={() => setIsOpen(false)}>Terminer</Button>
