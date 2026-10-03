@@ -1,7 +1,10 @@
+"use client"
+
 import "./terra-nova.css"
 
 import { MotionConfig } from "framer-motion"
 
+import { useLanguage } from "@/components/i18n/language-provider"
 import { LandingNavbar } from "@/components/landing/landing-navbar"
 import { VoyageSection } from "@/components/landing/voyage-section"
 import { ServicesSection } from "@/components/landing/services-section"
@@ -15,11 +18,13 @@ import { ScrollNavDots } from "@/components/landing/scroll-nav-dots"
 import { SocialRail } from "@/components/landing/social-rail"
 
 export default function Page() {
+  const { t } = useLanguage()
+
   return (
     <MotionConfig reducedMotion="user">
       <div className="terra-landing">
         <a href="#contenu" className="tn-skip-link">
-          Aller au contenu
+          {t("skipLink")}
         </a>
 
         <div className="tn-grid-overlay" aria-hidden="true" />

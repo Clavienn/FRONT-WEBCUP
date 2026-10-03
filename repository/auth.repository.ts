@@ -118,10 +118,11 @@ export function normalizeAuthUser(value: unknown): AuthUser {
   }
 }
 
+// Retourne le code de rôle ("admin" | "agent" | "citizen") ; traduire via t(`roles.${roleLabel(user)}`)
 export function roleLabel(user: AuthUser) {
-  if (user.roles.includes("admin")) return "Administrateur"
-  if (user.roles.includes("agent")) return "Agent de service"
-  return "Citoyen"
+  if (user.roles.includes("admin")) return "admin"
+  if (user.roles.includes("agent")) return "agent"
+  return "citizen"
 }
 
 export class AuthApiError extends Error {

@@ -6,22 +6,22 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, ArrowRight, CircleAlert, ShieldCheck } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import type { SignupRole } from "@/repository/auth.repository"
 
-const signupRoles: { value: SignupRole; label: string; hint: string }[] = [
-  { value: "citizen", label: "Citoyen", hint: "Demandes et signalements" },
-  { value: "agent", label: "Agent", hint: "Console des agents" },
-]
+const signupRoles: SignupRole[] = ["citizen", "agent"]
+const ROLE_DICT_KEY: Record<SignupRole, string> = { citizen: "roleCitizen", agent: "roleAgent" }
 
 type AuthMode = "login" | "register"
 
 export function AuthForm() {
   const router = useRouter()
   const { user, isLoading, signIn, signUp } = useAuth()
+  const { t } = useLanguage()
   const [mode, setMode] = useState<AuthMode>("login")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
@@ -55,7 +55,7 @@ export function AuthForm() {
       }
       router.replace("/dashboard")
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Une erreur est survenue. Réessayez.")
+      setError(cause instanceof Error ? cause.message : t("authForm.errorGeneric"))
     } finally {
       setIsSubmitting(false)
     }
@@ -71,7 +71,7 @@ export function AuthForm() {
       <section className="w-full max-w-110">
         <Link href="/" className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-secondary-foreground transition-colors hover:text-primary">
           <ArrowLeft className="size-4" aria-hidden="true" />
-          Retour à l’accueil
+          {t("authForm.backToHome")}
         </Link>
 
         <div className="rounded-2xl border border-border/80 bg-card/85 p-6 shadow-[0_16px_48px_rgba(30,55,90,0.08)] backdrop-blur-xl sm:p-8">
@@ -81,21 +81,19 @@ export function AuthForm() {
             </span>
             <div>
               <p className="text-sm font-semibold tracking-[0.08em] text-foreground">TERRA NOVA</p>
-              <p className="text-xs text-muted-foreground">Console des agents</p>
+              <p className="text-xs text-muted-foreground">{t("authForm.brandTagline")}</p>
             </div>
           </div>
 
           <header className="mb-7 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
-              Haut Conseil de Terra Nova
+              {t("authForm.kicker")}
             </p>
             <h1 className="text-3xl font-medium tracking-tight text-foreground">
-              {isRegistering ? "Créer un compte" : "Connexion"}
+              {isRegistering ? t("authForm.titleRegister") : t("authForm.titleLogin")}
             </h1>
             <p className="text-sm leading-6 text-muted-foreground">
-              {isRegistering
-                ? "Créez votre accès à la console des agents de Terra Nova."
-                : "Connectez-vous pour accompagner les habitants de Terra Nova."}
+              {isRegistering ? t("authForm.subtitleRegister") : t("authForm.subtitleLogin")}
             </p>
           </header>
 
@@ -103,7 +101,7 @@ export function AuthForm() {
             {isRegistering && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom</Label>
+                  <Label htmlFor="firstName">{t("authForm.firstName")}</Label>
                   <Input
                     id="firstName"
                     autoComplete="given-name"
@@ -114,7 +112,7 @@ export function AuthForm() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom</Label>
+                  <Label htmlFor="lastName">{t("authForm.lastName")}</Label>
                   <Input
                     id="lastName"
                     autoComplete="family-name"
@@ -129,22 +127,22 @@ export function AuthForm() {
 
             {isRegistering && (
               <fieldset className="space-y-2">
-                <legend className="text-sm font-medium leading-none">Je suis</legend>
+                <legend className="text-sm font-medium leading-none">{t("authForm.roleLegend")}</legend>
                 <div className="grid grid-cols-2 gap-3 pt-1">
-                  {signupRoles.map((option) => (
+                  {signupRoles.map((value) => (
                     <button
-                      key={option.value}
+                      key={value}
                       type="button"
-                      aria-pressed={role === option.value}
-                      onClick={() => setRole(option.value)}
+                      aria-pressed={role === value}
+                      onClick={() => setRole(value)}
                       className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${
-                        role === option.value
+                        role === value
                           ? "border-primary bg-accent text-foreground"
                           : "border-border bg-card/60 text-muted-foreground hover:border-primary/50"
                       }`}
                     >
-                      <span className="block text-sm font-semibold">{option.label}</span>
-                      <span className="block text-xs">{option.hint}</span>
+                      <span className="block text-sm font-semibold">{t(`authForm.${ROLE_DICT_KEY[value]}.label`)}</span>
+                      <span className="block text-xs">{t(`authForm.${ROLE_DICT_KEY[value]}.hint`)}</span>
                     </button>
                   ))}
                 </div>
@@ -152,7 +150,7 @@ export function AuthForm() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Adresse e-mail</Label>
+              <Label htmlFor="email">{t("authForm.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -160,13 +158,13 @@ export function AuthForm() {
                 maxLength={255}
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="nom@exemple.com"
+                placeholder={t("authForm.emailPlaceholder")}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password">{t("authForm.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -177,7 +175,7 @@ export function AuthForm() {
                 required
               />
               {isRegistering && (
-                <p className="text-xs text-muted-foreground">8 caractères minimum.</p>
+                <p className="text-xs text-muted-foreground">{t("authForm.passwordMinHint")}</p>
               )}
             </div>
 
@@ -191,24 +189,24 @@ export function AuthForm() {
             <Button type="submit" className="h-10 w-full rounded-xl" disabled={isLoading || isSubmitting}>
               {(isLoading || isSubmitting) ? <Spinner /> : null}
               {isLoading
-                ? "Vérification de la session..."
+                ? t("authForm.submitChecking")
                 : isSubmitting
-                  ? "Veuillez patienter..."
+                  ? t("authForm.submitWait")
                   : isRegistering
-                    ? "Créer mon compte"
-                    : "Se connecter"}
+                    ? t("authForm.submitCreate")
+                    : t("authForm.submitLogin")}
               {!isLoading && !isSubmitting && <ArrowRight className="size-4" aria-hidden="true" />}
             </Button>
           </form>
 
           <p className="mt-6 border-t border-border/70 pt-5 text-center text-sm text-muted-foreground">
-            {isRegistering ? "Vous avez déjà un compte ?" : "Vous n’avez pas encore de compte ?"}{" "}
+            {isRegistering ? t("authForm.switchHasAccount") : t("authForm.switchNoAccount")}{" "}
             <button
               type="button"
               onClick={changeMode}
               className="font-semibold text-primary underline-offset-4 hover:underline"
             >
-              {isRegistering ? "Se connecter" : "Créer un compte"}
+              {isRegistering ? t("authForm.switchToLogin") : t("authForm.switchToRegister")}
             </button>
           </p>
         </div>

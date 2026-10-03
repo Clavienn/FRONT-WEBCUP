@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { Moon, Sun } from "lucide-react"
 
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 
 type Theme = "light" | "dark"
@@ -17,6 +18,7 @@ function applyTheme(theme: Theme) {
 }
 
 export function ThemeToggle() {
+  const { t } = useLanguage()
   const [theme, setTheme] = useState<Theme>("light")
 
   useEffect(() => {
@@ -39,7 +41,7 @@ export function ThemeToggle() {
     setTheme(nextTheme)
   }
 
-  const nextThemeLabel = theme === "dark" ? "clair" : "sombre"
+  const nextThemeLabel = theme === "dark" ? t("themeToggle.activateLight") : t("themeToggle.activateDark")
 
   return (
     <Button
@@ -48,8 +50,8 @@ export function ThemeToggle() {
       size="icon"
       className="fixed top-4 right-4 z-40 size-10 rounded-full border-border/80 bg-card/85 shadow-sm backdrop-blur-md"
       onClick={toggleTheme}
-      aria-label={`Activer le mode ${nextThemeLabel}`}
-      title={`Activer le mode ${nextThemeLabel}`}
+      aria-label={nextThemeLabel}
+      title={nextThemeLabel}
     >
       {theme === "dark" ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
     </Button>

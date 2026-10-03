@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { getAnnouncements, type Announcement } from "@/lib/services/announcements"
-import { ANNOUNCEMENTS_CONTENT } from "@/config/landing-content"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Reveal } from "@/components/landing/reveal"
 
 type Status = "loading" | "error" | "empty" | "success"
@@ -48,6 +48,7 @@ function AnnouncementCard({ announcement }: { announcement: Announcement }) {
 }
 
 export function AnnouncementsSection() {
+  const { t } = useLanguage()
   const [status, setStatus] = useState<Status>("loading")
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
   const [total, setTotal] = useState(0)
@@ -93,8 +94,8 @@ export function AnnouncementsSection() {
     <section id="annonces" className="tn-section" aria-labelledby="annonces-title">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
         <Reveal>
-          <h2 id="annonces-title" className="tn-section-title tn-display max-w-2xl">
-            {ANNOUNCEMENTS_CONTENT.title}
+          <h2 id="actualites-title" className="tn-section-title tn-display max-w-2xl">
+            {t("announcements.title")}
           </h2>
         </Reveal>
 
@@ -109,13 +110,13 @@ export function AnnouncementsSection() {
 
           {status === "error" && (
             <p className="tn-card max-w-md text-sm text-[var(--tn-text-muted)]" role="alert">
-              {ANNOUNCEMENTS_CONTENT.errorMessage}
+              {t("announcements.error")}
             </p>
           )}
 
           {status === "empty" && (
             <p className="tn-card max-w-md text-sm text-[var(--tn-text-muted)]">
-              {ANNOUNCEMENTS_CONTENT.emptyMessage}
+              {t("announcements.empty")}
             </p>
           )}
 

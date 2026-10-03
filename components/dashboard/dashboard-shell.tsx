@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
@@ -66,35 +67,35 @@ interface MenuGroup {
 
 const menu: MenuGroup[] = [
   {
-    label: "Navigation",
+    label: "sidebar.groups.navigation",
     items: [
-      { label: "Accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
-      { label: "Services municipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
-      { label: "Annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
-      { label: "Mon profil", icon: UserRound, href: "/profil" },
+      { label: "sidebar.items.accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
+      { label: "sidebar.items.servicesMunicipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
+      { label: "sidebar.items.monProfil", icon: UserRound, href: "/profil" },
     ],
   },
   {
-    label: "Espace citoyen",
+    label: "sidebar.groups.citizenSpace",
     items: [
-      { label: "Mes démarches", icon: ClipboardList, permission: "citizen.services.view", view: "citizen", href: "/dashboard#recent-requests-title" },
-      { label: "Envoyer un message", icon: MessageSquare, permission: "citizen.message.send", view: "citizen" },
+      { label: "sidebar.items.mesDemarches", icon: ClipboardList, permission: "citizen.services.view", view: "citizen", href: "/dashboard#recent-requests-title" },
+      { label: "sidebar.items.communiques", icon: Megaphone, permission: "citizen.announcements.view", view: "citizen", href: "/dashboard#city-updates-title" },
+      { label: "sidebar.items.envoyerMessage", icon: MessageSquare, permission: "citizen.message.send", view: "citizen" },
     ],
   },
   {
-    label: "Console des agents",
+    label: "sidebar.groups.agentConsole",
     items: [
-      { label: "Demandes citoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard#queues-title" },
-      { label: "Intégration API", icon: RadioTower, permission: "agent.dashboard.access", view: "staff", href: "/dashboard#api-status-title" },
+      { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard#queues-title" },
+      { label: "sidebar.items.integrationApi", icon: RadioTower, permission: "agent.dashboard.access", view: "staff", href: "/dashboard#api-status-title" },
+      { label: "sidebar.items.communiques", icon: Megaphone, permission: "citizen.announcements.view", view: "staff", href: "/dashboard#announcements-title" },
     ],
   },
   {
-    label: "Administration",
+    label: "sidebar.groups.administration",
     items: [
-      { label: "Gérer les services", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
-      { label: "Messages des habitants", icon: MessageSquare, adminOnly: true, newMessagesBadge: true, href: "/dashboard/admin/messages" },
-      { label: "Utilisateurs et rôles", icon: Users, permission: "admin.users.manage" },
-      { label: "Permissions", icon: Settings2, permission: "admin.users.manage" },
+      { label: "sidebar.items.gererServices", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
+      { label: "sidebar.items.utilisateursRoles", icon: Users, permission: "admin.users.manage" },
+      { label: "sidebar.items.permissions", icon: Settings2, permission: "admin.users.manage" },
     ],
   },
 ]
@@ -123,6 +124,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
   const pathname = usePathname()
   const router = useRouter()
   const { signOut } = useAuth()
+  const { t } = useLanguage()
   const view: DashboardView = isStaff(user) ? "staff" : "citizen"
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
 
@@ -159,7 +161,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
               <span className="grid min-w-0 flex-1 text-left leading-tight">
                 <span className="truncate text-sm font-semibold tracking-[0.08em]">TERRA NOVA</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  {view === "staff" ? "Console des agents" : "Espace citoyen"}
+                  {view === "staff" ? t("sidebar.brand.staff") : t("sidebar.brand.citizen")}
                 </span>
               </span>
             </SidebarMenuButton>
@@ -170,7 +172,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
       <SidebarContent>
         {visibleMenu(user, view).map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t(group.label)}</SidebarGroupLabel>
             <SidebarMenu>
               {group.items.map(({ label, icon: Icon, href, newMessagesBadge }) => (
                 <SidebarMenuItem key={label}>
@@ -178,16 +180,16 @@ function AppSidebar({ user }: { user: AuthUser }) {
                     <SidebarMenuButton
                       render={<Link href={href} />}
                       isActive={!href.includes("#") && pathname === href}
-                      tooltip={label}
+                      tooltip={t(label)}
                     >
                       <Icon aria-hidden="true" />
-                      <span>{label}</span>
+                      <span>{t(label)}</span>
                     </SidebarMenuButton>
                   ) : (
-                    <SidebarMenuButton disabled tooltip={`${label} (bientôt)`}>
+                    <SidebarMenuButton disabled tooltip={`${t(label)} (${t("sidebar.comingSoon")})`}>
                       <Icon aria-hidden="true" />
-                      <span>{label}</span>
-                      <Badge variant="outline" className="ml-auto text-[10px]">Bientôt</Badge>
+                      <span>{t(label)}</span>
+                      <Badge variant="outline" className="ml-auto text-[10px]">{t("sidebar.comingSoon")}</Badge>
                     </SidebarMenuButton>
                   )}
                   {newMessagesBadge && newMessages > 0 && (
@@ -211,14 +213,14 @@ function AppSidebar({ user }: { user: AuthUser }) {
               </Avatar>
               <span className="grid min-w-0 flex-1 text-left leading-tight">
                 <span className="truncate text-sm font-medium">{fullName}</span>
-                <span className="truncate text-xs text-muted-foreground">{roleLabel(user)}</span>
+                <span className="truncate text-xs text-muted-foreground">{t(`roles.${roleLabel(user)}`)}</span>
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleSignOut} tooltip="Se déconnecter">
+            <SidebarMenuButton onClick={handleSignOut} tooltip={t("sidebar.signOut")}>
               <LogOut aria-hidden="true" />
-              <span>Se déconnecter</span>
+              <span>{t("sidebar.signOut")}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -229,12 +231,14 @@ function AppSidebar({ user }: { user: AuthUser }) {
 }
 
 function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children: React.ReactNode }>) {
+  const { t } = useLanguage()
+
   return (
     <SidebarProvider>
       <AppSidebar user={user} />
       <SidebarInset className="app-atmosphere min-h-screen bg-transparent text-foreground">
         <div className="px-4 pb-12 pt-4 sm:px-6 lg:px-8">
-          <SidebarTrigger aria-label="Afficher ou masquer le menu" className="mb-4" />
+          <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} className="mb-4" />
           <div className="mx-auto max-w-7xl space-y-8 pt-2">{children}</div>
         </div>
       </SidebarInset>
@@ -269,26 +273,14 @@ export function DashboardFrame({ children }: Readonly<{ children: React.ReactNod
 // Protège une page par permission (le serveur refuse de toute façon les appels sans droit)
 export function RequirePermission({ permission, children }: Readonly<{ permission: string; children: React.ReactNode }>) {
   const { user } = useAuth()
+  const { t } = useLanguage()
   if (user?.permissions.includes(permission)) return <>{children}</>
 
   return (
     <div className="flex min-h-64 flex-col items-center justify-center gap-2 rounded-2xl border border-border/80 bg-card/70 p-8 text-center">
       <ShieldAlert className="size-6 text-muted-foreground" aria-hidden="true" />
-      <p className="font-medium">Accès refusé</p>
-      <p className="text-sm text-muted-foreground">Votre rôle ne donne pas accès à cette page.</p>
-    </div>
-  )
-}
-
-export function RequireAdmin({ children }: Readonly<{ children: React.ReactNode }>) {
-  const { user } = useAuth()
-  if (user?.roles.includes("admin")) return <>{children}</>
-
-  return (
-    <div className="flex min-h-64 flex-col items-center justify-center gap-2 rounded-2xl border border-border/80 bg-card/70 p-8 text-center">
-      <ShieldAlert className="size-6 text-muted-foreground" aria-hidden="true" />
-      <p className="font-medium">Accès réservé à l’administration</p>
-      <p className="text-sm text-muted-foreground">Votre compte ne dispose pas du rôle administrateur.</p>
+      <p className="font-medium">{t("requirePermission.title")}</p>
+      <p className="text-sm text-muted-foreground">{t("requirePermission.description")}</p>
     </div>
   )
 }
