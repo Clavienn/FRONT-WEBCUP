@@ -8,6 +8,7 @@ import {
   CalendarClock,
   Globe,
   Landmark,
+  MapPin,
   ShieldAlert,
   ClipboardList,
   Home,
@@ -32,6 +33,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { WelcomeModal } from "@/components/dashboard/welcome-modal"
+import { PageBreadcrumb } from "@/components/navigation/page-breadcrumb"
 import { Toaster } from "@/components/ui/toast"
 import {
   Sidebar,
@@ -81,6 +83,7 @@ const menu: MenuGroup[] = [
     items: [
       { label: "sidebar.items.accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
       { label: "sidebar.items.servicesMunicipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
+      { label: "sidebar.items.lieuxUtiles", icon: MapPin, permission: "citizen.establishments.view", href: "/dashboard/lieux-utiles" },
       { label: "sidebar.items.annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
       { label: "sidebar.items.monProfil", icon: UserRound, href: "/profil" },
     ],
@@ -285,7 +288,10 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
             <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
             {user.permissions.includes("citizen.notifications.view") && <NotificationBell />}
           </div>
-          <div className="mx-auto max-w-7xl space-y-8 pt-2">{children}</div>
+          <div className="mx-auto max-w-7xl space-y-8 pt-2">
+            <PageBreadcrumb />
+            {children}
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>
