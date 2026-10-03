@@ -2,10 +2,11 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
 import {
-  AuthApiError,
   authRepository,
   type AuthUser,
   type Credentials,
+  type PasswordChange,
+  type ProfileUpdate,
   type RegistrationData,
 } from "@/repository/auth.repository"
 
@@ -17,6 +18,8 @@ interface AuthContextValue {
   signOut: () => Promise<void>
   signOutEverywhere: () => Promise<void>
   reloadUser: () => Promise<AuthUser>
+  updateProfile: (data: ProfileUpdate) => Promise<AuthUser>
+  changePassword: (data: PasswordChange) => Promise<AuthUser>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -73,22 +76,38 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
     }
   }
 
-  // Recharge le profil depuis /auth/me ; si l'access token a expiré, on repasse par /auth/refresh
+  // Recharge le profil depuis /auth/me
   const reloadUser = useCallback(async () => {
-    let sessionUser: AuthUser
-    try {
-      sessionUser = await authRepository.me()
-    } catch (error) {
-      if (!(error instanceof AuthApiError) || error.status !== 401) throw error
-      sessionUser = await authRepository.refresh()
-    }
+    const sessionUser = await authRepository.me()
     setUser(sessionUser)
     return sessionUser
   }, [])
 
+  const updateProfile = async (data: ProfileUpdate) => {
+    const sessionUser = await authRepository.updateProfile(data)
+    setUser(sessionUser)
+    return sessionUser
+  }
+
+  const changePassword = async (data: PasswordChange) => {
+    const sessionUser = await authRepository.changePassword(data)
+    setUser(sessionUser)
+    return sessionUser
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, signIn, signUp, signOut, signOutEverywhere, reloadUser }}
+      value={{
+        user,
+        isLoading,
+        signIn,
+        signUp,
+        signOut,
+        signOutEverywhere,
+        reloadUser,
+        updateProfile,
+        changePassword,
+      }}
     >
       {children}
     </AuthContext.Provider>

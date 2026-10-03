@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 import { ArrowLeftIcon, CalendarIcon, LogOutIcon, MailIcon, MonitorSmartphoneIcon, UserIcon } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { PasswordForm } from "@/components/profile/password-form"
+import { ProfileForm } from "@/components/profile/profile-form"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -121,6 +123,25 @@ export default function ProfilPage() {
                 </div>
               ))}
             </dl>
+          </section>
+
+          <section className="rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm">
+            <div className="mb-5">
+              <h2 className="font-medium text-foreground">Modifier le profil</h2>
+              <p className="text-sm text-muted-foreground">Mettez à jour votre nom et votre adresse e-mail.</p>
+            </div>
+            {/* key : réinitialise le formulaire quand le profil est rechargé ou enregistré */}
+            <ProfileForm key={`${user.id}-${user.updatedAt}`} user={user} />
+          </section>
+
+          <section className="rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm">
+            <div className="mb-5">
+              <h2 className="font-medium text-foreground">Mot de passe</h2>
+              <p className="text-sm text-muted-foreground">
+                Les autres appareils seront déconnectés après le changement.
+              </p>
+            </div>
+            <PasswordForm />
           </section>
 
           <section className="flex flex-col gap-3 rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">

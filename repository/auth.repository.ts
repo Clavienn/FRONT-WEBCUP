@@ -20,6 +20,17 @@ export interface RegistrationData extends Credentials {
   lastName?: string
 }
 
+export interface ProfileUpdate {
+  email?: string
+  firstName?: string | null
+  lastName?: string | null
+}
+
+export interface PasswordChange {
+  currentPassword: string
+  newPassword: string
+}
+
 interface AuthResponse {
   user: AuthUser
   accessToken: string
@@ -68,6 +79,21 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return body as T
 }
 
+// Message renvoyé par le middleware authenticate du backend quand l'access token est absent/expiré
+const isAccessTokenError = (error: unknown) =>
+  error instanceof AuthApiError && error.status === 401 && /token d'accès/i.test(error.message)
+
+// Requête protégée : si l'access token a expiré, on passe une fois par /auth/refresh puis on rejoue
+async function authorizedRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  try {
+    return await request<T>(path, init)
+  } catch (error) {
+    if (!isAccessTokenError(error)) throw error
+    await authRepository.refresh()
+    return request<T>(path, init)
+  }
+}
+
 async function authenticate(path: string, data: Credentials | RegistrationData): Promise<AuthUser> {
   const session = await request<AuthResponse>(path, {
     method: "POST",
@@ -99,8 +125,19 @@ export const authRepository = {
     }
   },
 
-  async me(): Promise<AuthUser> {
-    return request<AuthUser>("/auth/me")
+  me: () => authorizedRequest<AuthUser>("/auth/me"),
+
+  updateProfile: (data: ProfileUpdate) =>
+    authorizedRequest<AuthUser>("/auth/me", { method: "PATCH", body: JSON.stringify(data) }),
+
+  // Le backend révoque les autres sessions et renvoie de nouveaux tokens pour celle-ci
+  async changePassword(data: PasswordChange): Promise<AuthUser> {
+    const session = await authorizedRequest<AuthResponse>("/auth/me/password", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    })
+    accessToken = session.accessToken
+    return session.user
   },
 
   async logout(): Promise<void> {
@@ -113,7 +150,7 @@ export const authRepository = {
 
   async logoutAll(): Promise<void> {
     try {
-      await request<void>("/auth/logout-all", { method: "POST" })
+      await authorizedRequest<void>("/auth/logout-all", { method: "POST" })
     } finally {
       accessToken = null
     }
