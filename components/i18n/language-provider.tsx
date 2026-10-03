@@ -3,9 +3,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
 
 import { dictionary, type DictionaryNode } from "@/lib/i18n/dictionary"
-import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/i18n/types"
+import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, isLocale, type Locale } from "@/lib/i18n/types"
 
-const STORAGE_KEY = "terra-nova-locale"
+const STORAGE_KEY = LOCALE_STORAGE_KEY
 
 interface LanguageContextValue {
   locale: Locale

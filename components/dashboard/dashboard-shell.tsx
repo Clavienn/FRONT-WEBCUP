@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 import {
   Building2,
   CalendarClock,
+  Globe,
   Landmark,
   ShieldAlert,
   ClipboardList,
@@ -13,6 +14,8 @@ import {
   LogOut,
   Megaphone,
   MessageSquare,
+  Moon,
+  Sun,
   RadioTower,
   KeyRound,
   ScrollText,
@@ -24,6 +27,8 @@ import {
 
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useTheme } from "@/hooks/use-theme"
+import { NotificationBell } from "@/components/notifications/notification-bell"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
@@ -132,9 +137,16 @@ function AppSidebar({ user }: { user: AuthUser }) {
   const pathname = usePathname()
   const router = useRouter()
   const { signOut } = useAuth()
-  const { t } = useLanguage()
+  const { t, locale, setLocale } = useLanguage()
+  const { theme, toggleTheme } = useTheme()
   const view: DashboardView = isStaff(user) ? "staff" : "citizen"
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
+
+  // Réglages du footer : libellés décrivant l'état courant, le clic bascule
+  const themeLabel = t(theme === "dark" ? "sidebar.items.darkMode" : "sidebar.items.lightMode")
+  const localeLabel = t(locale === "fr" ? "sidebar.items.french" : "sidebar.items.english")
+  const ThemeIcon = theme === "dark" ? Moon : Sun
+  const switchLocale = () => setLocale(locale === "fr" ? "en" : "fr")
 
   // Messages "nouveaux" de la boîte de réception (admin) : compteur de la pastille du menu
   const [newMessages, setNewMessages] = useState(0)
@@ -213,6 +225,23 @@ function AppSidebar({ user }: { user: AuthUser }) {
       </SidebarContent>
 
       <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupLabel>{t("sidebar.groups.settings")}</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={toggleTheme} tooltip={themeLabel}>
+                <ThemeIcon aria-hidden="true" />
+                <span>{themeLabel}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={switchLocale} tooltip={localeLabel}>
+                <Globe aria-hidden="true" />
+                <span>{localeLabel}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" render={<Link href="/profil" />} tooltip={fullName}>
@@ -248,7 +277,10 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
       <AppSidebar user={user} />
       <SidebarInset className="app-atmosphere min-h-screen bg-transparent text-foreground">
         <div className="px-4 pb-12 pt-4 sm:px-6 lg:px-8">
-          <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} className="mb-4" />
+          <div className="mb-4 flex items-center justify-between">
+            <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
+            {user.permissions.includes("citizen.notifications.view") && <NotificationBell />}
+          </div>
           <div className="mx-auto max-w-7xl space-y-8 pt-2">{children}</div>
         </div>
       </SidebarInset>
