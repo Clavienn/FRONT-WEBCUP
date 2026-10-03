@@ -65,6 +65,7 @@ const menu: MenuGroup[] = [
     items: [
       { label: "Accueil", icon: Home, permission: "citizen.home.view", href: "/dashboard" },
       { label: "Services municipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
+      { label: "Annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
       { label: "Mon profil", icon: UserRound, href: "/profil" },
     ],
   },
@@ -72,7 +73,6 @@ const menu: MenuGroup[] = [
     label: "Espace citoyen",
     items: [
       { label: "Mes démarches", icon: ClipboardList, permission: "citizen.services.view", view: "citizen", href: "/dashboard#recent-requests-title" },
-      { label: "Communiqués", icon: Megaphone, permission: "citizen.announcements.view", view: "citizen", href: "/dashboard#city-updates-title" },
       { label: "Envoyer un message", icon: MessageSquare, permission: "citizen.message.send", view: "citizen" },
     ],
   },
@@ -81,7 +81,6 @@ const menu: MenuGroup[] = [
     items: [
       { label: "Demandes citoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard#queues-title" },
       { label: "Intégration API", icon: RadioTower, permission: "agent.dashboard.access", view: "staff", href: "/dashboard#api-status-title" },
-      { label: "Communiqués", icon: Megaphone, permission: "citizen.announcements.view", view: "staff", href: "/dashboard#announcements-title" },
     ],
   },
   {
