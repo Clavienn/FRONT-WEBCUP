@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { CircleAlert, Search } from "lucide-react"
+import Link from "next/link"
+import { ArrowRight, CircleAlert, Search } from "lucide-react"
 
 import { ServiceIcon } from "@/components/services/service-icon"
 import { Badge } from "@/components/ui/badge"
@@ -40,7 +41,7 @@ export function ServicesList() {
           <p className="text-sm font-medium text-primary">Haut Conseil de Terra Nova</p>
           <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">Services municipaux</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Les services proposés par la ville aux habitants de Terra Nova.
+            Découvrez les services de Terra Nova et trouvez celui qui répond à votre besoin. Sélectionnez un service pour accéder à ses informations.
           </p>
         </div>
         <div className="relative w-full sm:w-72">
@@ -75,7 +76,10 @@ export function ServicesList() {
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((service) => (
             <li key={service.id}>
-              <article className="h-full rounded-xl border border-border/80 bg-card/75 p-5 shadow-sm backdrop-blur-sm">
+              <Link
+                href={`/dashboard/services/detail?id=${service.id}`}
+                className="group block h-full cursor-pointer rounded-xl border border-border/80 bg-card/75 p-5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >
                 <div className="flex items-start justify-between gap-3">
                   <span className="grid size-10 place-items-center rounded-lg bg-accent text-accent-foreground">
                     <ServiceIcon name={service.icon} className="size-5" />
@@ -83,10 +87,14 @@ export function ServicesList() {
                   <Badge variant="outline" className="font-mono text-[11px]">{service.code}</Badge>
                 </div>
                 <h2 className="mt-4 text-base font-semibold">{service.name}</h2>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
                   {service.description || "Aucune description."}
                 </p>
-              </article>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                  Voir les informations
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                </span>
+              </Link>
             </li>
           ))}
         </ul>

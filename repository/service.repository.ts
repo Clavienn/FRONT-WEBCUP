@@ -31,6 +31,8 @@ export const serviceRepository = {
   // all: inclut les services désactivés (réservé aux gestionnaires, ignoré sinon par le serveur)
   list: (all = false) => authorizedRequest<MunicipalService[]>(`/services${all ? "?all=true" : ""}`),
 
+  get: (id: number) => authorizedRequest<MunicipalService>(`/services/${id}`),
+
   create: (data: ServiceCreation) => authorizedRequest<MunicipalService>("/services", json("POST", data)),
 
   update: (id: number, data: Partial<ServiceInput>) =>
