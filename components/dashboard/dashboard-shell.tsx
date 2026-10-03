@@ -87,7 +87,7 @@ const menu: MenuGroup[] = [
   {
     label: "sidebar.groups.agentConsole",
     items: [
-      { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard#queues-title" },
+      { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.messages.manage", view: "staff", newMessagesBadge: true, href: "/dashboard/agent/requests" },
       { label: "sidebar.items.integrationApi", icon: RadioTower, permission: "agent.dashboard.access", view: "staff", href: "/dashboard#api-status-title" },
     ],
   },
@@ -134,7 +134,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
 
   // Messages "nouveaux" de la boîte de réception (admin) : compteur de la pastille du menu
   const [newMessages, setNewMessages] = useState(0)
-  const canReadInbox = user.roles.includes("admin") && user.permissions.includes("agent.messages.manage")
+  const canReadInbox = user.permissions.includes("agent.messages.manage")
   useEffect(() => {
     if (!canReadInbox) return
     let mounted = true
