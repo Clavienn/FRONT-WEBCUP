@@ -32,6 +32,7 @@ import { NotificationBell } from "@/components/notifications/notification-bell"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
+import { WelcomeModal } from "@/components/dashboard/welcome-modal"
 import { Toaster } from "@/components/ui/toast"
 import {
   Sidebar,
@@ -273,6 +274,7 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
 
   return (
     <SidebarProvider>
+      <WelcomeModal key={user.id} user={user} />
       <AppSidebar user={user} />
       <SidebarInset className="app-atmosphere min-h-screen bg-transparent text-foreground">
         <div className="px-4 pb-12 pt-4 sm:px-6 lg:px-8">

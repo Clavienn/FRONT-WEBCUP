@@ -142,7 +142,7 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
 
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-8">
-            <CitizenRequestsPanel onChanged={loadStats} />
+            <CitizenRequestsPanel onChanged={loadStats} requestsHref="/dashboard/my-requests" />
           </div>
 
           <aside className="space-y-4">

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import Link from "next/link"
 import { CircleAlert, ClipboardList, RefreshCw } from "lucide-react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
@@ -96,9 +97,11 @@ function RequestTimeline({ requestId }: { requestId: number }) {
 interface CitizenRequestsPanelProps {
   // Prévient le dashboard qu'il doit recalculer ses compteurs par statut
   onChanged?: () => void
+  // Si défini, « Déposer une demande » et « Voir l'évolution » redirigent vers cette page au lieu de s'ouvrir ici
+  requestsHref?: string
 }
 
-export function CitizenRequestsPanel({ onChanged }: CitizenRequestsPanelProps = {}) {
+export function CitizenRequestsPanel({ onChanged, requestsHref }: CitizenRequestsPanelProps = {}) {
   const { t } = useLanguage()
   const statusLabel = useStatusLabel()
   const [state, setState] = useState<LoadState>("loading")
@@ -157,13 +160,19 @@ const load = useCallback(() => {
             {t("citizenRequests.subtitle")}
           </p>
         </div>
-        <Button
-          variant={formOpen ? "outline" : "default"}
-          onClick={() => setFormOpen((open) => !open)}
-          aria-expanded={formOpen}
-        >
-          {formOpen ? t("citizenRequests.cancelLabel") : t("citizenRequests.newLabel")}
-        </Button>
+        {requestsHref ? (
+          <Button nativeButton={false} render={<Link href={requestsHref} />}>
+            {t("citizenRequests.newLabel")}
+          </Button>
+        ) : (
+          <Button
+            variant={formOpen ? "outline" : "default"}
+            onClick={() => setFormOpen((open) => !open)}
+            aria-expanded={formOpen}
+          >
+            {formOpen ? t("citizenRequests.cancelLabel") : t("citizenRequests.newLabel")}
+          </Button>
+        )}
       </div>
 
       {formOpen && (
@@ -227,15 +236,21 @@ const load = useCallback(() => {
                       </Badge>
                     </div>
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mt-2"
-                      aria-expanded={expanded}
-                      onClick={() => setOpenId(expanded ? null : request.id)}
-                    >
-                      {expanded ? t("citizenRequests.hideDetailLabel") : t("citizenRequests.detailLabel")}
-                    </Button>
+                    {requestsHref ? (
+                      <Button variant="ghost" size="sm" className="mt-2" nativeButton={false} render={<Link href={requestsHref} />}>
+                        {t("citizenRequests.detailLabel")}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2"
+                        aria-expanded={expanded}
+                        onClick={() => setOpenId(expanded ? null : request.id)}
+                      >
+                        {expanded ? t("citizenRequests.hideDetailLabel") : t("citizenRequests.detailLabel")}
+                      </Button>
+                    )}
 
                     {expanded && <RequestTimeline requestId={request.id} />}
                   </li>

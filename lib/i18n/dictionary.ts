@@ -272,6 +272,26 @@ const fr = {
     statusRejected: "Refusée",
   },
 
+  // Accueil de l'espace citoyen : modale affichée une seule fois par utilisateur
+  welcomeModal: {
+    title: "Bienvenue sur Terra Nova",
+    titleNamed: "Bienvenue sur Terra Nova, {{name}}",
+    description: "Votre espace citoyen est prêt. Voici trois façons simples de commencer.",
+    profile: {
+      title: "Compléter votre profil",
+      description: "Ajoutez votre téléphone et votre adresse pour être joint plus facilement.",
+    },
+    services: {
+      title: "Consulter tous les services",
+      description: "Découvrez les services municipaux de la ville et ce qu'ils proposent.",
+    },
+    request: {
+      title: "Faire une démarche ou une demande",
+      description: "Déposez une demande à la ville et suivez son traitement.",
+    },
+    later: "Explorer plus tard",
+  },
+
   // Rendez-vous citoyens — parcours de réservation, sans ambiguïté sur le créneau choisi
   appointments: {
     title: "Prendre rendez-vous",
@@ -933,6 +953,26 @@ const en = {
     statusInProgress: "In progress",
     statusResolved: "Accepted",
     statusRejected: "Refused",
+  },
+
+  // Citizen space welcome: modal shown only once per user
+  welcomeModal: {
+    title: "Welcome to Terra Nova",
+    titleNamed: "Welcome to Terra Nova, {{name}}",
+    description: "Your citizen space is ready. Here are three simple ways to get started.",
+    profile: {
+      title: "Complete your profile",
+      description: "Add your phone number and address so the city can reach you more easily.",
+    },
+    services: {
+      title: "Browse all services",
+      description: "Discover the city's municipal services and what they offer.",
+    },
+    request: {
+      title: "Submit a request",
+      description: "Send a request to the city and follow how it is handled.",
+    },
+    later: "Explore later",
   },
 
   appointments: {
