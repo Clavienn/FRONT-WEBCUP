@@ -57,9 +57,24 @@ export function SearchResults() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{t("search.resultsTitle", { query })}</h1>
-        {results && <p className="mt-1 text-sm text-muted-foreground">{t("search.resultsCount", { count: results.length })}</p>}
+      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-primary">
+            <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
+            INDEX DES ARCHIVES & SERVICES // TERRA NOVA
+          </span>
+          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+            RECHERCHE MULTI-MODULES
+          </span>
+        </div>
+        <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          {t("search.resultsTitle", { query })}
+        </h1>
+        {results && (
+          <p className="mt-1.5 font-mono text-xs text-primary">
+            {t("search.resultsCount", { count: results.length })}
+          </p>
+        )}
       </div>
 
       {results === null ? (

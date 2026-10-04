@@ -213,20 +213,33 @@ export function StaffAlerts() {
 
   return (
     <>
-      <section className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-primary">{t("alerts.staff.eyebrow")}</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("alerts.staff.title")}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t("alerts.staff.subtitle")}</p>
+      <section className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-red-500">
+            <span className="size-2 rounded-full bg-red-500 animate-ping" />
+            DIFFUSION D'ALERTE POPULATION // CONSOLE AGENTS
+          </span>
+          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+            RÉSEAU RADIO TERRA NOVA
+          </span>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="icon" onClick={reload} aria-label={t("alerts.staff.refresh")}>
-            <RefreshCw aria-hidden="true" />
-          </Button>
-          <Button onClick={() => setPublishing({})} className="h-11 rounded-xl bg-red-600 px-5 text-white hover:bg-red-700">
-            <BellRing aria-hidden="true" />
-            {t("alerts.staff.new")}
-          </Button>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-red-500">{t("alerts.staff.eyebrow")}</p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+              {t("alerts.staff.title")}
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("alerts.staff.subtitle")}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="icon" onClick={reload} aria-label={t("alerts.staff.refresh")}>
+              <RefreshCw aria-hidden="true" />
+            </Button>
+            <Button onClick={() => setPublishing({})} className="h-11 rounded-xl bg-red-600 px-5 text-sm font-semibold uppercase tracking-wider text-white shadow-[0_0_24px_rgba(220,38,38,0.35)] hover:bg-red-700">
+              <BellRing aria-hidden="true" />
+              {t("alerts.staff.new")}
+            </Button>
+          </div>
         </div>
       </section>
 

@@ -1,10 +1,10 @@
 import { getAppLocale } from "@/lib/i18n/types"
 import { resilientFetch } from "@/lib/network"
 
-export type UserRole = "citizen" | "agent" | "admin"
+export type UserRole = "citizen" | "agent" | "admin" | "partner"
 
-// Rôles que l'utilisateur peut choisir à l'inscription (admin est attribué côté serveur)
-export type SignupRole = Exclude<UserRole, "admin">
+// Rôles que l'utilisateur peut choisir à l'inscription (admin et partner sont attribués côté serveur)
+export type SignupRole = Exclude<UserRole, "admin" | "partner">
 
 export interface AuthUser {
   id: number
@@ -15,12 +15,16 @@ export interface AuthUser {
   address: string | null
   roles: UserRole[]
   permissions: string[]
+  twoFactorEnabled: boolean
   createdAt: string
   updatedAt: string
 }
 
 // Agents et admins accèdent à la console ; les citoyens à l'espace citoyen
 export const isStaff = (user: AuthUser) => user.roles.some((role) => role === "agent" || role === "admin")
+
+// Un partenaire n'a ni les permissions citoyennes ni les permissions agent : son propre espace
+export const isPartner = (user: AuthUser) => user.roles.includes("partner")
 
 export interface Credentials {
   email: string
@@ -58,6 +62,28 @@ interface AuthResponse {
   accessToken: string
 }
 
+// Réponse de POST /auth/login quand le compte a la double authentification activée : le mot de passe
+// est le bon, mais aucun jeton n'est encore émis. challengeToken est à repasser avec le code à
+// POST /auth/login/2fa (voir authRepository.completeTwoFactorLogin).
+export interface TwoFactorChallenge {
+  twoFactorRequired: true
+  challengeToken: string
+}
+
+export type LoginResult = AuthUser | TwoFactorChallenge
+
+export function isTwoFactorChallenge(result: LoginResult): result is TwoFactorChallenge {
+  return (result as TwoFactorChallenge).twoFactorRequired === true
+}
+
+// Réponse de POST /auth/me/2fa/setup : secret à entrer manuellement si le QR code ne peut pas être
+// scanné, et le même secret encodé en QR (data URL, prêt à afficher dans une balise <img>).
+export interface TwoFactorSetup {
+  secret: string
+  otpauthUrl: string
+  qrCodeDataUrl: string
+}
+
 function normalizeRole(value: unknown): UserRole | null {
   const rawCode =
     typeof value === "string"
@@ -74,6 +100,7 @@ function normalizeRole(value: unknown): UserRole | null {
   if (["citizen", "resident", "user"].includes(code)) return "citizen"
   if (["agent", "municipalagent", "staff"].includes(code)) return "agent"
   if (["admin", "administrator"].includes(code)) return "admin"
+  if (["partner", "partenaire"].includes(code)) return "partner"
   return null
 }
 
@@ -115,6 +142,7 @@ export function normalizeAuthUser(value: unknown): AuthUser {
     phone: nullableString(data.phone),
     address: nullableString(data.address),
     roles,
+    twoFactorEnabled: data.twoFactorEnabled === true,
     permissions: rawPermissions
       .map((permission) => {
         if (typeof permission === "string") return permission
@@ -134,6 +162,7 @@ export function normalizeAuthUser(value: unknown): AuthUser {
 export function roleLabel(user: AuthUser) {
   if (user.roles.includes("admin")) return "admin"
   if (user.roles.includes("agent")) return "agent"
+  if (user.roles.includes("partner")) return "partner"
   return "citizen"
 }
 
@@ -276,6 +305,12 @@ async function authenticate(
   return user
 }
 
+function applySession(session: AuthResponse): AuthUser {
+  const user = normalizeAuthUser(session.user)
+  accessToken = session.accessToken
+  return user
+}
+
 export const authRepository = {
   // Jeton d'accès courant, pour authentifier la connexion temps réel (socket.io) du personnel
   getAccessToken: () => accessToken,
@@ -285,10 +320,36 @@ export const authRepository = {
   // Ferme une session (un autre appareil) ; 404 si inconnue ou pas la sienne
   revokeSession: (id: string | number) => authorizedRequest<void>(`/auth/me/sessions/${id}`, { method: "DELETE" }),
 
-  // headers : protection anti-robots (voir components/forms/form-guard.tsx)
-  login: (credentials: Credentials, headers?: Record<string, string>) => authenticate("/auth/login", credentials, headers),
+  // headers : protection anti-robots (voir components/forms/form-guard.tsx). Le mot de passe peut être
+  // le bon sans que la connexion soit terminée (double authentification) : voir isTwoFactorChallenge.
+  async login(credentials: Credentials, headers?: Record<string, string>): Promise<LoginResult> {
+    const result = await request<AuthResponse | TwoFactorChallenge>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+      headers,
+    })
+    if ("twoFactorRequired" in result) return result
+    return applySession(result)
+  },
+
+  completeTwoFactorLogin: async (challengeToken: string, code: string): Promise<AuthUser> =>
+    applySession(
+      await request<AuthResponse>("/auth/login/2fa", {
+        method: "POST",
+        body: JSON.stringify({ challengeToken, code }),
+      })
+    ),
 
   register: (data: RegistrationData, headers?: Record<string, string>) => authenticate("/auth/register", data, headers),
+
+  setupTwoFactor: (password: string) =>
+    authorizedRequest<TwoFactorSetup>("/auth/me/2fa/setup", { method: "POST", body: JSON.stringify({ password }) }),
+
+  verifyTwoFactorSetup: (code: string) =>
+    authorizedRequest<{ recoveryCodes: string[] }>("/auth/me/2fa/verify", { method: "POST", body: JSON.stringify({ code }) }),
+
+  disableTwoFactor: (password: string, code: string) =>
+    authorizedRequest<void>("/auth/me/2fa/disable", { method: "POST", body: JSON.stringify({ password, code }) }),
 
   async refresh(): Promise<AuthUser> {
     if (!refreshRequest) {

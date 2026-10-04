@@ -2,8 +2,8 @@ import type { Metadata } from "next"
 import { AuthForm } from "@/components/auth/auth-form"
 
 export const metadata: Metadata = {
-  title: "Connexion | DevAtoandro",
-  description: "Connexion ou création de compte pour Webcup 2026.",
+  title: "Connexion & Inscription | Terra Nova",
+  description: "Accès au terminal citoyen et aux services du Haut Conseil de Terra Nova.",
 }
 
 export default function ConnexionPage() {

@@ -30,10 +30,21 @@ export function ProjectList() {
 
   return (
     <>
-      <section>
-        <p className="text-sm font-medium text-primary">{t("projectsList.eyebrow")}</p>
-        <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("projectsList.title")}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t("projectsList.subtitle")}</p>
+      <section className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-primary">
+            <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
+            PROGRAMME DE DÉVELOPPEMENT PLANÉTAIRE
+          </span>
+          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+            INFRASTRUCTURES & EXPANSION
+          </span>
+        </div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t("projectsList.eyebrow")}</p>
+        <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+          {t("projectsList.title")}
+        </h1>
+        <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("projectsList.subtitle")}</p>
       </section>
 
       {error ? (

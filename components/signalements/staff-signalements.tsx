@@ -339,23 +339,36 @@ export function StaffSignalements() {
 
   return (
     <>
-      <section className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-primary">{t("signalements.staff.eyebrow")}</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("signalements.staff.title")}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t("signalements.staff.subtitle")}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"
-            title={t(channel === "live" ? "signalements.staff.liveOn" : "signalements.staff.liveOff")}
-          >
-            <span className={`size-2 rounded-full ${channel === "live" ? "bg-emerald-500" : "bg-muted-foreground/50"}`} aria-hidden="true" />
-            {t(channel === "live" ? "signalements.staff.liveOn" : "signalements.staff.liveOff")}
+      <section className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-amber-500">
+            <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
+            CENTRE DE CONTRÔLE DES INCIDENTS // DÔMES TERRA NOVA
           </span>
-          <Button variant="outline" size="icon" onClick={reload} aria-label={t("signalements.staff.refresh")}>
-            <RefreshCw aria-hidden="true" />
-          </Button>
+          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+            SÉCURITÉ & LOGISTIQUE URBAINE
+          </span>
+        </div>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t("signalements.staff.eyebrow")}</p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+              {t("signalements.staff.title")}
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("signalements.staff.subtitle")}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/60 px-3 py-1 font-mono text-xs text-muted-foreground"
+              title={t(channel === "live" ? "signalements.staff.liveOn" : "signalements.staff.liveOff")}
+            >
+              <span className={`size-2 rounded-full ${channel === "live" ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/50"}`} aria-hidden="true" />
+              {t(channel === "live" ? "signalements.staff.liveOn" : "signalements.staff.liveOff")}
+            </span>
+            <Button variant="outline" size="icon" onClick={reload} aria-label={t("signalements.staff.refresh")}>
+              <RefreshCw aria-hidden="true" />
+            </Button>
+          </div>
         </div>
       </section>
 

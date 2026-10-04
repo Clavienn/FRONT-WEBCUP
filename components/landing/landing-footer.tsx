@@ -37,6 +37,21 @@ export function LandingFooter() {
                   </a>
                 </li>
               ))}
+              <li className="pt-2 border-t border-[var(--tn-border)]/50">
+                <Link href="/connexion" className="text-sm text-[var(--tn-cyan)] font-medium hover:underline">
+                  → {t("breadcrumbs.login")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/visiteur" className="text-sm text-[var(--tn-text-muted)] hover:text-[var(--tn-text)]">
+                  {t("authForm.guestAccess")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/alertes" className="text-sm text-amber-400 hover:text-amber-300">
+                  ⚠ {t("alerts.title") || "Alertes colonie"}
+                </Link>
+              </li>
             </ul>
           </div>
 

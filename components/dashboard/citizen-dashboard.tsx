@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
-import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clock3, Megaphone } from "lucide-react"
+import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clock3, Megaphone, ShieldCheck } from "lucide-react"
 
 import type { AuthUser } from "@/repository/auth.repository"
 import { useLanguage } from "@/components/i18n/language-provider"
@@ -65,17 +65,46 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
 
   return (
     <>
+        {/* Welcome & Colony Telemetry Banner */}
+        <section className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+          <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+            <span className="flex items-center gap-2 font-medium text-primary">
+              <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
+              CONSOLE CITOYENNE ACTIVE // SECTEUR HABITATION
+            </span>
+            <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+              TERRA NOVA SOL 142
+            </span>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                {t("agentDashboard.greeting", { name: user.firstName || fullName })}
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t("citizenDashboard.welcomeSubtitle") || "Gérez vos démarches, participez aux projets du dôme et suivez vos requêtes officielles."}
+              </p>
+            </div>
+            <Badge variant="outline" className="w-fit gap-1.5 rounded-full px-3 py-1 font-mono text-xs text-muted-foreground">
+              <ShieldCheck className="size-3.5 text-cyan-500" aria-hidden="true" />
+              IDENTITÉ VALIDÉE
+            </Badge>
+          </div>
+        </section>
+
         {/* La participation de l'habitant passe avant tout le reste : c'est le premier levier de l'accueil */}
         {user.permissions.includes("citizen.ideas.create") && <IdeaBox />}
 
         <section aria-labelledby="services-title" className="space-y-4">
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
-              <h2 id="services-title" className="text-lg font-semibold">{t("citizenDashboard.servicesTitle")}</h2>
+              <h2 id="services-title" className="font-display text-lg font-bold tracking-tight text-foreground">
+                {t("citizenDashboard.servicesTitle")}
+              </h2>
               <p className="text-sm text-muted-foreground">{t("citizenDashboard.servicesSubtitle")}</p>
             </div>
-            <Link href="/dashboard/services" className="text-xs font-medium text-primary underline-offset-4 hover:underline">
-              {t("citizenDashboard.servicesSeeAll")}
+            <Link href="/dashboard/services" className="text-xs font-semibold text-primary underline-offset-4 hover:underline">
+              {t("citizenDashboard.servicesSeeAll")} →
             </Link>
           </div>
 
@@ -95,12 +124,14 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
                 <Link
                   key={service.id}
                   href={`/dashboard/services/detail?id=${service.id}`}
-                  className="group block h-full rounded-xl border border-border/80 bg-card/70 p-4 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+                  className="group block h-full rounded-xl border border-border/80 bg-card/80 p-5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
                 >
-                  <span className="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground">
-                    <ServiceIcon name={service.icon} className="size-4" />
+                  <span className="grid size-10 place-items-center rounded-lg border border-border/60 bg-muted/60 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                    <ServiceIcon name={service.icon} className="size-5" />
                   </span>
-                  <h3 className="mt-4 text-sm font-semibold">{service.name}</h3>
+                  <h3 className="mt-4 text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                    {service.name}
+                  </h3>
                   <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
                     {service.description || t("citizenDashboard.servicesNoDescription")}
                   </p>
@@ -113,18 +144,20 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
         <section aria-labelledby="citizen-requests-title" className="space-y-3">
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
-              <h2 id="citizen-requests-title" className="text-lg font-semibold">{t("citizenDashboard.requestsTitle")}</h2>
+              <h2 id="citizen-requests-title" className="font-display text-lg font-bold tracking-tight text-foreground">
+                {t("citizenDashboard.requestsTitle")}
+              </h2>
               <p className="text-sm text-muted-foreground">{t("citizenDashboard.requestsSubtitle")}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {requestStates.map(({ key, status, icon: Icon, tone }) => (
-              <div key={key} className="rounded-xl border border-border/80 bg-card/75 p-4 shadow-sm backdrop-blur-sm">
+              <div key={key} className="rounded-xl border border-border/80 bg-card/80 p-4 shadow-sm backdrop-blur-sm transition-all hover:border-primary/40">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm text-muted-foreground">{t(`citizenDashboard.requestStates.${key}`)}</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t(`citizenDashboard.requestStates.${key}`)}</p>
                   <Icon className={`size-4 shrink-0 ${tone}`} aria-hidden="true" />
                 </div>
-                <p className="mt-3 text-2xl font-semibold tabular-nums">{stats ? stats[status] : "—"}</p>
+                <p className="mt-3 text-2xl font-bold font-mono tabular-nums text-foreground">{stats ? stats[status] : "—"}</p>
               </div>
             ))}
           </div>

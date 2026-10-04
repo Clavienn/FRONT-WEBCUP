@@ -166,12 +166,23 @@ export function MySignalements() {
 
   return (
     <>
-      <section className="space-y-4">
+      <section className="relative overflow-hidden rounded-2xl border border-red-500/30 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-red-500">
+            <span className="size-2 rounded-full bg-red-500 animate-ping" />
+            CANAL D'URGENCE &amp; SÉCURITÉ DES DÔMES
+          </span>
+          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+            LIGNE PRIORITAIRE SÉCURITÉ CIVILE
+          </span>
+        </div>
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <p className="text-sm font-medium text-primary">{t("signalements.eyebrow")}</p>
-            <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("signalements.mine.title")}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t("signalements.mine.subtitle")}</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-red-500">{t("signalements.eyebrow")}</p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+              {t("signalements.mine.title")}
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("signalements.mine.subtitle")}</p>
           </div>
           <Button
             size="lg"
@@ -180,14 +191,14 @@ export function MySignalements() {
               setQueued(false)
               setFormOpen(true)
             }}
-            className="h-12 w-fit rounded-xl bg-red-600 px-5 text-base text-white hover:bg-red-700"
+            className="h-11 w-fit rounded-xl bg-red-600 px-5 text-sm font-semibold uppercase tracking-wider text-white shadow-[0_0_24px_rgba(220,38,38,0.35)] hover:bg-red-700"
           >
-            <Siren aria-hidden="true" />
+            <Siren aria-hidden="true" className="size-4" />
             {t("signalements.mine.report")}
           </Button>
         </div>
 
-        <p role="note" className="flex items-start gap-2 rounded-lg border border-red-600/30 bg-red-600/5 px-3 py-2.5 text-sm">
+        <p role="note" className="mt-4 flex items-start gap-2 rounded-lg border border-red-600/30 bg-red-600/5 px-3 py-2.5 text-sm">
           <Siren className="mt-0.5 size-4 shrink-0 text-red-600" aria-hidden="true" />
           {t("signalements.form.callEmergency")}
         </p>

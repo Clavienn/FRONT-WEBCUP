@@ -184,7 +184,7 @@ export function ProjectDetail() {
             <p className="text-sm font-medium text-primary">{t("projectDetail.eyebrow")}</p>
             <ProjectStatusBadge status={project.status} />
           </div>
-          <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">{project.title}</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-4xl">{project.title}</h1>
           {project.author && (
             <p className="text-sm text-muted-foreground">
               {t("projectDetail.proposedBy", { name: `${project.author.firstName} ${project.author.lastName}`.trim() })}
