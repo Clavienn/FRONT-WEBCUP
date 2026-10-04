@@ -5,6 +5,7 @@ import "./terra-nova.css"
 import { MotionConfig } from "framer-motion"
 
 import { useLanguage } from "@/components/i18n/language-provider"
+import { AlertBanner } from "@/components/alerts/alert-banner"
 import { LandingNavbar } from "@/components/landing/landing-navbar"
 import { VoyageSection } from "@/components/landing/voyage-section"
 import { ServicesSection } from "@/components/landing/services-section"
@@ -31,6 +32,7 @@ export default function Page() {
         <div className="tn-grid-overlay" aria-hidden="true" />
 
         <LandingNavbar />
+        <AlertBanner variant="floating" />
         <ScrollNavDots />
         <SocialRail />
 

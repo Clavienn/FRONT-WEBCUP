@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
@@ -13,6 +13,8 @@ import {
   Lightbulb,
   MapPin,
   ShieldAlert,
+  Siren,
+  BellRing,
   ClipboardList,
   Home,
   LogOut,
@@ -58,6 +60,10 @@ import {
 } from "@/components/ui/sidebar"
 import { isStaff, roleLabel, type AuthUser } from "@/repository/auth.repository"
 import { contactMessageRepository } from "@/repository/contactMessage.repository"
+import { signalementRepository, type SignalementEvent } from "@/repository/signalement.repository"
+import { useStaffChannel } from "@/components/signalements/use-staff-channel"
+import { toast } from "@/components/ui/toast"
+import { AlertBanner } from "@/components/alerts/alert-banner"
 
 type DashboardView = "citizen" | "staff"
 
@@ -71,6 +77,10 @@ interface MenuItem {
   agentOnly?: boolean
   // Pastille avec le nombre de messages de citoyens non traités
   newMessagesBadge?: boolean
+  // Pastille rouge : signalements urgents ou en retard
+  signalementsBadge?: boolean
+  // Entrée mise en avant (urgence) : icône rouge
+  emphasis?: boolean
   // Vue du dashboard où la cible existe (les ancres n'existent que dans leur vue)
   view?: DashboardView
   // Sans href, l'entrée est affichée désactivée (page pas encore disponible)
@@ -97,6 +107,7 @@ const menu: MenuGroup[] = [
   {
     label: "sidebar.groups.citizenSpace",
     items: [
+      { label: "sidebar.items.signalements", icon: Siren, permission: "citizen.signalements.create", view: "citizen", href: "/dashboard/signalements", emphasis: true },
       { label: "sidebar.items.mesDemarches", icon: ClipboardList, permission: "citizen.requests.view", view: "citizen", href: "/dashboard/my-requests" },
       { label: "sidebar.items.mesRendezVous", icon: CalendarClock, permission: "citizen.appointments.view", view: "citizen", href: "/dashboard/appointments" },
       { label: "sidebar.items.communiques", icon: Megaphone, permission: "citizen.announcements.view", view: "citizen", href: "/dashboard#city-updates-title" },
@@ -105,6 +116,8 @@ const menu: MenuGroup[] = [
   {
     label: "sidebar.groups.agentConsole",
     items: [
+      { label: "sidebar.items.alertesPopulation", icon: BellRing, permission: "agent.alerts.manage", view: "staff", href: "/dashboard/agent/alerts", emphasis: true },
+      { label: "sidebar.items.signalementsStaff", icon: Siren, permission: "agent.signalements.view", view: "staff", href: "/dashboard/agent/signalements", signalementsBadge: true, emphasis: true },
       { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard/agent/requests" },
       { label: "sidebar.items.comptesCitoyens", icon: Users, permission: "agent.citizens.manage", view: "staff", href: "/dashboard/agent/citizens" },
       { label: "sidebar.items.rendezVousCitoyens", icon: CalendarClock, permission: "agent.appointments.view", view: "staff", href: "/dashboard/appointments" },
@@ -167,6 +180,38 @@ function AppSidebar({ user }: { user: AuthUser }) {
 
   // Messages "nouveaux" de la boîte de réception (admin) : compteur de la pastille du menu
   const [newMessages, setNewMessages] = useState(0)
+
+  // Signalements d'urgence : pastille (urgents + en retard) et alerte en direct pour le personnel,
+  // où que se trouve l'agent dans la console
+  const canWatchSignalements = user.permissions.includes("agent.signalements.view")
+  const [signalementAlerts, setSignalementAlerts] = useState(0)
+  const refreshSignalements = useCallback(() => {
+    signalementRepository
+      .summary()
+      .then((summary) => setSignalementAlerts(summary.urgentOpen + summary.overdue))
+      .catch(() => undefined)
+  }, [])
+  useEffect(() => {
+    if (canWatchSignalements) refreshSignalements()
+  }, [canWatchSignalements, pathname, refreshSignalements])
+  useStaffChannel(
+    useCallback(
+      (kind: "new" | "updated", event: SignalementEvent) => {
+        if (kind === "new") {
+          toast.add({
+            title: t("signalements.staff.liveNew", { priority: t(`signalements.priority.${event.priority}`) }),
+            description: `${event.title} — ${event.location}`,
+            type: event.priority === "urgent" ? "urgent" : "caution",
+            priority: "high",
+            actionProps: { children: t("signalements.staff.liveOpen"), onClick: () => router.push("/dashboard/agent/signalements") },
+          })
+        }
+        refreshSignalements()
+      },
+      [refreshSignalements, router, t]
+    ),
+    canWatchSignalements
+  )
   const canReadInbox = user.permissions.includes("agent.messages.manage")
   useEffect(() => {
     if (!canReadInbox) return
@@ -211,7 +256,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
           <SidebarGroup key={group.label}>
             <SidebarGroupLabel>{t(group.label)}</SidebarGroupLabel>
             <SidebarMenu>
-              {group.items.map(({ label, icon: Icon, href, newMessagesBadge }) => (
+              {group.items.map(({ label, icon: Icon, href, newMessagesBadge, signalementsBadge, emphasis }) => (
                 <SidebarMenuItem key={label}>
                   {href ? (
                     <SidebarMenuButton
@@ -219,7 +264,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
                       isActive={!href.includes("#") && pathname === href}
                       tooltip={t(label)}
                     >
-                      <Icon aria-hidden="true" />
+                      <Icon aria-hidden="true" className={emphasis ? "text-red-600" : undefined} />
                       <span>{t(label)}</span>
                     </SidebarMenuButton>
                   ) : (
@@ -228,6 +273,14 @@ function AppSidebar({ user }: { user: AuthUser }) {
                       <span>{t(label)}</span>
                       <Badge variant="outline" className="ml-auto text-[10px]">{t("sidebar.comingSoon")}</Badge>
                     </SidebarMenuButton>
+                  )}
+                  {signalementsBadge && signalementAlerts > 0 && (
+                    <SidebarMenuBadge
+                      aria-label={t("signalements.staff.badgeAria", { count: signalementAlerts })}
+                      className="bg-red-600 text-white"
+                    >
+                      {signalementAlerts}
+                    </SidebarMenuBadge>
                   )}
                   {newMessagesBadge && newMessages > 0 && (
                     <SidebarMenuBadge aria-label={t("sidebar.newMessagesAriaLabel", { count: newMessages })}>
@@ -300,6 +353,8 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
       <WelcomeModal key={user.id} user={user} />
       <AppSidebar user={user} />
       <SidebarInset className="app-atmosphere min-h-screen bg-transparent text-foreground">
+        {/* Alertes à la population : visibles sur toutes les pages, collées en haut pendant le défilement */}
+        <AlertBanner variant="inline" />
         <div className="px-4 pb-12 pt-4 sm:px-6 lg:px-8">
           <div className="mb-4 flex items-center justify-between">
             <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />

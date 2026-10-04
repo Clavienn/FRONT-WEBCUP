@@ -54,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   <AnnouncementAlerts />
                   <SupportBubble />
                   <NetworkStatus />
+                  <IdleLogout />
                 </AuthProvider>
               </div>
             </SiteChrome>
