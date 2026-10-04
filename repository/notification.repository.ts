@@ -9,6 +9,9 @@ export interface AppNotification {
   // Demande concernée quand la notification décrit un changement d'état : l'interface peut
   // alors renvoyer le citoyen vers son dossier. Null pour un rappel de rendez-vous.
   requestId: number | null
+  // Annonce concernée quand la notification reprend une annonce publiée : l'interface peut
+  // ouvrir l'annonce elle-même. Null pour les deux autres types.
+  announcementId: number | null
   read: boolean
   createdAt: string
 }

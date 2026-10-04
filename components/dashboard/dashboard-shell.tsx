@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import {
+  ALargeSmall,
   Building2,
   CalendarClock,
   FolderKanban,
@@ -31,6 +32,7 @@ import { BrandMark } from "@/components/brand/brand-mark"
 import { BRAND_NAME } from "@/config/brand"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useAccessibility } from "@/hooks/use-accessibility"
 import { useTheme } from "@/hooks/use-theme"
 import { NotificationBell } from "@/components/notifications/notification-bell"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -38,7 +40,6 @@ import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { WelcomeModal } from "@/components/dashboard/welcome-modal"
 import { PageBreadcrumb } from "@/components/navigation/page-breadcrumb"
-import { Toaster } from "@/components/ui/toast"
 import {
   Sidebar,
   SidebarContent,
@@ -153,12 +154,14 @@ function AppSidebar({ user }: { user: AuthUser }) {
   const { signOut } = useAuth()
   const { t, locale, setLocale } = useLanguage()
   const { theme, toggleTheme } = useTheme()
+  const { textSize, cycleTextSize } = useAccessibility()
   const view: DashboardView = isStaff(user) ? "staff" : "citizen"
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
 
   // Réglages du footer : libellés décrivant l'état courant, le clic bascule
   const themeLabel = t(theme === "dark" ? "sidebar.items.darkMode" : "sidebar.items.lightMode")
   const localeLabel = t(locale === "fr" ? "sidebar.items.french" : "sidebar.items.english")
+  const textSizeLabel = t(`sidebar.items.textSize.${textSize}`)
   const ThemeIcon = theme === "dark" ? Moon : Sun
   const switchLocale = () => setLocale(locale === "fr" ? "en" : "fr")
 
@@ -254,6 +257,12 @@ function AppSidebar({ user }: { user: AuthUser }) {
                 <span>{localeLabel}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton onClick={cycleTextSize} tooltip={textSizeLabel}>
+                <ALargeSmall aria-hidden="true" />
+                <span>{textSizeLabel}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
         <SidebarMenu>
@@ -323,11 +332,9 @@ export function DashboardFrame({ children }: Readonly<{ children: React.ReactNod
     )
   }
 
-  return (
-    <Toaster>
-      <DashboardShell user={user}>{children}</DashboardShell>
-    </Toaster>
-  )
+  // Le Toaster est monté à la racine du site (app/layout.tsx) : un second provider afficherait
+  // chaque toast en double.
+  return <DashboardShell user={user}>{children}</DashboardShell>
 }
 
 // Protège une page par permission (le serveur refuse de toute façon les appels sans droit)

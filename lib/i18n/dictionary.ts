@@ -224,6 +224,11 @@ const fr = {
       darkMode: "Mode sombre",
       french: "Français",
       english: "Anglais",
+      textSize: {
+        normal: "Taille de texte normale",
+        large: "Texte agrandi",
+        xlarge: "Texte très agrandi",
+      },
       mesDemarches: "Mes démarches",
       mesRendezVous: "Mes rendez-vous",
       communiques: "Communiqués",
@@ -458,6 +463,63 @@ const fr = {
     submitError: "Votre idée n'a pas pu être envoyée",
     historyTitle: "Mes idées",
     loadError: "Impossible de charger vos idées.",
+    // Sélecteur de nature : un avis sur la ville, ou un besoin à orienter vers un service
+    kindLabel: "Nature de votre message",
+    kind: {
+      avis: "Un avis",
+      aide: "Demande",
+    },
+    kindHint: {
+      avis: "Votre idée sera enregistrée et transmise aux administrateurs.",
+      aide: "Décrivez votre problème : nous vous orientons vers le bon service.",
+    },
+  },
+
+  // Orientation — l'habitant décrit un problème, la ville désigne le service compétent
+  guidance: {
+    label: "Décrivez votre problème",
+    placeholder: "Ex. : plus d'eau dans mon quartier depuis ce matin",
+    hint: "Expliquez la situation avec vos mots, sans jargon administratif.",
+    submitLabel: "Trouver le bon service",
+    sendingLabel: "Orientation en cours",
+    tooShort: "Décrivez votre problème en au moins {{min}} caractères",
+    submitError: "Votre problème n'a pas pu être transmis",
+    // Réponse rendue à l'habitant
+    resultLabel: "Service compétent",
+    summaryLabel: "Votre situation",
+    stepsLabel: "La démarche",
+    noService:
+      "Aucun service n'a été reconnu dans votre description. Le Haut Conseil peut vous orienter : déposez une demande et un agent vous répondra.",
+    noServiceLink: "Déposer une demande à la ville",
+    automaticNotice:
+      "Orientation établie par recherche dans les services de la ville. Décrivez plus précisément pour une démarche détaillée.",
+    // Passage à l'acte : la demande part dans le service désigné
+    depositLabel: "Déposer la demande dans ce service",
+    depositingLabel: "Dépôt en cours",
+    depositError: "La demande n'a pas pu être déposée",
+    depositSuccess: "Demande {{reference}} déposée. Vous pouvez la suivre depuis vos demandes.",
+    alreadyDeposited: "Demande {{reference}} déposée le {{date}}.",
+    serviceLinkLabel: "Voir la fiche du service",
+  },
+
+  // Priorité d'une annonce : ce qui décide de l'alerte temps réel à la publication
+  announcementPriorities: {
+    label: "Priorité",
+    default: "Standard",
+    medium: "Prioritaire",
+    max: "Haut Conseil",
+    hint: {
+      default: "L'annonce apparaît dans les actualités, sans alerte.",
+      medium: "Une alerte jaune s'affiche à tous à la publication.",
+      max: "Une alerte rouge s'affiche immédiatement à tous : à réserver aux messages du Haut Conseil.",
+    },
+  },
+
+  // Alertes temps réel reçues du canal d'annonces
+  announcementAlerts: {
+    urgentTitle: "Annonce du Haut Conseil",
+    cautionTitle: "Annonce prioritaire",
+    view: "Voir l'annonce",
   },
 
   // Menu contextuel des mentions : "@" dans la boîte à idées
@@ -661,6 +723,7 @@ const fr = {
     errorLoad: "Impossible de charger les notifications.",
     markAllRead: "Tout marquer comme lu",
     viewRequest: "Voir la demande",
+    viewAnnouncement: "Voir l’annonce",
   },
 
   agentAppointments: {
@@ -841,6 +904,141 @@ const fr = {
     alertsBody:
       "Les signalements prioritaires et les événements de sécurité apparaîtront ici après connexion de leurs sources.",
     noAlertsFeed: "Pas de flux d'alertes connecté",
+
+    export: {
+      button: "Exporter en PDF",
+      dialogTitle: "Exporter les données d'administration",
+      dialogDescription:
+        "Cochez les sources à inclure dans le rapport. Seul le contenu sélectionné est récupéré, et chaque section est accompagnée de ses indicateurs et de ses points d'attention.",
+      selectedCount: "{{count}} source(s) sélectionnée(s) sur {{total}}",
+      selectAll: "Tout sélectionner",
+      clearAll: "Tout désélectionner",
+      noneSelected: "Sélectionnez au moins une source pour lancer l'export.",
+      run: "Exporter la sélection",
+      running: "Génération en cours...",
+      cancel: "Annuler",
+      successTitle: "Export PDF généré",
+      partialTitle: "Export PDF généré avec des sources manquantes",
+      partialDescription: "{{count}} source(s) n'ont pas pu être récupérées et sont signalées dans le rapport : {{sections}}.",
+      errorTitle: "Export impossible",
+      errorDescription: "Le rapport n'a pas pu être généré. Réessayez dans un instant.",
+      sections: {
+        synthesis: {
+          label: "Synthèse générale",
+          hint: "Indicateurs clés et points d'attention de toutes les sections cochées",
+        },
+        requests: {
+          label: "Demandes des citoyens",
+          hint: "Répartition par statut, priorité et backlog",
+        },
+        accounts: {
+          label: "Annuaire des comptes",
+          hint: "Comptes recensés, rôles attribués, désactivations et dernière connexion",
+        },
+        rbac: {
+          label: "Rôles et permissions",
+          hint: "Matrice des droits et poids de chaque rôle",
+        },
+        audit: {
+          label: "Journal d'audit",
+          hint: "Actions administratives récentes et échecs de connexion",
+        },
+        services: {
+          label: "Services municipaux",
+          hint: "Services publiés, notes moyennes et avis manquants",
+        },
+        projects: {
+          label: "Projets municipaux",
+          hint: "Avancement, participants et projets à l'arrêt",
+        },
+        ideas: {
+          label: "Idées des habitants",
+          hint: "Suggestions déposées et volumes récents",
+        },
+        messages: {
+          label: "Boîte de réception",
+          hint: "Messages reçus et traitement en cours",
+        },
+      },
+      values: { active: "Actif", inactive: "Inactif", new: "Nouveau", read: "Lu", processed: "Traité" },
+      columns: {
+        total: "Total",
+        pending: "En attente",
+        inProgress: "En cours",
+        resolved: "Acceptées",
+        rejected: "Rejetées",
+        subject: "Objet",
+        service: "Service",
+        priority: "Priorité",
+        status: "Statut",
+        date: "Date",
+        name: "Nom",
+        email: "E-mail",
+        roles: "Rôles",
+        lastLogin: "Dernière connexion",
+        staff: "Comptes agents et admin",
+        citizens: "Comptes citoyens",
+        directory: "Comptes recensés",
+        inactive: "Comptes désactivés",
+        role: "Rôle",
+        code: "Code",
+        level: "Niveau",
+        users: "Utilisateurs",
+        permissions: "Permissions",
+        customRoles: "Rôles personnalisés",
+        events: "Événements",
+        failures: "Échecs",
+        action: "Action",
+        entity: "Entité",
+        author: "Auteur",
+        active: "Services actifs",
+        inactiveServices: "Services désactivés",
+        averageRating: "Note moyenne",
+        reviews: "Avis",
+        planned: "Planifiés",
+        completed: "Terminés",
+        title: "Titre",
+        progress: "Avancement",
+        participants: "Participants",
+        reference: "Référence",
+        content: "Contenu",
+        unread: "Non lus",
+        read: "Lus",
+        processed: "Traités",
+        sender: "Expéditeur",
+      },
+      pdf: {
+        title: "Rapport d'administration Terra Nova",
+        subject: "Export des données d'administration",
+        brand: "TERRA NOVA  /  HAUT CONSEIL",
+        documentType: "RAPPORT INTERNE",
+        filename: "rapport-administration-{{date}}.pdf",
+        generatedAt: "Généré le {{date}}",
+        author: "Émis par {{author}}",
+        scope: "Périmètre : {{count}} source(s) sélectionnée(s) par l'administrateur",
+        footer: "Document interne Terra Nova — données de la console d'administration.",
+        synthesisTitle: "Synthèse générale",
+        sectionsCount: "Sources incluses",
+        attentionCount: "Points d'attention relevés",
+        noAttention: "Aucun point d'attention sur les sources sélectionnées.",
+        requestsOpen: "{{count}} demandes restent à traiter (en attente ou en cours), soit {{share}} du flux.",
+        requestsDrained: "Aucune demande en attente : le flux est entièrement traité.",
+        accountsInactive: "Comptes désactivés parmi les {{total}} lignes jointes : {{count}}. Un compte désactivé conserve son accès à la plateforme.",
+        accountsNeverLoggedIn: "Comptes n'ayant jamais ouvert de session parmi les {{total}} lignes jointes : {{count}}.",
+        rbacBroadest: "Le rôle « {{label}} » porte {{count}} permissions : c'est le périmètre le plus large.",
+        rbacCustom: "{{count}} rôle(s) personnalisé(s) hors rôles système.",
+        auditFailures: "{{count}} échec(s) de connexion sur {{total}} événements tracés.",
+        servicesUnrated: "{{count}} service(s) actif(s) sur {{total}} n'ont encore aucun avis.",
+        projectsStalled: "{{count}} projet(s) en cours n'ont aucune progression renseignée.",
+        ideasPending: "{{count}} idée(s) déposée(s) par les habitants, aucune n'est soldée.",
+        messagesUnread: "{{count}} message(s) attendent une réponse.",
+        messagesCleared: "Aucun message en attente de traitement.",
+        sourceUnavailable: "Source indisponible au moment de l'export.",
+        sourceUnavailableError: "Source indisponible au moment de l'export (accès refusé ou erreur de l'API).",
+        emptySource: "Aucun enregistrement pour cette source.",
+        truncated: "{{shown}} ligne(s) affichée(s) sur {{total}} — limite de {{limit}} lignes par source.",
+      },
+    },
   },
 
   profilePage: {
@@ -1119,6 +1317,12 @@ const fr = {
     activateDark: "Activer le mode sombre",
   },
 
+  textSizeToggle: {
+    activateLarge: "Agrandir le texte",
+    activateXLarge: "Agrandir encore le texte",
+    activateNormal: "Revenir à la taille de texte normale",
+  },
+
   projectsList: {
     eyebrow: "Haut Conseil de Terra Nova",
     title: "Projets de la ville",
@@ -1375,6 +1579,11 @@ const en = {
       darkMode: "Dark mode",
       french: "French",
       english: "English",
+      textSize: {
+        normal: "Normal text size",
+        large: "Larger text",
+        xlarge: "Extra-large text",
+      },
       mesDemarches: "My requests",
       mesRendezVous: "My appointments",
       communiques: "Announcements",
@@ -1607,6 +1816,63 @@ const en = {
     submitError: "Your idea could not be sent",
     historyTitle: "My ideas",
     loadError: "Your ideas could not be loaded.",
+    // Type selector: an opinion about the city, or a need to be routed to a service
+    kindLabel: "Type of message",
+    kind: {
+      avis: "An opinion",
+      aide: "Request",
+    },
+    kindHint: {
+      avis: "Your idea will be recorded and passed on to administrators.",
+      aide: "Describe your problem: we will point you to the right service.",
+    },
+  },
+
+  // Guidance — the resident describes a problem, the city names the competent service
+  guidance: {
+    label: "Describe your problem",
+    placeholder: "E.g.: no water in my district since this morning",
+    hint: "Explain the situation in your own words, no administrative jargon.",
+    submitLabel: "Find the right service",
+    sendingLabel: "Finding the right service",
+    tooShort: "Describe your problem in at least {{min}} characters",
+    submitError: "Your problem could not be submitted",
+    // Answer shown to the resident
+    resultLabel: "Competent service",
+    summaryLabel: "Your situation",
+    stepsLabel: "The procedure",
+    noService:
+      "No service was recognised in your description. The High Council can point you in the right direction: submit a request and an agent will answer you.",
+    noServiceLink: "Submit a request to the city",
+    automaticNotice:
+      "Guidance established by searching the city's services. Describe your situation more precisely to get a detailed procedure.",
+    // Taking action: the request goes to the named service
+    depositLabel: "Submit the request to this service",
+    depositingLabel: "Submitting",
+    depositError: "The request could not be submitted",
+    depositSuccess: "Request {{reference}} submitted. You can follow it from your requests.",
+    alreadyDeposited: "Request {{reference}} was submitted on {{date}}.",
+    serviceLinkLabel: "See the service page",
+  },
+
+  // Priorité d'une annonce : ce qui décide de l'alerte temps réel à la publication
+  announcementPriorities: {
+    label: "Priority",
+    default: "Standard",
+    medium: "Priority",
+    max: "High Council",
+    hint: {
+      default: "The announcement shows up in the news, without any alert.",
+      medium: "A yellow alert is shown to everyone when it is published.",
+      max: "A red alert is shown immediately to everyone: reserve it for High Council messages.",
+    },
+  },
+
+  // Alertes temps réel reçues du canal d'annonces
+  announcementAlerts: {
+    urgentTitle: "High Council announcement",
+    cautionTitle: "Priority announcement",
+    view: "See the announcement",
   },
 
   // Menu contextuel des mentions : "@" dans la boîte à idées
@@ -1807,6 +2073,7 @@ const en = {
     errorLoad: "The notifications could not be loaded.",
     markAllRead: "Mark all as read",
     viewRequest: "View the request",
+    viewAnnouncement: "View the announcement",
   },
 
   agentAppointments: {
@@ -1985,6 +2252,141 @@ const en = {
     alertsTitle: "Alerts and log",
     alertsBody: "Priority reports and security events will appear here once their sources are connected.",
     noAlertsFeed: "No alert feed connected",
+
+    export: {
+      button: "Export as PDF",
+      dialogTitle: "Export administration data",
+      dialogDescription:
+        "Tick the sources to include in the report. Only the selected content is fetched, and each section comes with its indicators and its points of attention.",
+      selectedCount: "{{count}} source(s) selected out of {{total}}",
+      selectAll: "Select all",
+      clearAll: "Clear all",
+      noneSelected: "Select at least one source to start the export.",
+      run: "Export selection",
+      running: "Generating...",
+      cancel: "Cancel",
+      successTitle: "PDF export generated",
+      partialTitle: "PDF export generated with missing sources",
+      partialDescription: "{{count}} source(s) could not be fetched and are flagged in the report: {{sections}}.",
+      errorTitle: "Export failed",
+      errorDescription: "The report could not be generated. Please try again shortly.",
+      sections: {
+        synthesis: {
+          label: "Overall summary",
+          hint: "Key indicators and points of attention across every selected section",
+        },
+        requests: {
+          label: "Citizen requests",
+          hint: "Breakdown by status and priority, plus the current backlog",
+        },
+        accounts: {
+          label: "Account directory",
+          hint: "Registered accounts, assigned roles, deactivations and last sign-in",
+        },
+        rbac: {
+          label: "Roles and permissions",
+          hint: "Rights matrix and the weight of each role",
+        },
+        audit: {
+          label: "Audit log",
+          hint: "Recent administrative actions and failed sign-ins",
+        },
+        services: {
+          label: "Municipal services",
+          hint: "Published services, average ratings and missing feedback",
+        },
+        projects: {
+          label: "Municipal projects",
+          hint: "Progress, participants and stalled projects",
+        },
+        ideas: {
+          label: "Resident ideas",
+          hint: "Submitted suggestions and recent volume",
+        },
+        messages: {
+          label: "Inbox",
+          hint: "Received messages and pending processing",
+        },
+      },
+      values: { active: "Active", inactive: "Inactive", new: "New", read: "Read", processed: "Processed" },
+      columns: {
+        total: "Total",
+        pending: "Pending",
+        inProgress: "In progress",
+        resolved: "Accepted",
+        rejected: "Rejected",
+        subject: "Subject",
+        service: "Service",
+        priority: "Priority",
+        status: "Status",
+        date: "Date",
+        name: "Name",
+        email: "Email",
+        roles: "Roles",
+        lastLogin: "Last sign-in",
+        staff: "Agent and admin accounts",
+        citizens: "Citizen accounts",
+        directory: "Registered accounts",
+        inactive: "Deactivated accounts",
+        role: "Role",
+        code: "Code",
+        level: "Level",
+        users: "Users",
+        permissions: "Permissions",
+        customRoles: "Custom roles",
+        events: "Events",
+        failures: "Failures",
+        action: "Action",
+        entity: "Entity",
+        author: "Author",
+        active: "Active services",
+        inactiveServices: "Inactive services",
+        averageRating: "Average rating",
+        reviews: "Reviews",
+        planned: "Planned",
+        completed: "Completed",
+        title: "Title",
+        progress: "Progress",
+        participants: "Participants",
+        reference: "Reference",
+        content: "Content",
+        unread: "Unread",
+        read: "Read",
+        processed: "Processed",
+        sender: "Sender",
+      },
+      pdf: {
+        title: "Terra Nova administration report",
+        subject: "Administration data export",
+        brand: "TERRA NOVA  /  HIGH COUNCIL",
+        documentType: "INTERNAL REPORT",
+        filename: "administration-report-{{date}}.pdf",
+        generatedAt: "Generated on {{date}}",
+        author: "Issued by {{author}}",
+        scope: "Scope: {{count}} source(s) selected by the administrator",
+        footer: "Terra Nova internal document — administration console data.",
+        synthesisTitle: "Overall summary",
+        sectionsCount: "Sources included",
+        attentionCount: "Points of attention found",
+        noAttention: "No point of attention on the selected sources.",
+        requestsOpen: "{{count}} requests still need handling (pending or in progress), i.e. {{share}} of the flow.",
+        requestsDrained: "No pending request: the flow is fully handled.",
+        accountsInactive: "Deactivated accounts among the {{total}} attached rows: {{count}}. A deactivated account keeps its platform access.",
+        accountsNeverLoggedIn: "Accounts that never signed in among the {{total}} attached rows: {{count}}.",
+        rbacBroadest: "Role “{{label}}” carries {{count}} permissions: this is the widest scope.",
+        rbacCustom: "{{count}} custom role(s) outside the system roles.",
+        auditFailures: "{{count}} failed sign-in(s) out of {{total}} logged events.",
+        servicesUnrated: "{{count}} active service(s) out of {{total}} have no review yet.",
+        projectsStalled: "{{count}} ongoing project(s) have no recorded progress.",
+        ideasPending: "{{count}} idea(s) submitted by residents, none of them closed.",
+        messagesUnread: "{{count}} message(s) are awaiting an answer.",
+        messagesCleared: "No message awaiting processing.",
+        sourceUnavailable: "Source unavailable at export time.",
+        sourceUnavailableError: "Source unavailable at export time (access denied or API error).",
+        emptySource: "No record for this source.",
+        truncated: "{{shown}} row(s) displayed out of {{total}} — limit of {{limit}} rows per source.",
+      },
+    },
   },
 
   profilePage: {
@@ -2260,6 +2662,12 @@ const en = {
   themeToggle: {
     activateLight: "Switch to light mode",
     activateDark: "Switch to dark mode",
+  },
+
+  textSizeToggle: {
+    activateLarge: "Make text larger",
+    activateXLarge: "Make text even larger",
+    activateNormal: "Return to normal text size",
   },
 
   projectsList: {

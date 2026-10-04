@@ -2,11 +2,16 @@ import { authorizedRequest } from "@/repository/auth.repository"
 
 export type AnnouncementStatus = "draft" | "published" | "archived"
 
+// Priorité de diffusion : "default" reste dans la liste, "medium" déclenche une alerte jaune,
+// "max" une alerte rouge réservée aux annonces du Haut Conseil.
+export type AnnouncementPriority = "default" | "medium" | "max"
+
 export interface Announcement {
   id: number
   title: string
   content: string
   status: AnnouncementStatus
+  priority: AnnouncementPriority
   author: { id: number; firstName: string; lastName: string } | null
   publishedAt: string | null
   createdAt: string
@@ -24,6 +29,7 @@ export interface AnnouncementInput {
   title: string
   content: string
   status: AnnouncementStatus
+  priority?: AnnouncementPriority
 }
 
 export interface AnnouncementQuery {

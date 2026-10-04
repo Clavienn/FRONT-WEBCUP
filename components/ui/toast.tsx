@@ -5,7 +5,7 @@ import { Toast as ToastPrimitive } from "@base-ui/react/toast"
 import { cn } from "cn"
 
 import { Button } from "@/components/ui/button"
-import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { XIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, SirenIcon, Loader2Icon } from "lucide-react"
 
 const toast = ToastPrimitive.createToastManager()
 
@@ -153,6 +153,16 @@ function ToastIcon({ type }: { type: string | undefined }) {
     )
   }
 
+  // Alerte d'une annonce du Haut Conseil : rouge plein, à ne pas confondre avec une erreur de saisie
+  if (type === "urgent") {
+    icon = <SirenIcon aria-hidden="true" />
+  }
+
+  // Alerte d'annonce prioritaire moyenne : jaune
+  if (type === "caution") {
+    icon = <TriangleAlertIcon aria-hidden="true" />
+  }
+
   if (type === "error") {
     icon = (
       <OctagonXIcon className="text-destructive" aria-hidden="true" />
@@ -179,11 +189,21 @@ function ToastIcon({ type }: { type: string | undefined }) {
   )
 }
 
+// Teinte de la bulle selon le type : une annonce du Haut Conseil ne doit pas ressembler
+// à un simple message d'information. Fonds pleins, sinon le texte de la page transparaît
+// derrière la bulle et la rend illisible.
+const TOAST_TONES: Record<string, string> = {
+  urgent:
+    "border-destructive bg-destructive text-white [&_[data-slot=toast-title]]:text-white [&_[data-slot=toast-description]]:text-white/90 [&_[data-slot=toast-icon]>svg]:text-white [&_[data-slot=toast-action]>button]:border-white/40 [&_[data-slot=toast-action]>button]:bg-white/10 [&_[data-slot=toast-action]>button]:text-white [&_[data-slot=toast-close]>button]:text-white/80 hover:[&_[data-slot=toast-close]>button]:text-white",
+  caution:
+    "border-amber-400 bg-amber-400 text-amber-950 [&_[data-slot=toast-title]]:text-amber-950 [&_[data-slot=toast-description]]:text-amber-950/90 [&_[data-slot=toast-icon]>svg]:text-amber-950 [&_[data-slot=toast-action]>button]:border-amber-950/40 [&_[data-slot=toast-action]>button]:bg-amber-950/10 [&_[data-slot=toast-action]>button]:text-amber-950 [&_[data-slot=toast-close]>button]:text-amber-950/80 hover:[&_[data-slot=toast-close]>button]:text-amber-950",
+}
+
 function ToastList() {
   const { toasts } = ToastPrimitive.useToastManager()
 
   return toasts.map((toastItem) => (
-    <Toast key={toastItem.id} toast={toastItem}>
+    <Toast key={toastItem.id} toast={toastItem} className={TOAST_TONES[toastItem.type ?? ""]}>
       <ToastContent>
         <ToastIcon type={toastItem.type} />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
