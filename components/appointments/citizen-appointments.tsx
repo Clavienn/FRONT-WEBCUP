@@ -353,7 +353,7 @@ export function CitizenAppointments() {
 
   return (
     <div className="space-y-8">
-<section aria-labelledby="appointments-title">
+      <section aria-labelledby="appointments-title">
         <div>
           <h1 id="appointments-title" className="text-3xl font-medium tracking-tight sm:text-4xl">
             {t("appointments.title")}

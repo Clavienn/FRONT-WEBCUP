@@ -372,6 +372,8 @@ export default function ProfilPage() {
 
           <SecuritySection />
 
+
+          <SecuritySection />
           {/* Un agent ou un administrateur reste administrable via la console : la suppression
               de compte n'est proposée qu'à l'espace citoyen, comme le refuse l'API. */}
           {!isStaff(user) && <DeleteAccountSection />}
