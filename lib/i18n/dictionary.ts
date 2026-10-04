@@ -99,6 +99,11 @@ const fr = {
     title: "Les annonces du Haut Conseil",
     error: "Les annonces du Haut Conseil sont momentanément indisponibles. Merci de réessayer plus tard.",
     empty: "Aucune annonce du Haut Conseil pour le moment. Revenez bientôt.",
+    readMore: "Lire la suite",
+    readLess: "Réduire",
+    loading: "Chargement…",
+    seeMore: "Voir plus d’annonces",
+    loadMoreError: "Impossible de charger la suite. Réessayez.",
   },
 
   projectsSection: {
@@ -582,6 +587,81 @@ const fr = {
     urgentTitle: "Annonce du Haut Conseil",
     cautionTitle: "Annonce prioritaire",
     view: "Voir l'annonce",
+  },
+
+  // Espace de travail des annonces (liste, détail, publication) et rappel durable des alertes.
+  // Ces écrans sont restés en français figé alors que le reste de l'application est bilingue :
+  // un habitant anglophone recevait une notification en anglais puis atterrissait sur une page
+  // française. La traduction se cassait exactement au moment où l'information devait être comprise.
+  announcementHub: {
+    eyebrow: "Haut Conseil de Terra Nova",
+    title: "Annonces",
+    subtitle: "Annonces municipales, informations pratiques et changements de service publiés par la ville.",
+    newButton: "Nouvelle annonce",
+    searchAriaLabel: "Rechercher une annonce",
+    searchPlaceholder: "Rechercher une annonce",
+    filterAriaLabel: "Filtrer par statut",
+    filterAll: "Tous les statuts",
+    retry: "Réessayer",
+    errorGeneric: "Une erreur est survenue",
+    emptySearch: "Aucune annonce ne correspond à votre recherche.",
+    empty: "Aucune annonce pour le moment.",
+    readMore: "Lire l’annonce",
+    paginationAriaLabel: "Pagination des annonces",
+    previous: "Précédent",
+    pageOf: "Page {{page}} sur {{pages}}",
+    next: "Suivant",
+    editAria: "Modifier {{title}}",
+    deleteAria: "Supprimer {{title}}",
+    created: "Annonce créée",
+    updated: "Annonce modifiée",
+    deleted: "Annonce supprimée",
+    cancel: "Annuler",
+    delete: "Supprimer",
+    errorTitle: "Erreur",
+
+    // Détail d'une annonce
+    backLink: "Toutes les annonces",
+    publishedOn: "Publiée le {{date}}",
+    notFound: "Cette annonce est introuvable ou n’est plus disponible.",
+    invalidId: "Identifiant d’annonce invalide.",
+    loadFailed: "Chargement impossible",
+    edit: "Modifier",
+    remove: "Supprimer",
+    removeFailed: "Suppression impossible",
+    deleteTitle: "Supprimer « {{title}} » ?",
+    removeTitle: "Supprimer cette annonce ?",
+    deleteDescription:
+      "Cette action est définitive. Pour la retirer de la vue publique en gardant l’historique, passez-la en « Archivée ».",
+
+    // Publication et modification
+    form: {
+      createTitle: "Nouvelle annonce",
+      editTitle: "Modifier l’annonce",
+      description:
+        "Annonce municipale, information pratique ou changement de service. Seules les annonces publiées sont visibles des habitants.",
+      titleLabel: "Titre",
+      titlePlaceholder: "Ex. Coupure d’eau dans le secteur B",
+      contentLabel: "Contenu",
+      statusLabel: "Statut",
+      submitCreate: "Créer l’annonce",
+      submitEdit: "Enregistrer",
+    },
+
+    // Statuts de cycle de vie, repris dans les filtres et les pastilles
+    status: {
+      draft: "Brouillon",
+      published: "Publiée",
+      archived: "Archivée",
+    },
+
+    // Rappel durable : l'alerte temps réel ne vit que quelques secondes, ce bandeau couvre
+    // l'habitant qui n'était pas devant son écran et qui revient plus tard.
+    banner: {
+      urgentTitle: "Information du Haut Conseil",
+      priorityTitle: "Annonce prioritaire",
+      dismiss: "Ne plus afficher",
+    },
   },
 
   // Menu contextuel des mentions : "@" dans la boîte à idées
@@ -1814,6 +1894,11 @@ const en = {
     title: "Announcements from the High Council",
     error: "The High Council's announcements are temporarily unavailable. Please try again later.",
     empty: "No announcements from the High Council yet. Check back soon.",
+    readMore: "Read more",
+    readLess: "Show less",
+    loading: "Loading…",
+    seeMore: "See more announcements",
+    loadMoreError: "Could not load more announcements. Please try again.",
   },
 
   projectsSection: {
@@ -2289,6 +2374,73 @@ const en = {
     urgentTitle: "High Council announcement",
     cautionTitle: "Priority announcement",
     view: "See the announcement",
+  },
+
+  // Espace de travail des annonces (liste, détail, publication) et rappel durable des alertes.
+  announcementHub: {
+    eyebrow: "High Council of Terra Nova",
+    title: "Announcements",
+    subtitle: "Municipal announcements, practical information and service changes published by the city.",
+    newButton: "New announcement",
+    searchAriaLabel: "Search an announcement",
+    searchPlaceholder: "Search an announcement",
+    filterAriaLabel: "Filter by status",
+    filterAll: "All statuses",
+    retry: "Try again",
+    errorGeneric: "Something went wrong",
+    emptySearch: "No announcement matches your search.",
+    empty: "No announcement yet.",
+    readMore: "Read the announcement",
+    paginationAriaLabel: "Announcements pagination",
+    previous: "Previous",
+    pageOf: "Page {{page}} of {{pages}}",
+    next: "Next",
+    editAria: "Edit {{title}}",
+    deleteAria: "Delete {{title}}",
+    created: "Announcement created",
+    updated: "Announcement updated",
+    deleted: "Announcement deleted",
+    cancel: "Cancel",
+    delete: "Delete",
+    errorTitle: "Error",
+
+    backLink: "All announcements",
+    publishedOn: "Published on {{date}}",
+    notFound: "This announcement cannot be found or is no longer available.",
+    invalidId: "Invalid announcement id.",
+    loadFailed: "Could not load",
+    edit: "Edit",
+    remove: "Delete",
+    removeFailed: "Could not delete",
+    deleteTitle: "Delete “{{title}}”?",
+    removeTitle: "Delete this announcement?",
+    deleteDescription:
+      "This action is permanent. To withdraw it from the public view while keeping the history, set it to “Archived”.",
+
+    form: {
+      createTitle: "New announcement",
+      editTitle: "Edit the announcement",
+      description:
+        "Municipal announcement, practical information or service change. Only published announcements are visible to residents.",
+      titleLabel: "Title",
+      titlePlaceholder: "E.g. Water cut-off in sector B",
+      contentLabel: "Content",
+      statusLabel: "Status",
+      submitCreate: "Create the announcement",
+      submitEdit: "Save",
+    },
+
+    status: {
+      draft: "Draft",
+      published: "Published",
+      archived: "Archived",
+    },
+
+    banner: {
+      urgentTitle: "High Council notice",
+      priorityTitle: "Priority announcement",
+      dismiss: "Do not show again",
+    },
   },
 
   // Menu contextuel des mentions : "@" dans la boîte à idées
