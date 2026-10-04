@@ -98,22 +98,35 @@ export function PartnerCatalog() {
 
   return (
     <>
-      <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
-          <p className="text-sm font-medium text-primary">{t("partnersCatalog.eyebrow")}</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("partnersCatalog.title")}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t("partnersCatalog.subtitle")}</p>
+      <section className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-primary">
+            <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
+            RÉSEAU DES PARTENAIRES EXTÉRIEURS // TERRA NOVA
+          </span>
+          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+            OFFRES & SERVICES ASSOCIÉS
+          </span>
         </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-          <Input
-            type="search"
-            aria-label={t("partnersCatalog.searchAriaLabel")}
-            placeholder={t("partnersCatalog.searchPlaceholder")}
-            className="pl-9"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t("partnersCatalog.eyebrow")}</p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+              {t("partnersCatalog.title")}
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("partnersCatalog.subtitle")}</p>
+          </div>
+          <div className="relative w-full sm:w-72">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Input
+              type="search"
+              aria-label={t("partnersCatalog.searchAriaLabel")}
+              placeholder={t("partnersCatalog.searchPlaceholder")}
+              className="pl-9"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
         </div>
       </section>
 
