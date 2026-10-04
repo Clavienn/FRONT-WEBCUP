@@ -81,7 +81,11 @@ export async function resilientFetch(url: string, init: RequestInit = {}): Promi
   for (let attempt = 0; ; attempt += 1) {
     try {
       const response = await fetchOnce(url, init)
-      if (attempt < retries && RETRYABLE_STATUS.has(response.status) && (readOnly || response.status === 429 || response.status === 503)) {
+      // Un 429 avec un long Retry-After n'est pas une surcharge passagère (adresse bloquée par la protection
+      // anti-robots) : réessayer ne servirait qu'à aggraver le blocage, on rend la réponse telle quelle
+      const retryAfter = Number(response.headers.get("Retry-After"))
+      const longBlock = response.status === 429 && Number.isFinite(retryAfter) && retryAfter > 30
+      if (attempt < retries && !longBlock && RETRYABLE_STATUS.has(response.status) && (readOnly || response.status === 429 || response.status === 503)) {
         await wait(retryDelay(attempt, response))
         continue
       }

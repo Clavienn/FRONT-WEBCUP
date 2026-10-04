@@ -80,8 +80,8 @@ function listMine(): Promise<AppointmentPage<CitizenAppointment>> {
 }
 
 /** Réservation : le serveur refuse (409) si le créneau vient d'être pris par un autre habitant. */
-function book(id: number, subject?: string | null): Promise<CitizenAppointment> {
-  return authorizedRequest<CitizenAppointment>(`/appointments/${id}/book`, json("POST", { subject }))
+function book(id: number, subject?: string | null, headers?: Record<string, string>): Promise<CitizenAppointment> {
+  return authorizedRequest<CitizenAppointment>(`/appointments/${id}/book`, { ...json("POST", { subject }), headers })
 }
 
 function cancelMine(id: number): Promise<void> {

@@ -71,8 +71,8 @@ export const serviceRepository = {
   // Avis déjà déposés par le citoyen connecté (sert à masquer le bouton « Donner mon avis »)
   myReviews: () => authorizedRequest<MyServiceReview[]>("/services/reviews/mine"),
 
-  createReview: (id: number, data: { rating: number; comment: string }) =>
-    authorizedRequest<MyServiceReview>(`/services/${id}/reviews`, json("POST", data)),
+  createReview: (id: number, data: { rating: number; comment: string }, headers?: Record<string, string>) =>
+    authorizedRequest<MyServiceReview>(`/services/${id}/reviews`, { ...json("POST", data), headers }),
 
   create: (data: ServiceCreation) => authorizedRequest<MunicipalService>("/services", json("POST", data)),
 

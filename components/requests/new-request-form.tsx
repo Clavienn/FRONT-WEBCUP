@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useFormGuard } from "@/components/forms/form-guard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -33,6 +34,7 @@ export function NewRequestForm({ onCreated }: NewRequestFormProps) {
   const [serviceId, setServiceId] = useState("")
   const [error, setError] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  const guard = useFormGuard("request")
 
   useEffect(() => {
     let cancelled = false
@@ -63,7 +65,7 @@ export function NewRequestForm({ onCreated }: NewRequestFormProps) {
     setError("")
     setSubmitting(true)
     try {
-      await citizenRequestRepository.create(payload)
+      await guard.run((headers) => citizenRequestRepository.create(payload, headers))
       setSubject("")
       setDescription("")
       setServiceId("")
@@ -82,6 +84,7 @@ export function NewRequestForm({ onCreated }: NewRequestFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      {guard.trap}
       <div className="space-y-1.5">
         <Label htmlFor="request-subject">{t("citizenRequests.subjectLabel")}</Label>
         <Input
