@@ -18,7 +18,7 @@ export default function AgentRequestsPage() {
           note : le citoyen suit l’avancement depuis son espace.
         </p>
       </section>
-      <AgentRequestsPanel initialStatus="all" hideHeading />
+      <AgentRequestsPanel initialStatus="all" initialSortByPriority hideHeading />
     </RequirePermission>
   )
 }

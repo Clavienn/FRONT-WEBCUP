@@ -1,22 +1,28 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { CircleAlert, Inbox, RefreshCw } from "lucide-react"
+import { CircleAlert, Copy, Inbox, RefreshCw, Search } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/toast"
 import {
+  REQUEST_PRIORITIES,
   REQUEST_STATUS_TRANSITIONS,
   citizenRequestRepository,
+  requestPriorityKey,
   requestStatusKey,
   type AgentRequest,
+  type RequestPriority,
   type RequestStatus,
+  type SimilarRequest,
 } from "@/repository/citizenRequest.repository"
 
 type LoadState = "loading" | "error" | "ready"
@@ -30,10 +36,79 @@ const STATUS_STYLES: Record<RequestStatus, string> = {
   rejected: "border-destructive/30 bg-destructive/10 text-destructive",
 }
 
+// Le niveau d'urgence se lit à la couleur, comme l'état : rouge = à traiter en premier
+const PRIORITY_STYLES: Record<RequestPriority, string> = {
+  urgent: "border-destructive/30 bg-destructive/10 text-destructive",
+  high: "border-orange-500/30 bg-orange-500/10 text-orange-800 dark:text-orange-200",
+  medium: "border-sky-500/30 bg-sky-500/10 text-sky-800 dark:text-sky-200",
+  low: "border-border bg-muted/50 text-muted-foreground",
+}
+
 const FILTERS: Array<RequestStatus | "all"> = ["all", "pending", "in_progress", "resolved", "rejected"]
 
 // Une clôture sans motif est refusée par le serveur : on l'explique avant l'envoi
 const CLOSING: RequestStatus[] = ["resolved", "rejected"]
+
+// Badge replié par défaut : la liste des demandes similaires n'est chargée qu'au premier clic
+function SimilarRequestsIndicator({ requestId, count }: { requestId: number; count: number }) {
+  const { t } = useLanguage()
+  const [expanded, setExpanded] = useState(false)
+  const [items, setItems] = useState<SimilarRequest[] | null>(null)
+  const [error, setError] = useState("")
+
+  const toggle = () => {
+    if (expanded) {
+      setExpanded(false)
+      return
+    }
+    setExpanded(true)
+    if (items === null) {
+      citizenRequestRepository
+        .getSimilar(requestId)
+        .then(setItems)
+        .catch(() => setError(t("agentRequests.similarLoadError")))
+    }
+  }
+
+  return (
+    <div className="mt-3">
+      <Button type="button" variant="outline" size="sm" onClick={toggle} className="gap-1.5">
+        <Copy className="size-3.5" aria-hidden="true" />
+        {expanded ? t("agentRequests.similarHide") : t(count === 1 ? "agentRequests.similarCountOne" : "agentRequests.similarCountMany", { count })}
+      </Button>
+
+      {expanded && (
+        <ul className="mt-2 space-y-1.5 rounded-lg border border-border/70 bg-background/40 p-2.5">
+          {error && <li className="text-xs text-destructive">{error}</li>}
+          {!error && items === null && (
+            <li>
+              <Skeleton className="h-10 rounded-md" />
+            </li>
+          )}
+          {!error && items !== null && items.length === 0 && (
+            <li className="text-xs text-muted-foreground">{t("agentRequests.similarEmpty")}</li>
+          )}
+          {!error &&
+            items?.map((item) => (
+              <li
+                key={item.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-card/60 px-2.5 py-1.5 text-xs"
+              >
+                <span className="min-w-0 truncate">
+                  {item.subject}
+                  {" · "}
+                  {item.owner ? [item.owner.firstName, item.owner.lastName].filter(Boolean).join(" ") : "—"}
+                </span>
+                <Badge variant="outline" className={`shrink-0 ${STATUS_STYLES[item.status]}`}>
+                  {t(`agentRequests.filter${requestStatusKey(item.status)}`)}
+                </Badge>
+              </li>
+            ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 interface RequestRowProps {
   request: AgentRequest
@@ -44,6 +119,7 @@ interface RequestRowProps {
 function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
   const { t } = useLanguage()
   const statusLabel = (status: RequestStatus) => t(`agentRequests.filter${requestStatusKey(status)}`)
+  const priorityLabel = (priority: RequestPriority) => t(`agentRequests.priority${requestPriorityKey(priority)}`)
 
   const [target, setTarget] = useState<RequestStatus | "">("")
   const [note, setNote] = useState("")
@@ -94,9 +170,14 @@ function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
-          <Badge variant="outline" className={STATUS_STYLES[request.status]}>
-            {statusLabel(request.status)}
-          </Badge>
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            <Badge variant="outline" className={PRIORITY_STYLES[request.priority]}>
+              {t("agentRequests.priorityLabel")} : {priorityLabel(request.priority)}
+            </Badge>
+            <Badge variant="outline" className={STATUS_STYLES[request.status]}>
+              {statusLabel(request.status)}
+            </Badge>
+          </div>
           <span className="text-xs text-muted-foreground">
             {request.assignee
               ? t("agentRequests.assignedTo", {
@@ -111,6 +192,10 @@ function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
 
       {request.description && (
         <p className="mt-3 text-sm leading-6 text-muted-foreground">{request.description}</p>
+      )}
+
+      {(request.similarCount ?? 0) > 0 && (
+        <SimilarRequestsIndicator requestId={request.id} count={request.similarCount!} />
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -141,6 +226,19 @@ function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
         >
           {statusLabel("in_progress")}
         </Button>
+        <NativeSelect
+          size="sm"
+          aria-label={`${t("agentRequests.priorityLabel")} : ${request.subject}`}
+          value={request.priority}
+          disabled={saving}
+          onChange={(event) => apply({ priority: event.target.value as RequestPriority })}
+        >
+          {REQUEST_PRIORITIES.map((value) => (
+            <NativeSelectOption key={value} value={value}>
+              {t("agentRequests.priorityLabel")} : {priorityLabel(value)}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
       </div>
 
       {transitions.length > 0 && (
@@ -213,6 +311,8 @@ interface AgentRequestsPanelProps {
   pageSize?: number
   // Masque le titre quand la page fournit déjà le sien
   hideHeading?: boolean
+  // Les plus urgentes d'abord (puis les plus anciennes) dès l'ouverture
+  initialSortByPriority?: boolean
 }
 
 /** File des demandes citoyennes : l'agent filtre, prend en charge, fait évoluer l'état. */
@@ -221,6 +321,7 @@ export function AgentRequestsPanel({
   initialStatus = "pending",
   pageSize = 20,
   hideHeading = false,
+  initialSortByPriority = false,
 }: AgentRequestsPanelProps = {}) {
   const { t } = useLanguage()
   const { user } = useAuth()
@@ -228,9 +329,21 @@ export function AgentRequestsPanel({
   const [requests, setRequests] = useState<AgentRequest[]>([])
   const [error, setError] = useState("")
   const [status, setStatus] = useState<RequestStatus | "all">(initialStatus)
+  const [priorityFilter, setPriorityFilter] = useState<RequestPriority | "all">("all")
+  const [sortByPriority, setSortByPriority] = useState(initialSortByPriority)
   const [mineOnly, setMineOnly] = useState(false)
+  const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim())
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [search])
 
   // Same rationale as the citizen panel: the initial state is already "loading", and a
   // synchronous setState in the effect body triggers a cascading render. Re-fetches
@@ -238,7 +351,14 @@ export function AgentRequestsPanel({
   const load = useCallback(() => {
     if (!user) return
     citizenRequestRepository
-      .listAll({ status, mine: mineOnly || undefined, page, limit: pageSize })
+      .listAll({
+        status,
+        priority: priorityFilter,
+        sort: sortByPriority ? "priority" : undefined,
+        mine: mineOnly || undefined,
+        page,
+        limit: pageSize,
+      })
       .then((result) => {
         setRequests(result.requests)
         setTotal(result.total)
@@ -250,7 +370,7 @@ export function AgentRequestsPanel({
         setError(cause instanceof Error ? cause.message : "")
         setState("error")
       })
-  }, [mineOnly, status, page, pageSize, user, onChanged])
+  }, [mineOnly, status, priorityFilter, sortByPriority, page, pageSize, user, onChanged])
 
   useEffect(() => {
     load()
@@ -264,6 +384,8 @@ export function AgentRequestsPanel({
   if (!user) return null
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
+
+  const priorityLabel = (priority: RequestPriority) => t(`agentRequests.priority${requestPriorityKey(priority)}`)
 
   const filterLabel = (value: RequestStatus | "all") =>
     value === "all" ? t("agentRequests.filterAll") : t(`agentRequests.filter${requestStatusKey(value)}`)
@@ -284,6 +406,17 @@ export function AgentRequestsPanel({
           </div>
         )}
         <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-full sm:w-64">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Input
+              type="search"
+              aria-label={t("agentRequests.searchAriaLabel")}
+              placeholder={t("agentRequests.searchPlaceholder")}
+              className="pl-9"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
           <NativeSelect
             value={status}
             onChange={(event) => {
@@ -297,6 +430,32 @@ export function AgentRequestsPanel({
               </NativeSelectOption>
             ))}
           </NativeSelect>
+          <NativeSelect
+            aria-label={t("agentRequests.priorityLabel")}
+            value={priorityFilter}
+            onChange={(event) => {
+              setPriorityFilter(event.target.value as RequestPriority | "all")
+              setPage(1)
+            }}
+          >
+            <NativeSelectOption value="all">{t("agentRequests.filterPriorityAll")}</NativeSelectOption>
+            {REQUEST_PRIORITIES.map((value) => (
+              <NativeSelectOption key={value} value={value}>
+                {priorityLabel(value)}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+          <Button
+            variant={sortByPriority ? "default" : "outline"}
+            size="sm"
+            aria-pressed={sortByPriority}
+            onClick={() => {
+              setSortByPriority((on) => !on)
+              setPage(1)
+            }}
+          >
+            {t("agentRequests.sortByPriority")}
+          </Button>
           <Button
             variant={mineOnly ? "default" : "outline"}
             size="sm"

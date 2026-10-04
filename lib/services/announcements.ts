@@ -1,3 +1,6 @@
+import { resilientFetch } from "@/lib/network"
+import { withStaleFallback } from "@/lib/stale-cache"
+
 export interface Announcement {
   id: number
   title: string
@@ -24,10 +27,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
  * Annonces publiées par les agents et administrateurs de la ville.
  * Route publique de l'API : aucune session requise.
  */
-export async function getAnnouncements(page = 1, limit = 9): Promise<AnnouncementsPage> {
+export function getAnnouncements(page = 1, limit = 9): Promise<AnnouncementsPage> {
+  // Repli sur la dernière réponse connue si l'API est lente ou injoignable
+  return withStaleFallback(`announcements:${page}:${limit}`, () => fetchAnnouncements(page, limit))
+}
+
+async function fetchAnnouncements(page: number, limit: number): Promise<AnnouncementsPage> {
   if (!API_URL) throw new Error("NEXT_PUBLIC_API_URL n'est pas configurée.")
 
-  const response = await fetch(`${API_URL}/public/announcements?page=${page}&limit=${limit}`, { cache: "no-store" })
+  const response = await resilientFetch(`${API_URL}/public/announcements?page=${page}&limit=${limit}`)
   if (!response.ok) throw new Error(`Erreur ${response.status}`)
 
   const body: { announcements: PublicAnnouncement[]; total: number } = await response.json()

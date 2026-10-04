@@ -17,6 +17,7 @@ interface AuthContextValue {
   signUp: (data: RegistrationData) => Promise<AuthUser>
   signOut: () => Promise<void>
   signOutEverywhere: () => Promise<void>
+  deleteAccount: (password: string) => Promise<void>
   reloadUser: () => Promise<AuthUser>
   updateProfile: (data: ProfileUpdate) => Promise<AuthUser>
   changePassword: (data: PasswordChange) => Promise<AuthUser>
@@ -76,6 +77,14 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
     }
   }
 
+  // La session locale ne tombe qu'en cas de succès : sur un mot de passe erroné, l'API
+  // renvoie 401 et le compte existe toujours. Vider l'utilisateur dans un finally
+  // déconnectait de l'interface et faisait disparaître le message d'erreur.
+  const deleteAccount = async (password: string) => {
+    await authRepository.deleteAccount(password)
+    setUser(null)
+  }
+
   // Recharge le profil depuis /auth/me
   const reloadUser = useCallback(async () => {
     const sessionUser = await authRepository.me()
@@ -104,6 +113,7 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
         signUp,
         signOut,
         signOutEverywhere,
+        deleteAccount,
         reloadUser,
         updateProfile,
         changePassword,

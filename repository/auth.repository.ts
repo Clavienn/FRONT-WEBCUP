@@ -1,4 +1,5 @@
 import { getAppLocale } from "@/lib/i18n/types"
+import { resilientFetch } from "@/lib/network"
 
 export type UserRole = "citizen" | "agent" | "admin"
 
@@ -154,7 +155,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   const headers = new Headers(init.headers)
-  if (init.body && !headers.has("Content-Type")) {
+  // FormData (upload de fichier) : laisser fetch poser son propre Content-Type avec la boundary
+  if (init.body && !(init.body instanceof FormData) && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json")
   }
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`)
@@ -165,17 +167,14 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Accept-Language", getAppLocale().toUpperCase())
   }
 
-  let response: Response
-  try {
-    response = await fetch(`${API_URL}${path}`, {
-      ...init,
-      credentials: "include",
-      cache: "no-store",
-      headers,
-    })
-  } catch {
-    throw new Error("Impossible de joindre l’API. Vérifiez que le serveur est démarré.")
-  }
+  // Délai maximal, et nouvelles tentatives sur les lectures si le serveur est surchargé (429/502/503/504)
+  // ou injoignable : voir lib/network.ts. Les écritures ne sont jamais rejouées.
+  const response = await resilientFetch(`${API_URL}${path}`, {
+    ...init,
+    credentials: "include",
+    cache: "no-store",
+    headers,
+  })
 
   const body = response.status === 204 ? undefined : await response.json().catch(() => null)
   if (!response.ok) {
@@ -270,6 +269,17 @@ export const authRepository = {
     } finally {
       accessToken = null
     }
+  },
+
+  // Suppression définitive du compte. Le token n'est lâché qu'en cas de succès : sur un refus
+  // (mot de passe erroné) la session est toujours valide et doit rester utilisable pour
+  // que l'utilisateur puisse réessayer.
+  async deleteAccount(password: string): Promise<void> {
+    await authorizedRequest<void>("/auth/me", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+    })
+    accessToken = null
   },
 
   clearAccessToken() {

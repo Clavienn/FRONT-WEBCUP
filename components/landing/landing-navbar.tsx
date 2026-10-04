@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { Menu, X, Globe } from "lucide-react"
 
-import { NAV_LINKS, SITE_NAME } from "@/config/landing-content"
+import { BrandLockup } from "@/components/brand/brand-lockup"
+import { NAV_LINKS } from "@/config/landing-content"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { useActiveSection } from "@/hooks/use-active-section"
 import { cn } from "@/lib/utils"
@@ -44,8 +45,14 @@ export function LandingNavbar() {
   return (
     <header className="tn-navbar" data-scrolled={scrolled}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12">
-        <Link href="#accueil" className="tn-display text-sm font-bold tracking-[0.2em] text-[var(--tn-text)]">
-          {SITE_NAME.toUpperCase()}
+        <Link
+          href="#accueil"
+          className="inline-flex items-center text-[var(--tn-text)] transition-opacity hover:opacity-80"
+        >
+          <BrandLockup
+            markClassName="w-6"
+            wordmarkClassName="tn-display text-sm font-bold tracking-[0.2em]"
+          />
         </Link>
 
         <ul className="hidden items-center gap-8 lg:flex">
@@ -93,7 +100,10 @@ export function LandingNavbar() {
       >
         <div className="flex h-full flex-col px-6 py-8">
           <div className="flex items-center justify-between">
-            <span className="tn-display text-sm font-bold tracking-[0.2em]">{SITE_NAME.toUpperCase()}</span>
+            <BrandLockup
+              markClassName="w-6"
+              wordmarkClassName="tn-display text-sm font-bold tracking-[0.2em]"
+            />
             <button
               type="button"
               onClick={() => setDrawerOpen(false)}
