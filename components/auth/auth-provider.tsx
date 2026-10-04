@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
+import { resetAgentApproval } from "@/lib/agent-approval"
 import {
   authRepository,
   type AuthUser,
@@ -61,10 +62,13 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
     return sessionUser
   }
 
+  // Le statut de validation est mémorisé par compte pour la durée de la session : il doit tomber
+  // avec la session, sinon l'agent qui se connecte ensuite hériterait du statut du précédent.
   const signOut = async () => {
     try {
       await authRepository.logout()
     } finally {
+      resetAgentApproval()
       setUser(null)
     }
   }
@@ -73,6 +77,7 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
     try {
       await authRepository.logoutAll()
     } finally {
+      resetAgentApproval()
       setUser(null)
     }
   }
@@ -82,6 +87,7 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
   // déconnectait de l'interface et faisait disparaître le message d'erreur.
   const deleteAccount = async (password: string) => {
     await authRepository.deleteAccount(password)
+    resetAgentApproval()
     setUser(null)
   }
 

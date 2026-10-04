@@ -419,6 +419,41 @@ const fr = {
     description: "Votre compte ne dispose pas du rôle administrateur.",
   },
 
+  // Protection des données administratives : ce que voit un compte agent encore en attente de
+  // validation. Les faits décrits ici sont ceux appliqués par l'API (staffAccess côté serveur).
+  agentApproval: {
+    banner: {
+      title: "Compte agent en attente de validation",
+      lead: "Vous pouvez travailler normalement. En attendant qu'un administrateur valide votre compte, ces protections s'appliquent aux dossiers des citoyens :",
+      masked: "leurs coordonnées — e-mail, téléphone, adresse — sont masquées ou retirées ;",
+      writes: "la modification et l'activation de leurs comptes sont indisponibles ;",
+      traced:
+        "chaque consultation est journalisée, plafonnée en nombre, et visible par le citoyen concerné.",
+    },
+    // Valeur volontairement non affichée en clair à un agent en attente
+    hidden: {
+      label: "Réservé aux agents validés",
+      maskedTitle: "Coordonnée masquée",
+      maskedDescription:
+        "Votre compte doit être validé par un administrateur pour que cette valeur s'affiche en entier.",
+      withheldTitle: "Champ non communiqué",
+      withheldDescription: "L'API ne transmet pas ce champ à un compte agent en attente de validation.",
+    },
+    // Bouton désactivé : on dit pourquoi, plutôt que de laisser deviner
+    blockedAction: {
+      description: "Un administrateur doit valider votre compte pour {{action}}.",
+      edit: "modifier un compte citoyen",
+      status: "activer ou désactiver un compte citoyen",
+    },
+    errors: {
+      notValidatedTitle: "Validation requise",
+      rateLimitedTitle: "Plafond de consultations atteint",
+      rateLimitedDescription:
+        "Vous avez consulté beaucoup de dossiers à la suite. Pour qu'une aspiration de données reste lente et visible, l'accès est suspendu {{seconds}} s. Vous pouvez continuer à travailler sur les autres écrans.",
+      retryIn: "Nouvel essai dans {{seconds}} s",
+    },
+  },
+
   citizenDashboard: {
     requestStates: { toProcess: "À traiter", inProgress: "En cours", accepted: "Acceptées", refused: "Refusées" },
     requestsTitle: "Mes démarches",
@@ -1772,6 +1807,37 @@ const en = {
   requireAdmin: {
     title: "Restricted to administrators",
     description: "Your account does not have the administrator role.",
+  },
+
+  // Protections applied to citizen records while an agent account is still awaiting validation.
+  // Wording mirrors what the API actually enforces (staffAccess on the server side).
+  agentApproval: {
+    banner: {
+      title: "Agent account awaiting validation",
+      lead: "You can work normally. Until an administrator validates your account, these protections apply to citizen records:",
+      masked: "their contact details — email, phone, address — are masked or withheld;",
+      writes: "editing and enabling their accounts is unavailable;",
+      traced: "every read is logged, rate-limited, and visible to the citizen concerned.",
+    },
+    hidden: {
+      label: "Restricted to validated agents",
+      maskedTitle: "Masked contact detail",
+      maskedDescription: "An administrator must validate your account before this value is shown in full.",
+      withheldTitle: "Field not disclosed",
+      withheldDescription: "The API does not send this field to an agent account awaiting validation.",
+    },
+    blockedAction: {
+      description: "An administrator must validate your account to {{action}}.",
+      edit: "edit a citizen account",
+      status: "enable or disable a citizen account",
+    },
+    errors: {
+      notValidatedTitle: "Validation required",
+      rateLimitedTitle: "Read limit reached",
+      rateLimitedDescription:
+        "You have read a large number of records in a row. So that bulk copying stays slow and visible, access is paused for {{seconds}} s. You can keep working on other screens.",
+      retryIn: "Retry in {{seconds}} s",
+    },
   },
 
   citizenDashboard: {
