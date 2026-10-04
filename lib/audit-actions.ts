@@ -57,6 +57,17 @@ export const actionKeys: Record<string, string> = {
   "establishment.create": "auditLog.actions.establishmentCreate",
   "establishment.update": "auditLog.actions.establishmentUpdate",
   "establishment.delete": "auditLog.actions.establishmentDelete",
+  "project.create": "auditLog.actions.projectCreate",
+  "project.update": "auditLog.actions.projectUpdate",
+  "project.delete": "auditLog.actions.projectDelete",
+  "project.participant.add": "auditLog.actions.projectParticipantAdd",
+  "project.participant.remove": "auditLog.actions.projectParticipantRemove",
+  "project.entity.add": "auditLog.actions.projectEntityAdd",
+  "project.entity.remove": "auditLog.actions.projectEntityRemove",
+  "project.comment.create": "auditLog.actions.projectCommentCreate",
+  "project.comment.delete": "auditLog.actions.projectCommentDelete",
+  "external_entity.create": "auditLog.actions.externalEntityCreate",
+  "external_entity.delete": "auditLog.actions.externalEntityDelete",
 };
 
 // entityType -> clé de dictionnaire. Deux formes coexistent : les audits métier citent la table
@@ -67,6 +78,9 @@ export const entityKeys: Record<string, string> = {
   permissions: "auditLog.entities.permission",
   municipal_services: "auditLog.entities.municipalService",
   establishments: "auditLog.entities.establishment",
+  projects: "auditLog.entities.project",
+  project_comments: "auditLog.entities.projectComment",
+  external_entities: "auditLog.entities.externalEntity",
   services: "auditLog.entities.service",
   announcements: "auditLog.entities.announcement",
   contact_messages: "auditLog.entities.contactMessage",
@@ -110,6 +124,7 @@ export const ACTION_GROUPS: { prefixes: string[]; labelKey: string }[] = [
   { prefixes: ["role.", "permission."], labelKey: "auditLog.agentPage.groupRbac" },
   { prefixes: ["service."], labelKey: "auditLog.agentPage.groupServices" },
   { prefixes: ["establishment."], labelKey: "auditLog.agentPage.groupEstablishments" },
+  { prefixes: ["project.", "external_entity."], labelKey: "auditLog.agentPage.groupProjects" },
 ];
 
 export const DEFAULT_GROUP_KEY = "auditLog.agentPage.groupAccounts";

@@ -11,6 +11,7 @@ import { VoyageSection } from "@/components/landing/voyage-section"
 import { ServicesSection } from "@/components/landing/services-section"
 import { HowItWorksSection } from "@/components/landing/how-it-works-section"
 import { AnnouncementsSection } from "@/components/landing/announcements-section"
+import { ProjectsSection } from "@/components/landing/projects-section"
 import { AudiencesSection } from "@/components/landing/audiences-section"
 import { CommitmentsSection } from "@/components/landing/commitments-section"
 import { CtaSection } from "@/components/landing/cta-section"
@@ -42,6 +43,7 @@ export default function Page() {
           <ServicesSection />
           <HowItWorksSection />
           <AnnouncementsSection />
+          <ProjectsSection />
           <AudiencesSection />
           <CommitmentsSection />
           <CtaSection />

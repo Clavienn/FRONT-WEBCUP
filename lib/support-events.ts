@@ -1,0 +1,1 @@
+export const OPEN_SUPPORT_BUBBLE_EVENT = "terra-nova:open-support-bubble"

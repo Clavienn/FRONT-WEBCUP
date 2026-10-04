@@ -3,8 +3,6 @@ export interface NavLink {
   href: string
 }
 
-export const SITE_NAME = "Terra Nova"
-
 export const NAV_LINKS: NavLink[] = [
   { id: "accueil", href: "#accueil" },
   { id: "presentation", href: "#presentation" },
@@ -88,8 +86,8 @@ export const CTA_CONTENT = {
 export const FOOTER_CONTENT = {
   contact: { email: "contact@terra-nova.world" },
   legalLinks: [
-    { id: "mentions", href: "#" },
-    { id: "privacy", href: "#" },
+    { id: "mentions" },
+    { id: "privacy" },
   ],
   webcup: { href: "#" },
 }

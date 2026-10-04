@@ -1,13 +1,15 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { CircleAlert, Inbox, RefreshCw } from "lucide-react"
+import { CircleAlert, Copy, Inbox, RefreshCw, Search } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/toast"
@@ -20,6 +22,7 @@ import {
   type AgentRequest,
   type RequestPriority,
   type RequestStatus,
+  type SimilarRequest,
 } from "@/repository/citizenRequest.repository"
 
 type LoadState = "loading" | "error" | "ready"
@@ -45,6 +48,67 @@ const FILTERS: Array<RequestStatus | "all"> = ["all", "pending", "in_progress", 
 
 // Une clôture sans motif est refusée par le serveur : on l'explique avant l'envoi
 const CLOSING: RequestStatus[] = ["resolved", "rejected"]
+
+// Badge replié par défaut : la liste des demandes similaires n'est chargée qu'au premier clic
+function SimilarRequestsIndicator({ requestId, count }: { requestId: number; count: number }) {
+  const { t } = useLanguage()
+  const [expanded, setExpanded] = useState(false)
+  const [items, setItems] = useState<SimilarRequest[] | null>(null)
+  const [error, setError] = useState("")
+
+  const toggle = () => {
+    if (expanded) {
+      setExpanded(false)
+      return
+    }
+    setExpanded(true)
+    if (items === null) {
+      citizenRequestRepository
+        .getSimilar(requestId)
+        .then(setItems)
+        .catch(() => setError(t("agentRequests.similarLoadError")))
+    }
+  }
+
+  return (
+    <div className="mt-3">
+      <Button type="button" variant="outline" size="sm" onClick={toggle} className="gap-1.5">
+        <Copy className="size-3.5" aria-hidden="true" />
+        {expanded ? t("agentRequests.similarHide") : t(count === 1 ? "agentRequests.similarCountOne" : "agentRequests.similarCountMany", { count })}
+      </Button>
+
+      {expanded && (
+        <ul className="mt-2 space-y-1.5 rounded-lg border border-border/70 bg-background/40 p-2.5">
+          {error && <li className="text-xs text-destructive">{error}</li>}
+          {!error && items === null && (
+            <li>
+              <Skeleton className="h-10 rounded-md" />
+            </li>
+          )}
+          {!error && items !== null && items.length === 0 && (
+            <li className="text-xs text-muted-foreground">{t("agentRequests.similarEmpty")}</li>
+          )}
+          {!error &&
+            items?.map((item) => (
+              <li
+                key={item.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-md bg-card/60 px-2.5 py-1.5 text-xs"
+              >
+                <span className="min-w-0 truncate">
+                  {item.subject}
+                  {" · "}
+                  {item.owner ? [item.owner.firstName, item.owner.lastName].filter(Boolean).join(" ") : "—"}
+                </span>
+                <Badge variant="outline" className={`shrink-0 ${STATUS_STYLES[item.status]}`}>
+                  {t(`agentRequests.filter${requestStatusKey(item.status)}`)}
+                </Badge>
+              </li>
+            ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 interface RequestRowProps {
   request: AgentRequest
@@ -128,6 +192,10 @@ function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
 
       {request.description && (
         <p className="mt-3 text-sm leading-6 text-muted-foreground">{request.description}</p>
+      )}
+
+      {(request.similarCount ?? 0) > 0 && (
+        <SimilarRequestsIndicator requestId={request.id} count={request.similarCount!} />
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -264,8 +332,18 @@ export function AgentRequestsPanel({
   const [priorityFilter, setPriorityFilter] = useState<RequestPriority | "all">("all")
   const [sortByPriority, setSortByPriority] = useState(initialSortByPriority)
   const [mineOnly, setMineOnly] = useState(false)
+  const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim())
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [search])
 
   // Same rationale as the citizen panel: the initial state is already "loading", and a
   // synchronous setState in the effect body triggers a cascading render. Re-fetches
@@ -328,6 +406,17 @@ export function AgentRequestsPanel({
           </div>
         )}
         <div className="flex flex-wrap items-center gap-2">
+          <div className="relative w-full sm:w-64">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Input
+              type="search"
+              aria-label={t("agentRequests.searchAriaLabel")}
+              placeholder={t("agentRequests.searchPlaceholder")}
+              className="pl-9"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </div>
           <NativeSelect
             value={status}
             onChange={(event) => {

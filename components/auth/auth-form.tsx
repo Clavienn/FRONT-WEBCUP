@@ -2,17 +2,22 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, CircleAlert, ShieldCheck } from "lucide-react"
+import { ArrowRight, CircleAlert, CircleCheck } from "lucide-react"
 
+import { BrandMark } from "@/components/brand/brand-mark"
+import { BRAND_NAME } from "@/config/brand"
 import { useAuth } from "@/components/auth/auth-provider"
+import { LegalDocumentDialog } from "@/components/legal/legal-document-dialog"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Breadcrumb } from "@/components/navigation/breadcrumb"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { isPasswordStrong, PasswordRequirements } from "@/components/auth/password-requirements"
+import { ACCOUNT_DELETED_KEY } from "@/components/profile/delete-account-section"
 import type { SignupRole } from "@/repository/auth.repository"
 
 const signupRoles: SignupRole[] = ["citizen", "agent"]
@@ -29,10 +34,22 @@ export function AuthForm() {
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [acceptedLegal, setAcceptedLegal] = useState(false)
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false)
   const [role, setRole] = useState<SignupRole>("citizen")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  // Lu dans l'initialiseur et non dans un effet : le rendu de React peut s'exécuter deux fois en
+  // StrictMode, mais le drapeau n'est effacé que par l'effet ci-dessous, donc le message reste.
+  const [accountDeleted] = useState(
+    () => typeof window !== "undefined" && window.sessionStorage.getItem(ACCOUNT_DELETED_KEY) === "1"
+  )
   const isRegistering = mode === "register"
+
+  // Le drapeau ne vaut que pour l'arrivée sur la page : le retirer évite de le revoir plus tard.
+  useEffect(() => {
+    if (accountDeleted) window.sessionStorage.removeItem(ACCOUNT_DELETED_KEY)
+  }, [accountDeleted])
 
   useEffect(() => {
     if (!isLoading && user) router.replace("/dashboard")
@@ -43,6 +60,10 @@ export function AuthForm() {
     setError("")
     if (isRegistering && !isPasswordStrong(password)) {
       setError(t("authForm.passwordRequirementsError"))
+      return
+    }
+    if (isRegistering && (!acceptedLegal || !acceptedPrivacy)) {
+      setError(t("authForm.legalConsentRequired"))
       return
     }
     setIsSubmitting(true)
@@ -69,6 +90,8 @@ export function AuthForm() {
 
   const changeMode = () => {
     setError("")
+    setAcceptedLegal(false)
+    setAcceptedPrivacy(false)
     setMode(isRegistering ? "login" : "register")
   }
 
@@ -83,13 +106,23 @@ export function AuthForm() {
           className="mb-6"
         />
 
+        {accountDeleted && (
+          <p
+            role="status"
+            className="mb-6 flex items-start gap-2 rounded-xl border border-primary/30 bg-accent px-4 py-3 text-sm text-foreground"
+          >
+            <CircleCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+            <span>{t("authForm.accountDeleted")}</span>
+          </p>
+        )}
+
         <div className="rounded-2xl border border-border/80 bg-card/85 p-6 shadow-[0_16px_48px_rgba(30,55,90,0.08)] backdrop-blur-xl sm:p-8">
           <div className="mb-8 flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-accent text-primary">
-              <ShieldCheck className="size-5" aria-hidden="true" />
-            </span>
+            <BrandMark className="w-9 text-foreground" />
             <div>
-              <p className="text-sm font-semibold tracking-[0.08em] text-foreground">TERRA NOVA</p>
+              <p className="text-sm font-semibold tracking-[0.08em] text-foreground uppercase">
+                {BRAND_NAME}
+              </p>
               <p className="text-xs text-muted-foreground">{t("authForm.brandTagline")}</p>
             </div>
           </div>
@@ -158,6 +191,45 @@ export function AuthForm() {
               </fieldset>
             )}
 
+            {isRegistering && (
+              <fieldset className="space-y-3 rounded-xl border border-border/70 bg-background/50 p-4">
+                <legend className="px-1 text-sm font-medium">{t("authForm.legalConsentTitle")}</legend>
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="accept-legal-terms"
+                    checked={acceptedLegal}
+                    aria-required="true"
+                    onCheckedChange={(checked) => setAcceptedLegal(checked === true)}
+                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="accept-legal-terms" className="cursor-pointer leading-5">
+                      {t("authForm.acceptLegal")}
+                    </Label>
+                    <LegalDocumentDialog kind="legal" className="text-sm font-medium text-primary hover:underline">
+                      {t("authForm.readLegal")}
+                    </LegalDocumentDialog>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    id="accept-privacy-policy"
+                    checked={acceptedPrivacy}
+                    aria-required="true"
+                    onCheckedChange={(checked) => setAcceptedPrivacy(checked === true)}
+                  />
+                  <div className="space-y-1">
+                    <Label htmlFor="accept-privacy-policy" className="cursor-pointer leading-5">
+                      {t("authForm.acceptPrivacy")}
+                    </Label>
+                    <LegalDocumentDialog kind="privacy" className="text-sm font-medium text-primary hover:underline">
+                      {t("authForm.readPrivacy")}
+                    </LegalDocumentDialog>
+                  </div>
+                </div>
+                <p className="text-xs leading-5 text-muted-foreground">{t("authForm.legalConsentHint")}</p>
+              </fieldset>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email">{t("authForm.email")}</Label>
               <Input
@@ -200,7 +272,11 @@ export function AuthForm() {
             <Button
               type="submit"
               className="h-10 w-full rounded-xl"
-              disabled={isLoading || isSubmitting || (isRegistering && !isPasswordStrong(password))}
+              disabled={
+                isLoading ||
+                isSubmitting ||
+                (isRegistering && (!isPasswordStrong(password) || !acceptedLegal || !acceptedPrivacy))
+              }
             >
               {(isLoading || isSubmitting) ? <Spinner /> : null}
               {isLoading

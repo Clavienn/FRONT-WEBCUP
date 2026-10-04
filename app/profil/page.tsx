@@ -8,7 +8,8 @@ import { ArrowLeftIcon, CalendarIcon, DownloadIcon, LogOutIcon, MailIcon, MapPin
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { DashboardFrame } from "@/components/dashboard/dashboard-shell"
-import { roleLabel } from "@/repository/auth.repository"
+import { isStaff, roleLabel } from "@/repository/auth.repository"
+import { DeleteAccountSection } from "@/components/profile/delete-account-section"
 import { PasswordForm } from "@/components/profile/password-form"
 import { ProfileForm } from "@/components/profile/profile-form"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -365,6 +366,10 @@ export default function ProfilPage() {
               {t("profilePage.signOutEverywhere")}
             </Button>
           </section>
+
+          {/* Un agent ou un administrateur reste administrable via la console : la suppression
+              de compte n'est proposée qu'à l'espace citoyen, comme le refuse l'API. */}
+          {!isStaff(user) && <DeleteAccountSection />}
         </div>
 
         <AlertDialog open={confirmAll} onOpenChange={setConfirmAll}>
