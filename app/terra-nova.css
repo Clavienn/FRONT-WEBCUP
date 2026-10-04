@@ -293,18 +293,8 @@
 }
 
 .tn-title-accent {
-  position: relative;
   display: inline-block;
-  padding-inline: 0.06em;
-}
-
-.tn-title-accent::before {
-  content: "";
-  position: absolute;
-  inset: 0.08em -0.02em;
-  background: var(--tn-accent);
-  z-index: -1;
-  border-radius: 2px;
+  color: var(--tn-accent);
 }
 
 .tn-lead {
