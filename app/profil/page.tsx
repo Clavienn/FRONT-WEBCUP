@@ -12,6 +12,7 @@ import { isStaff, roleLabel } from "@/repository/auth.repository"
 import { DeleteAccountSection } from "@/components/profile/delete-account-section"
 import { PasswordForm } from "@/components/profile/password-form"
 import { SecuritySection } from "@/components/profile/security-section"
+import { TwoFactorSection } from "@/components/profile/two-factor-section"
 import { ProfileForm } from "@/components/profile/profile-form"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -367,6 +368,11 @@ export default function ProfilPage() {
               {t("profilePage.signOutEverywhere")}
             </Button>
           </section>
+<<<<<<< HEAD
+=======
+
+          <TwoFactorSection />
+>>>>>>> f9dd8bb88424d50bcce546db9007b960124361be
 
           <SecuritySection />
 

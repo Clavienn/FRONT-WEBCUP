@@ -6,6 +6,7 @@ import {
   authRepository,
   type AuthUser,
   type Credentials,
+  type LoginResult,
   type PasswordChange,
   type ProfileUpdate,
   type RegistrationData,
@@ -14,7 +15,8 @@ import {
 interface AuthContextValue {
   user: AuthUser | null
   isLoading: boolean
-  signIn: (credentials: Credentials, headers?: Record<string, string>) => Promise<AuthUser>
+  signIn: (credentials: Credentials, headers?: Record<string, string>) => Promise<LoginResult>
+  completeTwoFactorLogin: (challengeToken: string, code: string) => Promise<AuthUser>
   signUp: (data: RegistrationData, headers?: Record<string, string>) => Promise<AuthUser>
   signOut: () => Promise<void>
   signOutEverywhere: () => Promise<void>
@@ -51,7 +53,16 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
   }, [])
 
   const signIn = async (credentials: Credentials, headers?: Record<string, string>) => {
-    const sessionUser = await authRepository.login(credentials, headers)
+    const result = await authRepository.login(credentials, headers)
+    // Mot de passe validé mais connexion pas encore terminée (double authentification) : pas
+    // d'utilisateur à stocker tant que completeTwoFactorLogin n'a pas confirmé le code.
+    if ("twoFactorRequired" in result) return result
+    setUser(result)
+    return result
+  }
+
+  const completeTwoFactorLogin = async (challengeToken: string, code: string) => {
+    const sessionUser = await authRepository.completeTwoFactorLogin(challengeToken, code)
     setUser(sessionUser)
     return sessionUser
   }
@@ -116,6 +127,7 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
         user,
         isLoading,
         signIn,
+        completeTwoFactorLogin,
         signUp,
         signOut,
         signOutEverywhere,

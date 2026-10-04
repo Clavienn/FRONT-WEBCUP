@@ -142,13 +142,15 @@ export interface CitizenRequestQuery {
   // Bornes sur la date de dépôt, au format YYYY-MM-DD (valeur native d'un input type="date")
   from?: string
   to?: string
+  // Nombre de lignes renvoyées (défaut serveur 20, plafond serveur 100)
+  limit?: number
 }
 
 /** Demandes du citoyen connecté. Le serveur filtre sur l'utilisateur de la session :
  * aucun identifiant de demande ne permet d'accéder à celle d'autrui. */
 function listMine(query_: CitizenRequestQuery = {}): Promise<RequestPage<CitizenRequest>> {
   return authorizedRequest<RequestPage<CitizenRequest>>(
-    `/requests/mine${query({ status: query_.status, from: query_.from, to: query_.to })}`
+    `/requests/mine${query({ status: query_.status, from: query_.from, to: query_.to, limit: query_.limit })}`
   )
 }
 
