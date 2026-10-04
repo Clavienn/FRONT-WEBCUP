@@ -10,6 +10,7 @@ import {
   FolderKanban,
   Globe,
   Handshake,
+  Handshake,
   Landmark,
   Lightbulb,
   MapPin,
