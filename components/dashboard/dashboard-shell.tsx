@@ -33,6 +33,7 @@ import {
 import { BrandMark } from "@/components/brand/brand-mark"
 import { BRAND_NAME } from "@/config/brand"
 import { useAuth } from "@/components/auth/auth-provider"
+import { AgentApprovalNotice } from "@/components/agent/agent-approval"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { useLiteMode } from "@/components/lite-mode/lite-mode-provider"
 import { useAccessibility } from "@/hooks/use-accessibility"
@@ -328,6 +329,9 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
           </div>
           <div className="mx-auto max-w-7xl space-y-8 pt-2">
             <PageBreadcrumb />
+            {/* Visible sur tout l'espace de travail d'un agent en attente de validation, plutôt
+                qu'auprès d'un échec : la restriction s'annonce au lieu de se découvrir. */}
+            {isStaff(user) && <AgentApprovalNotice />}
             {children}
           </div>
         </div>

@@ -56,10 +56,14 @@ export function AgentDashboard() {
   const loadStats = useCallback(() => {
     citizenRequestRepository.statsAll().then(setStats).catch(() => undefined)
   }, [])
+  // La file est mesurée sur toutes les demandes des citoyens, pas seulement sur celles de cet
+  // agent : c'est une donnée d'administration de la plateforme, donc conditionnée à la permission
+  // qui l'ouvre côté API (agent.requests.view) et non au seul rôle « agent ». Un compte du
+  // personnel qui n'a pas ce droit ne sollicite pas la file globale.
+  const canReadGlobalQueue = user?.permissions.includes("agent.requests.view") ?? false
   useEffect(() => {
-    // Décompte global de la file, pas seulement les demandes de cet agent
-    if (user && isStaff(user) && !user.roles.includes("admin")) loadStats()
-  }, [user, loadStats])
+    if (user && isStaff(user) && canReadGlobalQueue && !user.roles.includes("admin")) loadStats()
+  }, [user, canReadGlobalQueue, loadStats])
 
   if (isLoading || !user) {
     return (

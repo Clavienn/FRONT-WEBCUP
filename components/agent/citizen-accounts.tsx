@@ -4,6 +4,12 @@ import { useEffect, useState } from "react"
 import { CircleAlert, Pencil, Search } from "lucide-react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
+import {
+  ProtectedValue,
+  useApprovalErrorToast,
+  useBlockedActionHint,
+  useCurrentAgentApproval,
+} from "@/components/agent/agent-approval"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -63,10 +69,7 @@ function EditProfileDialog({
   const { t } = useLanguage()
   const [form, setForm] = useState<ProfileForm | null>(null)
   const [saving, setSaving] = useState(false)
-
-  const errorMessage = (cause: unknown) => (cause instanceof Error ? cause.message : t("citizenAccounts.errorGeneric"))
-  const notifyError = (cause: unknown) =>
-    toast.add({ title: t("citizenAccounts.toast.errorTitle"), description: errorMessage(cause), type: "error" })
+  const notifyError = useApprovalErrorToast()
 
   useEffect(() => {
     setForm(user ? toForm(user) : null)
@@ -94,7 +97,7 @@ function EditProfileDialog({
       toast.add({ title: t("citizenAccounts.toast.profileUpdated"), type: "success" })
       onClose()
     } catch (cause) {
-      notifyError(cause)
+      notifyError(cause, t("citizenAccounts.toast.errorTitle"), "edit")
     } finally {
       setSaving(false)
     }
@@ -154,9 +157,15 @@ export function CitizenAccounts() {
   const [busyId, setBusyId] = useState<number | null>(null)
   const [editingId, setEditingId] = useState<number | null>(null)
 
+  const { approval, reportContacts } = useCurrentAgentApproval()
+  const notifyError = useApprovalErrorToast()
+  // Tant que le compte attend sa validation, l'API refuse ces deux écritures : on désactive le
+  // bouton en annonçant pourquoi, au lieu de laisser l'agent découvrir le refus à chaque clic.
+  const pending = approval === "pending"
+  const editHint = useBlockedActionHint("edit")
+  const statusHint = useBlockedActionHint("status")
+
   const errorMessage = (cause: unknown) => (cause instanceof Error ? cause.message : t("citizenAccounts.errorGeneric"))
-  const notifyError = (cause: unknown) =>
-    toast.add({ title: t("citizenAccounts.toast.errorTitle"), description: errorMessage(cause), type: "error" })
 
   const formatDate = (value: string | null) =>
     value ? new Date(value).toLocaleDateString(locale === "fr" ? "fr-FR" : "en-US", { dateStyle: "medium" }) : t("citizenAccounts.never")
@@ -176,7 +185,12 @@ export function CitizenAccounts() {
     let mounted = true
     citizenAccountRepository
       .list({ q: debouncedSearch || undefined, page, limit: PAGE_SIZE })
-      .then((data) => mounted && setResult({ key, data }))
+      .then((data) => {
+        if (!mounted) return
+        // Ce lot de contacts est la seule chose qui révèle si l'API masque les coordonnées.
+        reportContacts(data.users)
+        setResult({ key, data })
+      })
       .catch((cause) => mounted && setResult({ key, error: errorMessage(cause) }))
     return () => {
       mounted = false
@@ -212,7 +226,7 @@ export function CitizenAccounts() {
         type: "success",
       })
     } catch (cause) {
-      notifyError(cause)
+      notifyError(cause, t("citizenAccounts.toast.errorTitle"), "status")
     } finally {
       setBusyId(null)
     }
@@ -277,14 +291,22 @@ export function CitizenAccounts() {
                 <TableRow key={item.id} className={item.isActive ? undefined : "opacity-60"}>
                   <TableCell>
                     <p className="truncate font-medium">{`${item.firstName} ${item.lastName}`.trim()}</p>
-                    <p className="truncate text-xs text-muted-foreground">{item.email}</p>
+                    {/* Un e-mail « a***@domaine » vient du masquage côté API : il s'affiche tel quel,
+                        mais marqué comme restreint, pour ne pas passer pour une donnée cassée. */}
+                    <ProtectedValue value={item.email} className="block truncate text-xs text-muted-foreground" />
                   </TableCell>
-                  <TableCell className="hidden md:table-cell">{item.phone ?? "—"}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    {/* En attente de validation, l'API ne transmet aucun téléphone : on montre le
+                        cadenas plutôt qu'un tiret, qui se lirait comme un champ laissé vide. */}
+                    <ProtectedValue value={item.phone} withheld={pending} />
+                  </TableCell>
                   <TableCell className="hidden md:table-cell">{formatDate(item.lastLoginAt)}</TableCell>
                   <TableCell>
                     <Switch
                       checked={item.isActive}
-                      disabled={busyId === item.id}
+                      // Le refus de l'API est ici une information : on le dit avant le clic
+                      disabled={pending || busyId === item.id}
+                      title={pending ? statusHint ?? undefined : undefined}
                       onCheckedChange={(checked) => toggleActive(item, checked)}
                       aria-label={t(
                         item.isActive ? "citizenAccounts.table.deactivateAria" : "citizenAccounts.table.activateAria",
@@ -293,7 +315,13 @@ export function CitizenAccounts() {
                     />
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" onClick={() => setEditingId(item.id)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={pending}
+                      title={pending ? editHint ?? undefined : undefined}
+                      onClick={() => setEditingId(item.id)}
+                    >
                       <Pencil />
                       {t("citizenAccounts.table.edit")}
                     </Button>
