@@ -397,12 +397,6 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
             <div className="flex items-center gap-3">
               <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
-              <div className="hidden sm:flex items-center gap-2 rounded-full border border-border/70 bg-card/75 px-3 py-1 text-[11px] font-mono tracking-wider text-muted-foreground shadow-xs">
-                <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="text-foreground/90 font-medium">TERRA NOVA</span>
-                <span className="text-muted-foreground/60">//</span>
-                <span>DÔME CENTRAL</span>
-              </div>
             </div>
             <div className="flex flex-1 items-center justify-end gap-3 max-w-md">
               <div className="hidden sm:block flex-1">

@@ -359,9 +359,6 @@ export function CitizenAppointments() {
             <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
             MODULE PLANIFICATION // GUICHET DES AGENTS
           </span>
-          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
-            DÔME CENTRAL TERRA NOVA
-          </span>
         </div>
         <div>
           <h1 id="appointments-title" className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
