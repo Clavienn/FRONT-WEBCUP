@@ -173,3 +173,4 @@ export function groupActions(t: Translate): [string, string[]][] {
   }
   return [...groups.entries()].map(([labelKey, codes]) => [t(labelKey), codes]);
 }
+
