@@ -19,6 +19,7 @@ import {
 import type { AuthUser } from "@/repository/auth.repository"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { AdminExportDialog } from "@/components/admin/admin-export-dialog"
+import { MostUsedServices } from "@/components/services/most-used-services"
 import { Badge } from "@/components/ui/badge"
 
 const adminMetrics = [
@@ -82,6 +83,8 @@ export function AdminDashboard({ user }: { user: AuthUser }) {
           ))}
         </div>
       </section>
+
+      <MostUsedServices />
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-8">

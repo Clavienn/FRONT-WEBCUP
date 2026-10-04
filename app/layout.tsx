@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { LanguageProvider } from "@/components/i18n/language-provider";
+import { LiteModeProvider } from "@/components/lite-mode/lite-mode-provider";
 import { IdleLogout } from "@/components/auth/idle-logout";
 import { NetworkStatus } from "@/components/network-status";
 import { AnnouncementAlerts } from "@/components/realtime/announcement-alerts";
@@ -10,6 +11,7 @@ import { SupportBubble } from "@/components/support-bubble";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 import "./accessibility.css";
+import "./lite-mode.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,20 +46,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="isolate min-h-full flex flex-col">
         <LanguageProvider>
-          {/* Toaster à la racine : une alerte du Haut Conseil doit surgir sur la page publique
-              comme dans les tableaux de bord, pas seulement là où un ancien Toaster était monté. */}
-          <Toaster>
-            <SiteChrome>
-              <div className="relative z-10 flex min-h-full flex-1 flex-col">
-                <AuthProvider>
-                  {children}
-                  <AnnouncementAlerts />
-                  <SupportBubble />
-                  <NetworkStatus />
-                </AuthProvider>
-              </div>
-            </SiteChrome>
-          </Toaster>
+          <LiteModeProvider>
+            {/* Toaster à la racine : une alerte du Haut Conseil doit surgir sur la page publique
+                comme dans les tableaux de bord, pas seulement là où un ancien Toaster était monté. */}
+            <Toaster>
+              <SiteChrome>
+                <div className="relative z-10 flex min-h-full flex-1 flex-col">
+                  <AuthProvider>
+                    {children}
+                    <AnnouncementAlerts />
+                    <SupportBubble />
+                    <NetworkStatus />
+                  </AuthProvider>
+                </div>
+              </SiteChrome>
+            </Toaster>
+          </LiteModeProvider>
         </LanguageProvider>
       </body>
     </html>

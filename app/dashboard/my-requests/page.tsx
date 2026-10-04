@@ -17,7 +17,7 @@ export default function MyRequestsPage() {
           Déposez une demande à la ville et suivez son évolution étape par étape.
         </p>
       </section>
-      <CitizenRequestsPanel />
+      <CitizenRequestsPanel hideHeader />
     </RequirePermission>
   )
 }

@@ -15,6 +15,8 @@ export interface MunicipalService {
   averageRating: number | null
   // L'utilisateur connecté a déjà laissé un avis sur ce service
   reviewedByMe: boolean
+  // Nombre de demandes reçues : présent seulement quand la liste est triée par `mostUsed`
+  requestsCount?: number
 }
 
 export interface ServiceReview {
@@ -57,11 +59,31 @@ export interface ServiceCreation extends ServiceInput {
   code: string
 }
 
+export interface ServiceQuery {
+  // Inclut les services désactivés (réservé aux gestionnaires, ignoré sinon par le serveur)
+  all?: boolean
+  // "mostUsed" : classe par nombre de demandes reçues, les plus demandés d'abord
+  sort?: "mostUsed"
+  // Tronque la liste déjà triée (ex. les 3 services les plus utilisés d'un tableau de bord)
+  limit?: number
+}
+
 const json = (method: string, data: unknown): RequestInit => ({ method, body: JSON.stringify(data) })
 
+function query(params: Record<string, string | number | boolean | undefined>): string {
+  const search = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) search.set(key, String(value))
+  }
+  const encoded = search.toString()
+  return encoded ? `?${encoded}` : ""
+}
+
 export const serviceRepository = {
-  // all: inclut les services désactivés (réservé aux gestionnaires, ignoré sinon par le serveur)
-  list: (all = false) => authorizedRequest<MunicipalService[]>(`/services${all ? "?all=true" : ""}`),
+  list: (options: ServiceQuery = {}) =>
+    authorizedRequest<MunicipalService[]>(
+      `/services${query({ all: options.all, sort: options.sort, limit: options.limit })}`
+    ),
 
   get: (id: number) => authorizedRequest<MunicipalService>(`/services/${id}`),
 

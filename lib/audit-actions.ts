@@ -14,6 +14,16 @@ export const actionKeys: Record<string, string> = {
   "login.failed": "auditLog.actions.loginFailed",
   "login.blocked": "auditLog.actions.loginBlocked",
   "bot.blocked": "auditLog.actions.botBlocked",
+  "alert.publish": "auditLog.actions.alertPublish",
+  "alert.update": "auditLog.actions.alertUpdate",
+  "alert.end": "auditLog.actions.alertEnd",
+  "signalement.create": "auditLog.actions.signalementCreate",
+  "signalement.acknowledge": "auditLog.actions.signalementAcknowledge",
+  "signalement.status": "auditLog.actions.signalementStatus",
+  "signalement.priority": "auditLog.actions.signalementPriority",
+  "signalement.assigned": "auditLog.actions.signalementAssigned",
+  "signalement.update": "auditLog.actions.signalementUpdate",
+  "signalement.cancel": "auditLog.actions.signalementCancel",
   "bot.attack_probe": "auditLog.actions.botAttackProbe",
   "bot.role_escalation": "auditLog.actions.botRoleEscalation",
   "security.bulk_access": "auditLog.actions.securityBulkAccess",
@@ -108,6 +118,7 @@ export const entityKeys: Record<string, string> = {
   "audit-logs": "auditLog.entities.auditLogsRoute",
   auth: "auditLog.entities.auth",
   forms: "auditLog.entities.forms",
+  signalements: "auditLog.entities.signalement",
 };
 
 // Une action non déclarée affiche son code brut : lisible et traçable, donc preferable à une ligne vide

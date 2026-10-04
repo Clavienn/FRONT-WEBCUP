@@ -12,6 +12,12 @@ function apiOrigin(): string | null {
   }
 }
 
+// Alertes en temps réel (socket.io) : même hôte que l'API, en ws:// ou wss://
+function apiSocketOrigin(): string | null {
+  const origin = apiOrigin()
+  return origin ? origin.replace(/^http/, "ws") : null
+}
+
 // Politique de contenu. Les scripts sont limités à ceux du site : aucun script externe ne peut s'exécuter.
 // 'unsafe-inline' reste nécessaire pour les scripts de démarrage de Next.js : une CSP par nonce obligerait à
 // rendre toutes les pages dynamiquement à chaque requête (voir docs Next.js, « Content Security Policy »),
@@ -23,7 +29,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  `connect-src 'self' ${[apiOrigin(), isDev ? "ws: wss:" : null].filter(Boolean).join(" ")}`.trim(),
+  `connect-src 'self' ${[apiOrigin(), apiSocketOrigin(), isDev ? "ws: wss:" : null].filter(Boolean).join(" ")}`.trim(),
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

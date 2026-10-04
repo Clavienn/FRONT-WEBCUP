@@ -6,6 +6,7 @@ import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clo
 
 import type { AuthUser } from "@/repository/auth.repository"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useLiteMode } from "@/components/lite-mode/lite-mode-provider"
 import { CitizenRequestsPanel } from "@/components/requests/citizen-requests-panel"
 import { IdeaBox } from "@/components/ideas/idea-box"
 import {
@@ -37,6 +38,7 @@ function getInitials(user: AuthUser) {
 
 export function CitizenDashboard({ user }: { user: AuthUser }) {
   const { t } = useLanguage()
+  const { liteMode } = useLiteMode()
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
 
   const [stats, setStats] = useState<RequestStatusCounts | null>(null)
@@ -155,29 +157,33 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
               <Badge variant="secondary" className="mt-4">{t("citizenDashboard.roleBadge")}</Badge>
             </section>
 
-            <section aria-labelledby="city-updates-title" className="rounded-xl border border-border/80 bg-card/75 p-5 shadow-sm backdrop-blur-sm">
-              <div className="flex items-center gap-2">
-                <Megaphone className="size-4 text-primary" aria-hidden="true" />
-                <h2 id="city-updates-title" className="text-sm font-semibold">{t("citizenDashboard.cityUpdatesTitle")}</h2>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {t("citizenDashboard.noAnnouncements")}
-              </p>
-            </section>
+            {!liteMode && (
+              <>
+                <section aria-labelledby="city-updates-title" className="rounded-xl border border-border/80 bg-card/75 p-5 shadow-sm backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <Megaphone className="size-4 text-primary" aria-hidden="true" />
+                    <h2 id="city-updates-title" className="text-sm font-semibold">{t("citizenDashboard.cityUpdatesTitle")}</h2>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    {t("citizenDashboard.noAnnouncements")}
+                  </p>
+                </section>
 
-            <section aria-labelledby="citizen-notice-title" className="rounded-xl border border-primary/20 bg-primary/5 p-5">
-              <div className="flex items-center gap-2">
-                <Bell className="size-4 text-primary" aria-hidden="true" />
-                <h2 id="citizen-notice-title" className="text-sm font-semibold">{t("citizenDashboard.noticeTitle")}</h2>
-              </div>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {t("citizenDashboard.noticeBody")}
-              </p>
-              <div className="mt-4 flex items-center gap-2 border-t border-primary/10 pt-3 text-xs text-muted-foreground">
-                <CircleAlert className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
-                {t("citizenDashboard.consultRegularly")}
-              </div>
-            </section>
+                <section aria-labelledby="citizen-notice-title" className="rounded-xl border border-primary/20 bg-primary/5 p-5">
+                  <div className="flex items-center gap-2">
+                    <Bell className="size-4 text-primary" aria-hidden="true" />
+                    <h2 id="citizen-notice-title" className="text-sm font-semibold">{t("citizenDashboard.noticeTitle")}</h2>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    {t("citizenDashboard.noticeBody")}
+                  </p>
+                  <div className="mt-4 flex items-center gap-2 border-t border-primary/10 pt-3 text-xs text-muted-foreground">
+                    <CircleAlert className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+                    {t("citizenDashboard.consultRegularly")}
+                  </div>
+                </section>
+              </>
+            )}
           </aside>
         </div>
 

@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { CitizenDashboard } from "@/components/dashboard/citizen-dashboard"
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard"
+import { MostUsedServices } from "@/components/services/most-used-services"
 
 const metrics: { key: string; status: RequestStatus; icon: typeof Clock3; tone: string }[] = [
   { key: "pending", status: "pending", icon: Clock3, tone: "text-amber-700 dark:text-amber-300" },
@@ -55,10 +56,14 @@ export function AgentDashboard() {
   const loadStats = useCallback(() => {
     citizenRequestRepository.statsAll().then(setStats).catch(() => undefined)
   }, [])
+  // La file est mesurée sur toutes les demandes des citoyens, pas seulement sur celles de cet
+  // agent : c'est une donnée d'administration de la plateforme, donc conditionnée à la permission
+  // qui l'ouvre côté API (agent.requests.view) et non au seul rôle « agent ». Un compte du
+  // personnel qui n'a pas ce droit ne sollicite pas la file globale.
+  const canReadGlobalQueue = user?.permissions.includes("agent.requests.view") ?? false
   useEffect(() => {
-    // Décompte global de la file, pas seulement les demandes de cet agent
-    if (user && isStaff(user) && !user.roles.includes("admin")) loadStats()
-  }, [user, loadStats])
+    if (user && isStaff(user) && canReadGlobalQueue && !user.roles.includes("admin")) loadStats()
+  }, [user, canReadGlobalQueue, loadStats])
 
   if (isLoading || !user) {
     return (
@@ -116,6 +121,8 @@ export function AgentDashboard() {
             ))}
           </div>
         </section>
+
+        <MostUsedServices />
 
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
           <section aria-labelledby="queues-title">
