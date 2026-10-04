@@ -1,5 +1,6 @@
 import { resilientFetch } from "@/lib/network"
 import { withStaleFallback } from "@/lib/stale-cache"
+import { API_URL } from "@/lib/api-url"
 
 export interface PublicMunicipalService {
   id: number
@@ -8,8 +9,6 @@ export interface PublicMunicipalService {
   description: string | null
   icon: string | null
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
 
 /**
  * Catalogue des services actifs de la ville. Route publique de l'API : aucune
