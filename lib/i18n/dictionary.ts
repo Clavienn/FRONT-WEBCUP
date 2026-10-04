@@ -684,6 +684,12 @@ const fr = {
     subjectNoneLabel: "Aucun motif indiqué",
   },
 
+  agentRequestsPage: {
+    eyebrow: "Console des agents",
+    title: "Demandes citoyennes",
+    description:
+      "Toutes les demandes déposées par les citoyens. Prenez-en une en charge, faites évoluer son état et laissez une note : le citoyen suit l’avancement depuis son espace.",
+  },
   agentRequests: {
     title: "Demandes citoyennes",
     subtitle: "Prenez en charge une demande et mettez à jour son état.",
@@ -2064,6 +2070,12 @@ const en = {
     subjectNoneLabel: "No reason given",
   },
 
+  agentRequestsPage: {
+    eyebrow: "Agent console",
+    title: "Citizen requests",
+    description:
+      "All requests submitted by citizens. Take one on, move its status forward, and leave a note: the citizen follows progress from their own space.",
+  },
   agentRequests: {
     title: "Citizen requests",
     subtitle: "Take charge of a request and update its status.",
