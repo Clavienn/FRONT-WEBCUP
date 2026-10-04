@@ -149,66 +149,25 @@ export function AuthForm() {
           </p>
         )}
 
-        <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-6 shadow-[0_16px_48px_rgba(15,28,50,0.12)] backdrop-blur-xl sm:p-8">
-          {/* Futuristic colony terminal top bar */}
-          <div className="mb-6 flex items-center justify-between border-b border-border/60 pb-3 text-[11px] font-mono tracking-wider text-muted-foreground">
-            <span className="flex items-center gap-1.5 font-medium text-primary">
-              <span className="inline-block size-2 rounded-full bg-cyan-400 animate-pulse" />
-              TERMINAL CITOYEN // DÔME-01
-            </span>
-            <span className="hidden sm:inline text-xs uppercase tracking-widest text-muted-foreground/80">
-              STATION ST-TERRA
-            </span>
-          </div>
-
-          <div className="mb-6 flex items-center gap-3">
-            <BrandMark className="w-10 text-primary" />
+        <div className="rounded-2xl border border-border/80 bg-card/85 p-6 shadow-[0_16px_48px_rgba(30,55,90,0.08)] backdrop-blur-xl sm:p-8">
+          <div className="mb-8 flex items-center gap-3">
+            <BrandMark className="w-9 text-foreground" />
             <div>
-              <p className="font-display text-base font-bold tracking-[0.15em] text-foreground uppercase">
+              <p className="text-sm font-semibold tracking-[0.08em] text-foreground uppercase">
                 {BRAND_NAME}
               </p>
               <p className="text-xs text-muted-foreground">{t("authForm.brandTagline")}</p>
             </div>
           </div>
 
-          {/* Segmented Mode Switcher */}
-          <div className="mb-6 grid grid-cols-2 gap-1 rounded-xl bg-muted/70 p-1 border border-border/60">
-            <button
-              type="button"
-              onClick={() => {
-                if (isRegistering) changeMode()
-              }}
-              className={`rounded-lg py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
-                !isRegistering
-                  ? "bg-card text-foreground shadow-sm border border-border/40 font-bold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t("authForm.titleLogin")}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (!isRegistering) changeMode()
-              }}
-              className={`rounded-lg py-2 text-xs font-semibold uppercase tracking-wider transition-all ${
-                isRegistering
-                  ? "bg-card text-foreground shadow-sm border border-border/40 font-bold"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t("authForm.titleRegister")}
-            </button>
-          </div>
-
-          <header className="mb-6 space-y-1.5">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+          <header className="mb-7 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
               {t("authForm.kicker")}
             </p>
-            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="text-3xl font-medium tracking-tight text-foreground">
               {isRegistering ? t("authForm.titleRegister") : t("authForm.titleLogin")}
             </h1>
-            <p className="text-sm leading-relaxed text-muted-foreground">
+            <p className="text-sm leading-6 text-muted-foreground">
               {isRegistering ? t("authForm.subtitleRegister") : t("authForm.subtitleLogin")}
             </p>
           </header>

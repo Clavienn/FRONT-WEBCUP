@@ -9,7 +9,6 @@ import {
   CalendarClock,
   FolderKanban,
   Globe,
-  Handshake,
   Landmark,
   Lightbulb,
   MapPin,
@@ -88,9 +87,6 @@ interface MenuItem {
   adminOnly?: boolean
   // Masqué pour les admins (qui ont la version complète dans le groupe Administration)
   agentOnly?: boolean
-  // Réservé aux porteurs du rôle partenaire : l'admin a la permission (il gère tout) mais ne
-  // possède aucune offre, donc "Mes offres"/"Demandes" lui seraient vides et trompeuses
-  partnerOnly?: boolean
   // Pastille avec le nombre de messages de citoyens non traités
   newMessagesBadge?: boolean
   // Pastille rouge : signalements urgents ou en retard
@@ -117,7 +113,6 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.lieuxUtiles", icon: MapPin, permission: "citizen.establishments.view", href: "/dashboard/lieux-utiles" },
       { label: "sidebar.items.projets", icon: FolderKanban, permission: "citizen.projects.view", href: "/dashboard/projects" },
       { label: "sidebar.items.annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
-      { label: "sidebar.items.partenaires", icon: Handshake, permission: "citizen.partners.view", href: "/dashboard/partners" },
     ],
   },
   {
@@ -138,21 +133,12 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.rendezVousCitoyens", icon: CalendarClock, permission: "agent.appointments.view", view: "staff", href: "/dashboard/appointments" },
       { label: "sidebar.items.historiqueOperations", icon: ScrollText, permission: "agent.activity.view", view: "staff", agentOnly: true, href: "/dashboard/agent/activite" },
       { label: "sidebar.items.gererEtablissements", icon: MapPin, permission: "agent.establishments.manage", view: "staff", href: "/dashboard/agent/etablissements" },
-      { label: "sidebar.items.partenaires", icon: Handshake, permission: "citizen.partners.view", view: "staff", href: "/dashboard/partners" },
-    ],
-  },
-  {
-    label: "sidebar.groups.partnerConsole",
-    items: [
-      { label: "sidebar.items.gererOffresPartenaires", icon: Handshake, permission: "partner.services.manage", partnerOnly: true, href: "/dashboard/partner/services" },
-      { label: "sidebar.items.demandesPartenaires", icon: ClipboardList, permission: "partner.requests.view", partnerOnly: true, href: "/dashboard/partner/requests" },
     ],
   },
   {
     label: "sidebar.groups.administration",
     items: [
       { label: "sidebar.items.gererServices", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
-      { label: "sidebar.items.gererPartenaires", icon: Handshake, permission: "admin.partners.manage", href: "/dashboard/admin/partners" },
       { label: "sidebar.items.gererProjets", icon: FolderKanban, permission: "admin.projects.manage", href: "/dashboard/admin/projects" },
       { label: "sidebar.items.ideesHabitants", icon: Lightbulb, permission: "admin.ideas.manage", href: "/dashboard/admin/ideas" },
       { label: "sidebar.items.messagesHabitants", icon: MessageSquare, adminOnly: true, newMessagesBadge: true, href: "/dashboard/admin/messages" },
@@ -174,7 +160,6 @@ function visibleMenu(user: AuthUser, view: DashboardView): MenuGroup[] {
           (!item.view || item.view === view) &&
           (!item.adminOnly || user.roles.includes("admin")) &&
           (!item.agentOnly || !user.roles.includes("admin")) &&
-          (!item.partnerOnly || user.roles.includes("partner")) &&
           (!item.permission || user.permissions.includes(item.permission))
       ),
     }))
@@ -394,16 +379,9 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
         {/* Alertes à la population : visibles sur toutes les pages, collées en haut pendant le défilement */}
         <AlertBanner variant="inline" />
         <div className="px-4 pb-12 pt-4 sm:px-6 lg:px-8">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
-            <div className="flex items-center gap-3">
-              <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
-            </div>
-            <div className="flex flex-1 items-center justify-end gap-3 max-w-md">
-              <div className="hidden sm:block flex-1">
-                <GlobalSearchBar user={user} />
-              </div>
-              {user.permissions.includes("citizen.notifications.view") && <NotificationBell />}
-            </div>
+          <div className="mb-4 flex items-center justify-between">
+            <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
+            {user.permissions.includes("citizen.notifications.view") && <NotificationBell />}
           </div>
           <div className="mx-auto max-w-7xl space-y-8 pt-2">
             <PageBreadcrumb />

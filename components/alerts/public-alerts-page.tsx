@@ -20,38 +20,17 @@ export function PublicAlertsPage() {
 
   return (
     <main className="app-atmosphere min-h-screen px-4 py-10">
-      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="mx-auto max-w-3xl space-y-6">
         <Breadcrumb items={[{ label: t("nav.accueil"), href: "/" }, { label: t("alerts.page.title") }]} />
 
-        {/* Colony Emergency Telemetry Header */}
-        <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/90 p-6 shadow-[0_16px_40px_rgba(15,28,50,0.1)] backdrop-blur-xl sm:p-8">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3 text-[11px] font-mono tracking-wider text-muted-foreground">
-            <span className="flex items-center gap-2 font-semibold text-primary">
-              <span className="relative flex size-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
-                <span className="relative inline-flex size-2.5 rounded-full bg-cyan-500" />
-              </span>
-              RÉSEAU DE SURVEILLANCE DES DÔMES
-            </span>
-            <span className="rounded-full bg-muted/80 px-2.5 py-0.5 text-xs text-muted-foreground">
-              FREQUENCE URGENCE // CANAL 09
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-4xl">
-              {t("alerts.page.title")}
-            </h1>
-            <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              {t("alerts.page.subtitle")}
-            </p>
-          </div>
-
-          <div className="mt-6 rounded-xl border border-border/80 bg-background/60 p-4 shadow-inner">
+        <header className="space-y-3">
+          <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">{t("alerts.page.title")}</h1>
+          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{t("alerts.page.subtitle")}</p>
+          <div className="rounded-xl border border-border/80 bg-card/70 p-3">
             <ZonePicker zone={zone} onChange={setZone} />
             <p className="mt-2 text-xs text-muted-foreground">{t("alerts.page.districtHint")}</p>
           </div>
-        </div>
+        </header>
 
         {!loaded ? (
           <div className="space-y-3">
