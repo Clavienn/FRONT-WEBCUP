@@ -8,6 +8,8 @@ import { BrandMark } from "@/components/brand/brand-mark"
 import { BRAND_NAME } from "@/config/brand"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useFormGuard } from "@/components/forms/form-guard"
+import type { Locale } from "@/lib/i18n/types"
+import { startVisitorSession } from "@/lib/visitor-session"
 import { LegalDocumentDialog } from "@/components/legal/legal-document-dialog"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Breadcrumb } from "@/components/navigation/breadcrumb"
@@ -29,7 +31,7 @@ type AuthMode = "login" | "register"
 export function AuthForm() {
   const router = useRouter()
   const { user, isLoading, signIn, signUp } = useAuth()
-  const { t } = useLanguage()
+  const { locale, setLocale, t } = useLanguage()
   const [mode, setMode] = useState<AuthMode>("login")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
@@ -40,6 +42,9 @@ export function AuthForm() {
   const [role, setRole] = useState<SignupRole>("citizen")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isVisitorSetup, setIsVisitorSetup] = useState(false)
+  const [visitorLocale, setVisitorLocale] = useState<Locale>(locale)
+  const [visitorError, setVisitorError] = useState("")
   // Lu dans l'initialiseur et non dans un effet : le rendu de React peut s'exécuter deux fois en
   // StrictMode, mais le drapeau n'est effacé que par l'effet ci-dessous, donc le message reste.
   const [accountDeleted] = useState(
@@ -87,9 +92,20 @@ export function AuthForm() {
 
   const changeMode = () => {
     setError("")
+    setIsVisitorSetup(false)
     setAcceptedLegal(false)
     setAcceptedPrivacy(false)
     setMode(isRegistering ? "login" : "register")
+  }
+
+  const startVisitorAccess = () => {
+    setVisitorError("")
+    if (!startVisitorSession()) {
+      setVisitorError(t("visitor.sessionUnavailable"))
+      return
+    }
+    setLocale(visitorLocale)
+    router.push("/visiteur")
   }
 
   return (
@@ -298,6 +314,56 @@ export function AuthForm() {
               {isRegistering ? t("authForm.switchToLogin") : t("authForm.switchToRegister")}
             </button>
           </p>
+
+          <section className="mt-5 border-t border-border/70 pt-5">
+            {isVisitorSetup ? (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="font-medium text-foreground">{t("visitor.accessTitle")}</h2>
+                  <p className="mt-1 text-sm leading-5 text-muted-foreground">{t("visitor.accessDescription")}</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="visitor-language">{t("visitor.languageQuestion")}</Label>
+                  <select
+                    id="visitor-language"
+                    value={visitorLocale}
+                    onChange={(event) => setVisitorLocale(event.currentTarget.value as Locale)}
+                    className="h-10 w-full rounded-[10px] border border-input bg-card/75 px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+                  >
+                    <option value="fr">{t("visitor.languageFrench")}</option>
+                    <option value="en">{t("visitor.languageEnglish")}</option>
+                  </select>
+                </div>
+                <p className="text-xs leading-5 text-muted-foreground">{t("visitor.readOnlyDuration")}</p>
+                {visitorError && <p role="alert" className="text-sm text-destructive">{visitorError}</p>}
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button type="button" onClick={startVisitorAccess} className="flex-1">
+                    {t("visitor.start")}
+                    <ArrowRight className="size-4" aria-hidden="true" />
+                  </Button>
+                  <Button type="button" variant="ghost" onClick={() => setIsVisitorSetup(false)}>
+                    {t("visitor.back")}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">{t("visitor.invitation")}</p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-3 w-full"
+                  onClick={() => {
+                    setVisitorLocale(locale)
+                    setVisitorError("")
+                    setIsVisitorSetup(true)
+                  }}
+                >
+                  {t("visitor.enterAsVisitor")}
+                </Button>
+              </div>
+            )}
+          </section>
         </div>
       </section>
     </main>
