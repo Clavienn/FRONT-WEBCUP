@@ -10,7 +10,6 @@ import {
   FolderKanban,
   Globe,
   Handshake,
-  Handshake,
   Landmark,
   Lightbulb,
   MapPin,
@@ -295,9 +294,6 @@ function AppSidebar({ user }: { user: AuthUser }) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="group-data-[collapsible=icon]:hidden">
-          <GlobalSearchBar user={user} />
-        </div>
       </SidebarHeader>
 
       <SidebarContent className="gap-1">
