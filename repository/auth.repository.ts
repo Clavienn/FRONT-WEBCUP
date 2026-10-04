@@ -161,7 +161,7 @@ export interface SecurityDataAccess {
   at: string
   by: string
   role: "agent" | "admin"
-  resource: "request" | "message" | "account"
+  resource: "request" | "message" | "account" | "report"
 }
 
 export interface SecurityOverview {
@@ -274,6 +274,9 @@ async function authenticate(
 }
 
 export const authRepository = {
+  // Jeton d'accès courant, pour authentifier la connexion temps réel (socket.io) du personnel
+  getAccessToken: () => accessToken,
+
   security: () => authorizedRequest<SecurityOverview>("/auth/me/security"),
 
   // Ferme une session (un autre appareil) ; 404 si inconnue ou pas la sienne
