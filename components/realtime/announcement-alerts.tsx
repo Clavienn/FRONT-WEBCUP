@@ -7,12 +7,10 @@ import { io } from "socket.io-client"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { toast } from "@/components/ui/toast"
+import { SOCKET_OPTIONS, SOCKET_URL } from "@/lib/api-url"
 
 // Événement émis par l'API (src/realtime/announcementChannel.ts)
 const PUBLISHED_EVENT = "announcement:published"
-
-// L'API est exposée sous /api pour le HTTP ; socket.io se connecte à la racine du même hôte.
-const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "").replace(/\/api$/, "")
 
 // La description peut faire 65 000 caractères : la bulle n'en montre qu'un extrait
 const MAX_DESCRIPTION_LENGTH = 180
@@ -42,7 +40,7 @@ export function AnnouncementAlerts() {
   useEffect(() => {
     if (!SOCKET_URL) return
 
-    const socket = io(SOCKET_URL, { transports: ["websocket", "polling"] })
+    const socket = io(SOCKET_URL, SOCKET_OPTIONS)
 
     const openAnnouncement = (id: number) => () =>
       // Un visiteur anonyme n'a pas accès au détail : on le renvoie à la liste publique
