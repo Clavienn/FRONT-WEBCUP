@@ -15,6 +15,7 @@ export interface AuthUser {
   address: string | null
   roles: UserRole[]
   permissions: string[]
+  twoFactorEnabled: boolean
   createdAt: string
   updatedAt: string
 }
@@ -59,6 +60,28 @@ export interface PasswordChange {
 interface AuthResponse {
   user: unknown
   accessToken: string
+}
+
+// Réponse de POST /auth/login quand le compte a la double authentification activée : le mot de passe
+// est le bon, mais aucun jeton n'est encore émis. challengeToken est à repasser avec le code à
+// POST /auth/login/2fa (voir authRepository.completeTwoFactorLogin).
+export interface TwoFactorChallenge {
+  twoFactorRequired: true
+  challengeToken: string
+}
+
+export type LoginResult = AuthUser | TwoFactorChallenge
+
+export function isTwoFactorChallenge(result: LoginResult): result is TwoFactorChallenge {
+  return (result as TwoFactorChallenge).twoFactorRequired === true
+}
+
+// Réponse de POST /auth/me/2fa/setup : secret à entrer manuellement si le QR code ne peut pas être
+// scanné, et le même secret encodé en QR (data URL, prêt à afficher dans une balise <img>).
+export interface TwoFactorSetup {
+  secret: string
+  otpauthUrl: string
+  qrCodeDataUrl: string
 }
 
 function normalizeRole(value: unknown): UserRole | null {
@@ -119,6 +142,7 @@ export function normalizeAuthUser(value: unknown): AuthUser {
     phone: nullableString(data.phone),
     address: nullableString(data.address),
     roles,
+    twoFactorEnabled: data.twoFactorEnabled === true,
     permissions: rawPermissions
       .map((permission) => {
         if (typeof permission === "string") return permission
@@ -278,6 +302,12 @@ async function authenticate(
   return user
 }
 
+function applySession(session: AuthResponse): AuthUser {
+  const user = normalizeAuthUser(session.user)
+  accessToken = session.accessToken
+  return user
+}
+
 export const authRepository = {
   // Jeton d'accès courant, pour authentifier la connexion temps réel (socket.io) du personnel
   getAccessToken: () => accessToken,
@@ -287,10 +317,36 @@ export const authRepository = {
   // Ferme une session (un autre appareil) ; 404 si inconnue ou pas la sienne
   revokeSession: (id: string | number) => authorizedRequest<void>(`/auth/me/sessions/${id}`, { method: "DELETE" }),
 
-  // headers : protection anti-robots (voir components/forms/form-guard.tsx)
-  login: (credentials: Credentials, headers?: Record<string, string>) => authenticate("/auth/login", credentials, headers),
+  // headers : protection anti-robots (voir components/forms/form-guard.tsx). Le mot de passe peut être
+  // le bon sans que la connexion soit terminée (double authentification) : voir isTwoFactorChallenge.
+  async login(credentials: Credentials, headers?: Record<string, string>): Promise<LoginResult> {
+    const result = await request<AuthResponse | TwoFactorChallenge>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+      headers,
+    })
+    if ("twoFactorRequired" in result) return result
+    return applySession(result)
+  },
+
+  completeTwoFactorLogin: async (challengeToken: string, code: string): Promise<AuthUser> =>
+    applySession(
+      await request<AuthResponse>("/auth/login/2fa", {
+        method: "POST",
+        body: JSON.stringify({ challengeToken, code }),
+      })
+    ),
 
   register: (data: RegistrationData, headers?: Record<string, string>) => authenticate("/auth/register", data, headers),
+
+  setupTwoFactor: (password: string) =>
+    authorizedRequest<TwoFactorSetup>("/auth/me/2fa/setup", { method: "POST", body: JSON.stringify({ password }) }),
+
+  verifyTwoFactorSetup: (code: string) =>
+    authorizedRequest<{ recoveryCodes: string[] }>("/auth/me/2fa/verify", { method: "POST", body: JSON.stringify({ code }) }),
+
+  disableTwoFactor: (password: string, code: string) =>
+    authorizedRequest<void>("/auth/me/2fa/disable", { method: "POST", body: JSON.stringify({ password, code }) }),
 
   async refresh(): Promise<AuthUser> {
     if (!refreshRequest) {
