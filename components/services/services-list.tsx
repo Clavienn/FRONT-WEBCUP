@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, CircleAlert, MessageSquareText, Search, BadgeCheck } from "lucide-react"
+import { ArrowRight, CircleAlert, MessageSquareText, Search, BadgeCheck, TrendingUp } from "lucide-react"
 
 import { ServiceIcon } from "@/components/services/service-icon"
 import { StarDisplay } from "@/components/services/star-rating"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { serviceRepository, type MunicipalService } from "@/repository/service.repository"
@@ -17,18 +18,19 @@ export function ServicesList() {
   const [services, setServices] = useState<MunicipalService[] | null>(null)
   const [error, setError] = useState("")
   const [query, setQuery] = useState("")
+  const [sortByUsage, setSortByUsage] = useState(false)
 
   useEffect(() => {
     let mounted = true
     serviceRepository
-      .list()
+      .list(sortByUsage ? { sort: "mostUsed" } : {})
       .then((data) => mounted && setServices(data))
       .catch((cause) => mounted && setError(cause instanceof Error ? cause.message : t("servicesList.loadError")))
     return () => {
       mounted = false
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- chargement unique au montage ; t() n'a pas besoin de redéclencher le fetch
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- t() n'a pas besoin de redéclencher le fetch
+  }, [sortByUsage])
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
@@ -48,16 +50,29 @@ export function ServicesList() {
             {t("servicesList.subtitle")}
           </p>
         </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-          <Input
-            type="search"
-            aria-label={t("servicesList.searchAriaLabel")}
-            placeholder={t("servicesList.searchPlaceholder")}
-            className="pl-9"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <div className="relative w-full sm:w-72">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Input
+              type="search"
+              aria-label={t("servicesList.searchAriaLabel")}
+              placeholder={t("servicesList.searchPlaceholder")}
+              className="pl-9"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
+          <Button
+            type="button"
+            variant={sortByUsage ? "default" : "outline"}
+            size="sm"
+            aria-pressed={sortByUsage}
+            onClick={() => setSortByUsage((on) => !on)}
+            className="w-fit"
+          >
+            <TrendingUp className="size-4" aria-hidden="true" />
+            {t("servicesList.sortByMostUsed")}
+          </Button>
         </div>
       </section>
 
@@ -106,6 +121,12 @@ export function ServicesList() {
                     <MessageSquareText className="size-3.5" aria-hidden="true" />
                     {t("serviceReviews.count", { count: service.reviewsCount })}
                   </span>
+                  {service.requestsCount !== undefined && (
+                    <span className="inline-flex items-center gap-1">
+                      <TrendingUp className="size-3.5" aria-hidden="true" />
+                      {t("servicesList.requestsCount", { count: service.requestsCount })}
+                    </span>
+                  )}
                   {service.reviewedByMe && (
                     <span
                       className="inline-flex items-center gap-1 font-medium text-emerald-700 dark:text-emerald-300"

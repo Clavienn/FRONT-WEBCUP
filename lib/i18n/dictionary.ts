@@ -7,6 +7,18 @@ export type DictionaryNode = string | string[] | { [key: string]: DictionaryNode
 const fr = {
   skipLink: "Aller au contenu",
   langToggle: { ariaLabel: "Changer la langue" },
+  liteModeToggle: { ariaLabelOn: "Désactiver le mode allégé", ariaLabelOff: "Activer le mode allégé" },
+  search: {
+    placeholder: "Rechercher un service, un lieu, un projet…",
+    ariaLabel: "Recherche générale",
+    minChars: "Continuez à taper pour lancer la recherche",
+    noResults: "Aucun résultat pour « {{query}} »",
+    seeAllResults: "Voir tous les résultats",
+    resultsTitle: "Résultats pour « {{query}} »",
+    resultsCount: "{{count}} résultat(s)",
+    resultsEmpty: "Aucun résultat ne correspond à votre recherche.",
+    resultsEmptyHint: "Essayez un autre mot-clé, ou vérifiez l'orthographe.",
+  },
   nav: {
     accueil: "Accueil",
     presentation: "Présentation",
@@ -224,6 +236,8 @@ const fr = {
       darkMode: "Mode sombre",
       french: "Français",
       english: "Anglais",
+      liteModeOn: "Mode allégé activé",
+      liteModeOff: "Mode allégé désactivé",
       textSize: {
         normal: "Taille de texte normale",
         large: "Texte agrandi",
@@ -231,7 +245,6 @@ const fr = {
       },
       mesDemarches: "Mes démarches",
       mesRendezVous: "Mes rendez-vous",
-      communiques: "Communiqués",
       envoyerMessage: "Envoyer un message",
       demandesCitoyennes: "Demandes citoyennes",
       comptesCitoyens: "Comptes citoyens",
@@ -579,6 +592,11 @@ const fr = {
     errorLoad: "Impossible de charger vos demandes.",
     retryLabel: "Réessayer",
     totalLabel: "{{count}} demande(s)",
+    dateFromLabel: "Depuis le",
+    dateToLabel: "Jusqu'au",
+    clearDateFilter: "Réinitialiser",
+    noResultsRangeTitle: "Aucune demande sur cette période",
+    noResultsRangeDescription: "Essayez d'élargir la période, ou réinitialisez le filtre pour revoir toutes vos demandes.",
     detailLabel: "Voir l'évolution",
     hideDetailLabel: "Masquer l'évolution",
     detailError: "Impossible de charger l'évolution de la demande.",
@@ -1279,6 +1297,18 @@ const fr = {
     noDescription: "Aucune description.",
     seeInfo: "Voir les informations",
     loadError: "Chargement impossible",
+    sortByMostUsed: "Les plus utilisés",
+    requestsCount: "{{count}} demande(s)",
+  },
+
+  mostUsedServices: {
+    title: "Services les plus utilisés",
+    subtitle: "Les démarches les plus demandées par les habitants.",
+    requestsCount: "{{count}} demande(s)",
+    emptyTitle: "Pas encore de données",
+    emptyDescription: "Le classement apparaîtra dès que des demandes seront déposées.",
+    loadError: "Chargement impossible",
+    rankAria: "Rang {{rank}}",
   },
 
   establishmentsFinder: {
@@ -1364,6 +1394,18 @@ const fr = {
 const en = {
   skipLink: "Skip to content",
   langToggle: { ariaLabel: "Change language" },
+  liteModeToggle: { ariaLabelOn: "Turn off lite mode", ariaLabelOff: "Turn on lite mode" },
+  search: {
+    placeholder: "Search a service, a place, a project…",
+    ariaLabel: "General search",
+    minChars: "Keep typing to search",
+    noResults: "No results for “{{query}}”",
+    seeAllResults: "See all results",
+    resultsTitle: "Results for “{{query}}”",
+    resultsCount: "{{count}} result(s)",
+    resultsEmpty: "No results match your search.",
+    resultsEmptyHint: "Try another keyword, or check the spelling.",
+  },
   nav: {
     accueil: "Home",
     presentation: "About",
@@ -1579,6 +1621,8 @@ const en = {
       darkMode: "Dark mode",
       french: "French",
       english: "English",
+      liteModeOn: "Lite mode on",
+      liteModeOff: "Lite mode off",
       textSize: {
         normal: "Normal text size",
         large: "Larger text",
@@ -1586,7 +1630,6 @@ const en = {
       },
       mesDemarches: "My requests",
       mesRendezVous: "My appointments",
-      communiques: "Announcements",
       envoyerMessage: "Send a message",
       demandesCitoyennes: "Citizen requests",
       comptesCitoyens: "Citizen accounts",
@@ -1930,6 +1973,11 @@ const en = {
     errorLoad: "Your requests could not be loaded.",
     retryLabel: "Try again",
     totalLabel: "{{count}} request(s)",
+    dateFromLabel: "From",
+    dateToLabel: "To",
+    clearDateFilter: "Reset",
+    noResultsRangeTitle: "No request in this date range",
+    noResultsRangeDescription: "Try widening the range, or reset the filter to see all your requests.",
     detailLabel: "View progress",
     hideDetailLabel: "Hide progress",
     detailError: "The request progress could not be loaded.",
@@ -2626,6 +2674,18 @@ const en = {
     noDescription: "No description.",
     seeInfo: "See details",
     loadError: "Couldn't load",
+    sortByMostUsed: "Most used",
+    requestsCount: "{{count}} request(s)",
+  },
+
+  mostUsedServices: {
+    title: "Most used services",
+    subtitle: "The procedures most requested by residents.",
+    requestsCount: "{{count}} request(s)",
+    emptyTitle: "No data yet",
+    emptyDescription: "The ranking will appear once requests start coming in.",
+    loadError: "Couldn't load",
+    rankAria: "Rank {{rank}}",
   },
 
   establishmentsFinder: {

@@ -118,7 +118,7 @@ const LOADERS: { [K in ExportDataKey]: () => Promise<ExportData[K]> } = {
     permissions: await permissionRepository.list(),
   }),
   audit: async () => ({ page: await auditRepository.list({ page: 1, limit: EXPORT_ROW_LIMIT }) }),
-  services: async () => ({ services: await serviceRepository.list(true) }),
+  services: async () => ({ services: await serviceRepository.list({ all: true }) }),
   projects: async () => ({ projects: await projectRepository.list() }),
   ideas: async () => ({ list: await ideaRepository.listAll(1, EXPORT_ROW_LIMIT) }),
   messages: async () => ({ inbox: await contactMessageRepository.listInbox({ page: 1, limit: EXPORT_ROW_LIMIT }) }),

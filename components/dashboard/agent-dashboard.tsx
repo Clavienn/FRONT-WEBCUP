@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { CitizenDashboard } from "@/components/dashboard/citizen-dashboard"
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard"
+import { MostUsedServices } from "@/components/services/most-used-services"
 
 const metrics: { key: string; status: RequestStatus; icon: typeof Clock3; tone: string }[] = [
   { key: "pending", status: "pending", icon: Clock3, tone: "text-amber-700 dark:text-amber-300" },
@@ -116,6 +117,8 @@ export function AgentDashboard() {
             ))}
           </div>
         </section>
+
+        <MostUsedServices />
 
         <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_320px]">
           <section aria-labelledby="queues-title">

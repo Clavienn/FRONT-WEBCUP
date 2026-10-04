@@ -268,7 +268,7 @@ export function EstablishmentsAdmin() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- chargement initial depuis l'API
     load()
-    serviceRepository.list(true).then(setServices).catch(() => undefined)
+    serviceRepository.list({ all: true }).then(setServices).catch(() => undefined)
   }, [load])
 
   const handleSaved = (saved: Establishment, created: boolean) => {

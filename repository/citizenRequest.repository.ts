@@ -137,10 +137,19 @@ function query(params: Record<string, string | number | boolean | undefined>): s
   return encoded ? `?${encoded}` : ""
 }
 
+export interface CitizenRequestQuery {
+  status?: RequestStatus
+  // Bornes sur la date de dépôt, au format YYYY-MM-DD (valeur native d'un input type="date")
+  from?: string
+  to?: string
+}
+
 /** Demandes du citoyen connecté. Le serveur filtre sur l'utilisateur de la session :
  * aucun identifiant de demande ne permet d'accéder à celle d'autrui. */
-function listMine(status?: RequestStatus): Promise<RequestPage<CitizenRequest>> {
-  return authorizedRequest<RequestPage<CitizenRequest>>(`/requests/mine${query({ status })}`)
+function listMine(query_: CitizenRequestQuery = {}): Promise<RequestPage<CitizenRequest>> {
+  return authorizedRequest<RequestPage<CitizenRequest>>(
+    `/requests/mine${query({ status: query_.status, from: query_.from, to: query_.to })}`
+  )
 }
 
 function getMine(id: number): Promise<CitizenRequestDetail> {
@@ -181,7 +190,7 @@ function update(id: number, input: RequestUpdateInput): Promise<AgentRequestDeta
 
 // Le total de chaque page suffit : pas besoin de charger les lignes pour compter.
 async function statsMine(): Promise<RequestStatusCounts> {
-  const pages = await Promise.all(REQUEST_STATUSES.map((status) => listMine(status)))
+  const pages = await Promise.all(REQUEST_STATUSES.map((status) => listMine({ status })))
   return REQUEST_STATUSES.reduce((counts, status, index) => {
     counts[status] = pages[index].total
     return counts

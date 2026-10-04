@@ -6,6 +6,7 @@ import Link from "next/link"
 
 import { getLatestProjects, resolveProjectImageUrl, type Project } from "@/lib/services/projects"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useLiteMode } from "@/components/lite-mode/lite-mode-provider"
 import { Reveal } from "@/components/landing/reveal"
 
 type Status = "loading" | "error" | "empty" | "success"
@@ -20,14 +21,17 @@ const STATUS_LABEL_KEY: Record<Project["status"], string> = {
 // une connexion si besoin avant d'afficher le projet et ses commentaires.
 function ProjectCard({ project }: { project: Project }) {
   const { t } = useLanguage()
+  const { liteMode } = useLiteMode()
   const imageSrc = resolveProjectImageUrl(project.imageUrl)
 
   return (
     <li className="h-full overflow-hidden rounded-[var(--tn-radius-lg)] border border-[var(--tn-border)] bg-[var(--tn-surface)] transition-[border-color,background-color,transform] duration-250 [transition-timing-function:var(--tn-ease)] hover:-translate-y-1 hover:border-[var(--tn-border-strong)] hover:bg-[var(--tn-surface-strong)]">
       <Link href={`/dashboard/projects/detail?id=${project.id}`} className="block h-full">
-        <div className="relative aspect-[16/9] w-full bg-[var(--tn-surface-strong)]">
-          {imageSrc && <Image src={imageSrc} alt="" fill className="object-cover" unoptimized />}
-        </div>
+        {!liteMode && (
+          <div className="relative aspect-[16/9] w-full bg-[var(--tn-surface-strong)]">
+            {imageSrc && <Image src={imageSrc} alt="" fill className="object-cover" unoptimized />}
+          </div>
+        )}
         <div className="p-6">
           <span className="text-xs font-medium tracking-widest text-[var(--tn-accent)] uppercase">
             {t(STATUS_LABEL_KEY[project.status])}

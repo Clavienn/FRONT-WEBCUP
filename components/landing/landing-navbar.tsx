@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { Menu, X, Globe } from "lucide-react"
+import { Menu, X, Globe, Zap, ZapOff } from "lucide-react"
 
 import { BrandLockup } from "@/components/brand/brand-lockup"
 import { NAV_LINKS } from "@/config/landing-content"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useLiteMode } from "@/components/lite-mode/lite-mode-provider"
 import { useActiveSection } from "@/hooks/use-active-section"
 import { cn } from "@/lib/utils"
 
@@ -16,7 +17,9 @@ export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { locale, setLocale, t } = useLanguage()
+  const { liteMode, toggleLiteMode } = useLiteMode()
   const activeId = useActiveSection(SECTION_IDS)
+  const LiteModeIcon = liteMode ? Zap : ZapOff
   const firstDrawerLinkRef = useRef<HTMLAnchorElement | null>(null)
 
   useEffect(() => {
@@ -66,6 +69,17 @@ export function LandingNavbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleLiteMode}
+            data-active={liteMode}
+            className="inline-flex items-center gap-1.5 rounded-[var(--tn-radius-sm)] border border-[var(--tn-border)] px-2.5 py-1.5 text-xs font-medium tracking-widest text-[var(--tn-text-muted)] transition-colors hover:border-[var(--tn-border-strong)] hover:text-[var(--tn-text)] data-[active=true]:border-[var(--tn-accent)] data-[active=true]:text-[var(--tn-accent)]"
+            aria-label={t(liteMode ? "liteModeToggle.ariaLabelOn" : "liteModeToggle.ariaLabelOff")}
+            aria-pressed={liteMode}
+          >
+            <LiteModeIcon className="size-3.5" aria-hidden="true" />
+          </button>
+
           <button
             type="button"
             onClick={() => setLocale(locale === "fr" ? "en" : "fr")}

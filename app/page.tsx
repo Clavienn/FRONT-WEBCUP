@@ -5,8 +5,10 @@ import "./terra-nova.css"
 import { MotionConfig } from "framer-motion"
 
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useLiteMode } from "@/components/lite-mode/lite-mode-provider"
 import { LandingNavbar } from "@/components/landing/landing-navbar"
 import { VoyageSection } from "@/components/landing/voyage-section"
+import { LiteHero } from "@/components/landing/lite-hero"
 import { ServicesSection } from "@/components/landing/services-section"
 import { HowItWorksSection } from "@/components/landing/how-it-works-section"
 import { AnnouncementsSection } from "@/components/landing/announcements-section"
@@ -20,9 +22,10 @@ import { SocialRail } from "@/components/landing/social-rail"
 
 export default function Page() {
   const { t } = useLanguage()
+  const { liteMode } = useLiteMode()
 
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionConfig reducedMotion={liteMode ? "always" : "user"}>
       <div className="terra-landing">
         <a href="#contenu" className="tn-skip-link">
           {t("skipLink")}
@@ -31,11 +34,11 @@ export default function Page() {
         <div className="tn-grid-overlay" aria-hidden="true" />
 
         <LandingNavbar />
-        <ScrollNavDots />
-        <SocialRail />
+        {!liteMode && <ScrollNavDots />}
+        {!liteMode && <SocialRail />}
 
         <main id="contenu">
-          <VoyageSection />
+          {liteMode ? <LiteHero /> : <VoyageSection />}
           <ServicesSection />
           <HowItWorksSection />
           <AnnouncementsSection />
