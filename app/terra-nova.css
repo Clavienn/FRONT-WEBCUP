@@ -616,6 +616,7 @@
 
   .tn-scrollseq__chapter--story {
     justify-content: flex-start;
+    padding-top: calc(4rem + var(--tn-space-4));
   }
 
   .tn-scrollseq__chapter--story > div {
