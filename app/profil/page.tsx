@@ -85,7 +85,8 @@ export default function ProfilPage() {
       const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
       const initials =
         ((user.firstName?.[0] ?? "") + (user.lastName?.[0] ?? "")).toUpperCase() ||
-        user.email[0]?.toUpperCase() || "?"
+        user.email[0]?.toUpperCase() ||
+        "?"
       const locale = t("profilePage.pdf.locale")
       const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long" })
       const formatPdfDate = (value: string) =>
@@ -283,96 +284,110 @@ export default function ProfilPage() {
 
   return (
     <DashboardFrame>
-        <div className="mx-auto max-w-2xl space-y-6">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-            <div className="space-y-2">
-              <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/dashboard" />}>
-                <ArrowLeftIcon /> {t("profilePage.backToDashboard")}
-              </Button>
-              <h1 className="text-2xl font-medium tracking-tight text-foreground">{t("profilePage.title")}</h1>
-            </div>
-            <div className="flex w-full gap-2 sm:w-auto">
-              <Button
-                onClick={handleDownloadProfile}
-                disabled={exportingPdf || signingOut !== null}
-                className="flex-1 sm:flex-none"
-              >
-                {exportingPdf ? <Spinner /> : <DownloadIcon />}
-                {exportingPdf ? t("profilePage.generatingPdf") : t("profilePage.downloadProfile")}
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => handleSignOut("one")}
-                disabled={signingOut !== null || exportingPdf}
-                className="flex-1 sm:flex-none"
-              >
-                {signingOut === "one" ? <Spinner /> : <LogOutIcon />}
-                {t("profilePage.signOut")}
-              </Button>
-            </div>
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="space-y-1.5">
+            <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/dashboard" />}>
+              <ArrowLeftIcon /> {t("profilePage.backToDashboard")}
+            </Button>
+            <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              {t("profilePage.title")}
+            </h1>
           </div>
+          <div className="flex w-full gap-2 sm:w-auto">
+            <Button
+              onClick={handleDownloadProfile}
+              disabled={exportingPdf || signingOut !== null}
+              className="flex-1 sm:flex-none"
+            >
+              {exportingPdf ? <Spinner /> : <DownloadIcon />}
+              {exportingPdf ? t("profilePage.generatingPdf") : t("profilePage.downloadProfile")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => handleSignOut("one")}
+              disabled={signingOut !== null || exportingPdf}
+              className="flex-1 sm:flex-none"
+            >
+              {signingOut === "one" ? <Spinner /> : <LogOutIcon />}
+              {t("profilePage.signOut")}
+            </Button>
+          </div>
+        </div>
 
-          <section className="rounded-2xl border border-border/80 bg-card/70 p-6 shadow-[0_8px_30px_rgba(50,80,120,0.04)] backdrop-blur-sm">
-            <div className="flex items-center gap-4">
-              <Avatar className="size-14">
-                <AvatarFallback className="bg-accent text-lg font-medium text-primary">{initials}</AvatarFallback>
-              </Avatar>
-              <div className="min-w-0">
-                <p className="truncate text-lg font-medium text-foreground">{fullName || user.email}</p>
-                <Badge variant={user.roles.includes("admin") ? "default" : "secondary"} className="mt-1">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Left Column: Citizen Identity Card */}
+          <div className="space-y-6 lg:col-span-4">
+            <section className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-sm">
+              <div className="mb-4 flex items-center justify-between border-b border-border/60 pb-3 text-[10px] font-mono tracking-wider text-muted-foreground">
+                <span className="flex items-center gap-1.5 font-medium text-cyan-500">
+                  <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
+                  MATRICULE TN-{user.id.toString().padStart(4, "0")}
+                </span>
+                <span className="uppercase text-muted-foreground">STATUT : ACTIF</span>
+              </div>
+
+              <div className="flex flex-col items-center text-center">
+                <Avatar className="size-20 border-2 border-primary/40 shadow-[0_0_24px_rgba(47,111,219,0.2)]">
+                  <AvatarFallback className="bg-primary/10 font-display text-xl font-bold text-primary">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <h2 className="font-display mt-3 text-lg font-bold text-foreground">
+                  {fullName || user.email}
+                </h2>
+                <Badge variant={user.roles.includes("admin") ? "default" : "secondary"} className="mt-1.5 font-mono text-xs">
                   {t(`roles.${roleLabel(user)}`)}
                 </Badge>
               </div>
-            </div>
 
-            <dl className="mt-6 divide-y divide-border/70 border-t border-border/70">
-              {details.map(({ icon: Icon, label, value }) => (
-                <div key={label} className="flex items-center gap-3 py-3 text-sm">
-                  <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                  <dt className="w-40 shrink-0 text-muted-foreground">{label}</dt>
-                  <dd className="min-w-0 truncate font-medium text-foreground">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
+              <dl className="mt-6 divide-y divide-border/60 border-t border-border/60 text-xs">
+                {details.map(({ icon: Icon, label, value }) => (
+                  <div key={label} className="flex items-center justify-between gap-2 py-2.5">
+                    <dt className="flex items-center gap-2 text-muted-foreground">
+                      <Icon className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
+                      <span>{label}</span>
+                    </dt>
+                    <dd className="max-w-[150px] truncate font-medium text-foreground text-right">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          </div>
 
-          <section className="rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm">
-            <div className="mb-5">
-              <h2 className="font-medium text-foreground">{t("profilePage.editTitle")}</h2>
-              <p className="text-sm text-muted-foreground">{t("profilePage.editSubtitle")}</p>
-            </div>
-            {/* key : réinitialise le formulaire quand le profil est rechargé ou enregistré */}
-            <ProfileForm key={`${user.id}-${user.updatedAt}`} user={user} />
-          </section>
+          {/* Right Column: Actions & Configurations */}
+          <div className="space-y-6 lg:col-span-8">
+            <section className="rounded-2xl border border-border/80 bg-card/80 p-6 backdrop-blur-sm shadow-sm">
+              <div className="mb-5">
+                <h2 className="font-display text-lg font-bold text-foreground">{t("profilePage.editTitle")}</h2>
+                <p className="text-sm text-muted-foreground">{t("profilePage.editSubtitle")}</p>
+              </div>
+              <ProfileForm key={`${user.id}-${user.updatedAt}`} user={user} />
+            </section>
 
-          <section className="rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm">
-            <div className="mb-5">
-              <h2 className="font-medium text-foreground">{t("profilePage.passwordTitle")}</h2>
-              <p className="text-sm text-muted-foreground">
-                {t("profilePage.passwordSubtitle")}
-              </p>
-            </div>
-            <PasswordForm />
-          </section>
+            <section className="rounded-2xl border border-border/80 bg-card/80 p-6 backdrop-blur-sm shadow-sm">
+              <div className="mb-5">
+                <h2 className="font-display text-lg font-bold text-foreground">{t("profilePage.passwordTitle")}</h2>
+                <p className="text-sm text-muted-foreground">{t("profilePage.passwordSubtitle")}</p>
+              </div>
+              <PasswordForm />
+            </section>
 
-          <section className="flex flex-col gap-3 rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-medium text-foreground">{t("profilePage.sessionsTitle")}</p>
-              <p className="text-sm text-muted-foreground">
-                {t("profilePage.sessionsSubtitle")}
-              </p>
-            </div>
-            <Button variant="outline" onClick={() => setConfirmAll(true)} disabled={signingOut !== null}>
-              {signingOut === "all" ? <Spinner /> : <MonitorSmartphoneIcon />}
-              {t("profilePage.signOutEverywhere")}
-            </Button>
-          </section>
+            <section className="flex flex-col gap-4 rounded-2xl border border-border/80 bg-card/80 p-6 backdrop-blur-sm shadow-sm sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-display text-base font-bold text-foreground">{t("profilePage.sessionsTitle")}</p>
+                <p className="text-sm text-muted-foreground">{t("profilePage.sessionsSubtitle")}</p>
+              </div>
+              <Button variant="outline" onClick={() => setConfirmAll(true)} disabled={signingOut !== null} className="shrink-0">
+                {signingOut === "all" ? <Spinner /> : <MonitorSmartphoneIcon />}
+                {t("profilePage.signOutEverywhere")}
+              </Button>
+            </section>
 
-          <SecuritySection />
+            <SecuritySection />
 
-          {/* Un agent ou un administrateur reste administrable via la console : la suppression
-              de compte n'est proposée qu'à l'espace citoyen, comme le refuse l'API. */}
-          {!isStaff(user) && <DeleteAccountSection />}
+            {!isStaff(user) && <DeleteAccountSection />}
+          </div>
         </div>
 
         <AlertDialog open={confirmAll} onOpenChange={setConfirmAll}>
@@ -397,6 +412,7 @@ export default function ProfilPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      </div>
     </DashboardFrame>
   )
 }

@@ -42,37 +42,50 @@ export function ServicesList() {
 
   return (
     <>
-      <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
-          <p className="text-sm font-medium text-primary">{t("servicesList.eyebrow")}</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("servicesList.title")}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            {t("servicesList.subtitle")}
-          </p>
+      <section className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-primary">
+            <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
+            REGISTRE DES SERVICES DU DÔME // TERRA NOVA
+          </span>
+          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+            ACCÈS CITOYEN & HABITAT
+          </span>
         </div>
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-72">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-            <Input
-              type="search"
-              aria-label={t("servicesList.searchAriaLabel")}
-              placeholder={t("servicesList.searchPlaceholder")}
-              className="pl-9"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t("servicesList.eyebrow")}</p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+              {t("servicesList.title")}
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {t("servicesList.subtitle")}
+            </p>
           </div>
-          <Button
-            type="button"
-            variant={sortByUsage ? "default" : "outline"}
-            size="sm"
-            aria-pressed={sortByUsage}
-            onClick={() => setSortByUsage((on) => !on)}
-            className="w-fit"
-          >
-            <TrendingUp className="size-4" aria-hidden="true" />
-            {t("servicesList.sortByMostUsed")}
-          </Button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <div className="relative w-full sm:w-72">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+              <Input
+                type="search"
+                aria-label={t("servicesList.searchAriaLabel")}
+                placeholder={t("servicesList.searchPlaceholder")}
+                className="pl-9"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+            </div>
+            <Button
+              type="button"
+              variant={sortByUsage ? "default" : "outline"}
+              size="sm"
+              aria-pressed={sortByUsage}
+              onClick={() => setSortByUsage((on) => !on)}
+              className="w-fit"
+            >
+              <TrendingUp className="size-4" aria-hidden="true" />
+              {t("servicesList.sortByMostUsed")}
+            </Button>
+          </div>
         </div>
       </section>
 

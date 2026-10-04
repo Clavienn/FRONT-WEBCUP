@@ -36,8 +36,6 @@ export default function Page() {
 
         <LandingNavbar />
         <AlertBanner variant="floating" />
-        <ScrollNavDots />
-        <SocialRail />
         {!liteMode && <ScrollNavDots />}
         {!liteMode && <SocialRail />}
 

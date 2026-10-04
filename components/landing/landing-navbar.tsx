@@ -90,6 +90,13 @@ export function LandingNavbar() {
             {locale.toUpperCase()}
           </button>
 
+          <Link
+            href="/connexion"
+            className="hidden sm:inline-flex items-center gap-2 rounded-[var(--tn-radius-sm)] border border-[var(--tn-accent)]/60 bg-[var(--tn-accent-soft)] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--tn-cyan)] transition-all hover:bg-[var(--tn-accent)] hover:text-white hover:border-[var(--tn-cyan)] hover:shadow-[0_0_20px_rgba(111,227,255,0.35)]"
+          >
+            <span>{t("breadcrumbs.login")}</span>
+          </Link>
+
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
@@ -146,6 +153,23 @@ export function LandingNavbar() {
               </a>
             ))}
           </nav>
+
+          <div className="mt-8 flex flex-col gap-3 pt-6 border-t border-[var(--tn-border)]">
+            <Link
+              href="/connexion"
+              onClick={() => setDrawerOpen(false)}
+              className="flex items-center justify-center rounded-[var(--tn-radius-sm)] bg-[var(--tn-accent)] px-4 py-3 text-sm font-semibold uppercase tracking-wider text-white shadow-[0_0_24px_rgba(47,111,219,0.4)]"
+            >
+              {t("breadcrumbs.login")}
+            </Link>
+            <Link
+              href="/visiteur"
+              onClick={() => setDrawerOpen(false)}
+              className="flex items-center justify-center rounded-[var(--tn-radius-sm)] border border-[var(--tn-border)] px-4 py-3 text-sm font-medium tracking-wider text-[var(--tn-text-muted)] hover:text-[var(--tn-text)]"
+            >
+              {t("authForm.guestAccess")}
+            </Link>
+          </div>
         </div>
       </div>
     </header>

@@ -43,22 +43,33 @@ export function AdminDashboard({ user }: { user: AuthUser }) {
 
   return (
     <>
-      <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-        <div>
-          <p className="text-sm font-medium text-primary">{t("adminDashboard.eyebrow")}</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">
-            {t("adminDashboard.title")}
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            {t("adminDashboard.subtitle")}
-          </p>
+      <section className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
+        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
+          <span className="flex items-center gap-2 font-medium text-amber-500 dark:text-amber-400">
+            <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
+            CONSOLE DE SUPERVISION // HAUT CONSEIL
+          </span>
+          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
+            AUTORITÉ CENTRALE DE COLONISATION
+          </span>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <AdminExportDialog user={user} />
-          <Badge variant="outline" className="w-fit gap-1.5 rounded-full px-3 py-1 text-muted-foreground">
-            <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
-            {t("adminDashboard.accessBadge")}
-          </Badge>
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t("adminDashboard.eyebrow")}</p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
+              {t("adminDashboard.title")}
+            </h1>
+            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {t("adminDashboard.subtitle")}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <AdminExportDialog user={user} />
+            <Badge variant="outline" className="w-fit gap-1.5 rounded-full px-3 py-1 font-mono text-xs text-muted-foreground">
+              <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
+              {t("adminDashboard.accessBadge")}
+            </Badge>
+          </div>
         </div>
       </section>
 
