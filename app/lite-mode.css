@@ -1,0 +1,20 @@
+/* Mode allégé (voir components/lite-mode/lite-mode-provider.tsx) : réduit le coût de rendu sur
+   mobile ou connexion limitée en désactivant les effets coûteux (flou, animations, transitions).
+   Les animations pilotées par framer-motion sont coupées séparément via MotionConfig. */
+
+html.lite-mode *,
+html.lite-mode *::before,
+html.lite-mode *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+html.lite-mode .backdrop-blur-sm,
+html.lite-mode .backdrop-blur,
+html.lite-mode .backdrop-blur-md,
+html.lite-mode .backdrop-blur-lg {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}

@@ -9,6 +9,8 @@ import { NewRequestForm } from "@/components/requests/new-request-form"
 import { ReviewDialog } from "@/components/services/review-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "@/components/ui/toast"
 import {
@@ -102,9 +104,12 @@ interface CitizenRequestsPanelProps {
   onChanged?: () => void
   // Si défini, « Déposer une demande » et « Voir l'évolution » redirigent vers cette page au lieu de s'ouvrir ici
   requestsHref?: string
+  // La page dédiée affiche déjà son propre titre et sous-titre : inutile de les répéter ici.
+  // Le titre reste dans le DOM (lecteurs d'écran) mais n'est plus visible.
+  hideHeader?: boolean
 }
 
-export function CitizenRequestsPanel({ onChanged, requestsHref }: CitizenRequestsPanelProps = {}) {
+export function CitizenRequestsPanel({ onChanged, requestsHref, hideHeader }: CitizenRequestsPanelProps = {}) {
   const { t } = useLanguage()
   const statusLabel = useStatusLabel()
   const [state, setState] = useState<LoadState>("loading")
@@ -116,6 +121,9 @@ export function CitizenRequestsPanel({ onChanged, requestsHref }: CitizenRequest
   // Services déjà notés par le citoyen : un seul avis par service, le bouton disparaît ensuite
   const [reviewedServiceIds, setReviewedServiceIds] = useState<Set<number>>(new Set())
   const [reviewing, setReviewing] = useState<{ id: number; name: string } | null>(null)
+  // Filtre par date de dépôt : uniquement sur la page dédiée (requestsHref absent), pas dans l'aperçu du tableau de bord
+  const [dateFrom, setDateFrom] = useState("")
+  const [dateTo, setDateTo] = useState("")
 
   useEffect(() => {
     let cancelled = false
@@ -133,7 +141,7 @@ export function CitizenRequestsPanel({ onChanged, requestsHref }: CitizenRequest
 // declenches par l'utilisateur passent par refresh().
 const load = useCallback(() => {
     citizenRequestRepository
-      .listMine()
+      .listMine({ from: dateFrom || undefined, to: dateTo || undefined })
       .then((page) => {
         setRequests(page.requests)
         setTotal(page.total)
@@ -145,15 +153,18 @@ const load = useCallback(() => {
         setError(cause instanceof Error ? cause.message : "")
         setState("error")
       })
-  }, [onChanged])
+  }, [onChanged, dateFrom, dateTo])
 
   const refresh = useCallback(() => {
     setState("loading")
     load()
   }, [load])
 
+  // Un changement de filtre de date doit remettre l'état à "loading" (c'est un rechargement
+  // déclenché par l'utilisateur), contrairement au montage initial qui l'est déjà.
   useEffect(() => {
-    load()
+    refresh()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh dépend de load, qui dépend déjà de dateFrom/dateTo
   }, [load])
 
   const handleCreated = () => {
@@ -169,7 +180,7 @@ const load = useCallback(() => {
       className="rounded-2xl border border-border/80 bg-card/75 p-5 shadow-sm backdrop-blur-sm sm:p-6"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className={hideHeader ? "sr-only" : undefined}>
           <h2 id="citizen-requests-title" className="text-lg font-semibold">
             {t("citizenRequests.title")}
           </h2>
@@ -198,6 +209,49 @@ const load = useCallback(() => {
         </div>
       )}
 
+      {!requestsHref && (
+        <div className="mt-4 flex flex-wrap items-end gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="requests-date-from" className="text-xs text-muted-foreground">
+              {t("citizenRequests.dateFromLabel")}
+            </Label>
+            <Input
+              id="requests-date-from"
+              type="date"
+              value={dateFrom}
+              max={dateTo || undefined}
+              onChange={(event) => setDateFrom(event.target.value)}
+              className="w-auto"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="requests-date-to" className="text-xs text-muted-foreground">
+              {t("citizenRequests.dateToLabel")}
+            </Label>
+            <Input
+              id="requests-date-to"
+              type="date"
+              value={dateTo}
+              min={dateFrom || undefined}
+              onChange={(event) => setDateTo(event.target.value)}
+              className="w-auto"
+            />
+          </div>
+          {(dateFrom || dateTo) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setDateFrom("")
+                setDateTo("")
+              }}
+            >
+              {t("citizenRequests.clearDateFilter")}
+            </Button>
+          )}
+        </div>
+      )}
+
       <div className="mt-6" aria-live="polite">
         {state === "loading" && (
           <div className="space-y-3" aria-hidden="true">
@@ -222,9 +276,13 @@ const load = useCallback(() => {
         {state === "ready" && requests.length === 0 && !formOpen && (
           <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border/80 px-4 py-10 text-center">
             <ClipboardList className="size-6 text-muted-foreground/70" aria-hidden="true" />
-            <p className="text-sm font-medium">{t("citizenRequests.emptyTitle")}</p>
+            <p className="text-sm font-medium">
+              {dateFrom || dateTo ? t("citizenRequests.noResultsRangeTitle") : t("citizenRequests.emptyTitle")}
+            </p>
             <p className="max-w-md text-sm leading-6 text-muted-foreground">
-              {t("citizenRequests.emptyDescription")}
+              {dateFrom || dateTo
+                ? t("citizenRequests.noResultsRangeDescription")
+                : t("citizenRequests.emptyDescription")}
             </p>
           </div>
         )}

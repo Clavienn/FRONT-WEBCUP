@@ -27,14 +27,31 @@ import type { AuthUser } from "@/repository/auth.repository"
 const DEFAULT_SECTIONS: ExportSection[] = ["synthesis", "requests", "accounts"]
 
 /**
+ * Droit exigé pour produire le rapport.
+ *
+ * L'export n'a pas son propre code de permission côté API (le seed n'en définit aucun pour
+ * l'export) : on s'appuie donc sur un droit réel, déjà exigé par les écrans que le PDF reproduit.
+ * `admin.users.manage` ouvre l'annuaire des comptes, les rôles, les permissions et le journal
+ * d'audit — c'est-à-dire l'essentiel de ce que le rapport peut rassembler. Un compte
+ * administrateur qui en serait privé n'a plus de raison d'exporter la plateforme.
+ */
+const EXPORT_PERMISSION = "admin.users.manage"
+
+/**
  * Export PDF de la console d'administration : l'admin coche les sources utiles, le rapport est
  * construit côté client à partir des mêmes endpoints que l'écran (aucune donnée n'est ajoutée ici).
+ *
+ * Le déclencheur n'apparaît que pour un compte portant EXPORT_PERMISSION, et `handleExport` le
+ * revérifie : l'export est l'opération la plus sensible de la console (une source refusée par
+ * l'API est signalée dans le PDF, pas bloquée), elle ne doit pas dépendre du seul écran qui
+ * l'affiche. Chaque source garde par ailleurs son propre `requirePermission` côté serveur.
  */
 export function AdminExportDialog({ user }: { user: AuthUser }) {
   const { t, locale } = useLanguage()
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<ExportSection[]>(DEFAULT_SECTIONS)
   const [busy, setBusy] = useState(false)
+  const canExport = user.permissions.includes(EXPORT_PERMISSION)
 
   const toggle = (section: ExportSection) =>
     setSelected((current) =>
@@ -45,6 +62,9 @@ export function AdminExportDialog({ user }: { user: AuthUser }) {
 
   const handleExport = async () => {
     if (selected.length === 0) return
+    // Revérifié ici, pas seulement sur le bouton : l'état des permissions peut avoir changé
+    // depuis l'ouverture de la boîte de dialogue.
+    if (!canExport) return
     setBusy(true)
     try {
       const results = await loadAdminExport(selected)
@@ -82,6 +102,10 @@ export function AdminExportDialog({ user }: { user: AuthUser }) {
       setBusy(false)
     }
   }
+
+  // Sans le droit d'export, l'action n'est pas offerte : un lien inactif devant un tableau de
+  // cases à cocher n'apporterait rien. Les écrans eux-mêmes gardent leur propre garde.
+  if (!canExport) return null
 
   return (
     <>

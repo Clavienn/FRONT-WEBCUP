@@ -188,6 +188,21 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
 let accessToken: string | null = null
 let refreshRequest: Promise<AuthResponse> | null = null
 
+// L'API n'emploie pas un seul format de délai avant réessai : `retryAfterMs` pour un jeton de
+// formulaire soumis trop vite, `retryAfterSeconds` pour les 429/503 (blocage anti-robot, surcharge
+// du serveur, plafond de consultations de dossiers), et l'en-tête Retry-After en secours. Tout est
+// normalisé en millisecondes : ne lire que `retryAfterMs` faisait perdre le délai annoncé par le
+// serveur, et l'interface ne pouvait ni afficher un compte à rebours ni expliquer l'attente.
+function retryDelayMs(response: Response, body: unknown): number | undefined {
+  const data = (body ?? {}) as { retryAfterMs?: unknown; retryAfterSeconds?: unknown }
+  if (typeof data.retryAfterMs === "number" && data.retryAfterMs > 0) return data.retryAfterMs
+  if (typeof data.retryAfterSeconds === "number" && data.retryAfterSeconds > 0) {
+    return data.retryAfterSeconds * 1000
+  }
+  const header = Number(response.headers.get("Retry-After"))
+  return Number.isFinite(header) && header > 0 ? header * 1000 : undefined
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!API_URL) {
     throw new Error("La variable NEXT_PUBLIC_API_URL n'est pas configurée.")
@@ -221,7 +236,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       body?.message || `Erreur ${response.status}`,
       response.status,
       typeof body?.code === "string" ? body.code : undefined,
-      typeof body?.retryAfterMs === "number" ? body.retryAfterMs : undefined
+      retryDelayMs(response, body)
     )
   }
 

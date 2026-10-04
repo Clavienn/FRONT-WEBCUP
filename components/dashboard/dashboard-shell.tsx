@@ -24,21 +24,32 @@ import {
   Sun,
   KeyRound,
   ScrollText,
+  Settings,
   ShieldCheck,
-  UserRound,
   Users,
+  Zap,
+  ZapOff,
   type LucideIcon,
 } from "lucide-react"
 
 import { BrandMark } from "@/components/brand/brand-mark"
 import { BRAND_NAME } from "@/config/brand"
 import { useAuth } from "@/components/auth/auth-provider"
+import { AgentApprovalNotice } from "@/components/agent/agent-approval"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useLiteMode } from "@/components/lite-mode/lite-mode-provider"
 import { useAccessibility } from "@/hooks/use-accessibility"
 import { useTheme } from "@/hooks/use-theme"
 import { NotificationBell } from "@/components/notifications/notification-bell"
+import { GlobalSearchBar } from "@/components/search/global-search-bar"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Spinner } from "@/components/ui/spinner"
 import { WelcomeModal } from "@/components/dashboard/welcome-modal"
 import { PageBreadcrumb } from "@/components/navigation/page-breadcrumb"
@@ -101,7 +112,6 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.lieuxUtiles", icon: MapPin, permission: "citizen.establishments.view", href: "/dashboard/lieux-utiles" },
       { label: "sidebar.items.projets", icon: FolderKanban, permission: "citizen.projects.view", href: "/dashboard/projects" },
       { label: "sidebar.items.annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
-      { label: "sidebar.items.monProfil", icon: UserRound, href: "/profil" },
     ],
   },
   {
@@ -110,7 +120,6 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.signalements", icon: Siren, permission: "citizen.signalements.create", view: "citizen", href: "/dashboard/signalements", emphasis: true },
       { label: "sidebar.items.mesDemarches", icon: ClipboardList, permission: "citizen.requests.view", view: "citizen", href: "/dashboard/my-requests" },
       { label: "sidebar.items.mesRendezVous", icon: CalendarClock, permission: "citizen.appointments.view", view: "citizen", href: "/dashboard/appointments" },
-      { label: "sidebar.items.communiques", icon: Megaphone, permission: "citizen.announcements.view", view: "citizen", href: "/dashboard#city-updates-title" },
     ],
   },
   {
@@ -168,6 +177,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
   const { t, locale, setLocale } = useLanguage()
   const { theme, toggleTheme } = useTheme()
   const { textSize, cycleTextSize } = useAccessibility()
+  const { liteMode, toggleLiteMode } = useLiteMode()
   const view: DashboardView = isStaff(user) ? "staff" : "citizen"
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email
 
@@ -175,7 +185,9 @@ function AppSidebar({ user }: { user: AuthUser }) {
   const themeLabel = t(theme === "dark" ? "sidebar.items.darkMode" : "sidebar.items.lightMode")
   const localeLabel = t(locale === "fr" ? "sidebar.items.french" : "sidebar.items.english")
   const textSizeLabel = t(`sidebar.items.textSize.${textSize}`)
+  const liteModeLabel = t(liteMode ? "sidebar.items.liteModeOn" : "sidebar.items.liteModeOff")
   const ThemeIcon = theme === "dark" ? Moon : Sun
+  const LiteModeIcon = liteMode ? Zap : ZapOff
   const switchLocale = () => setLocale(locale === "fr" ? "en" : "fr")
 
   // Messages "nouveaux" de la boîte de réception (admin) : compteur de la pastille du menu
@@ -249,6 +261,9 @@ function AppSidebar({ user }: { user: AuthUser }) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        <div className="group-data-[collapsible=icon]:hidden">
+          <GlobalSearchBar user={user} />
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -296,25 +311,32 @@ function AppSidebar({ user }: { user: AuthUser }) {
 
       <SidebarFooter>
         <SidebarGroup className="group-data-[collapsible=icon]:p-0">
-          <SidebarGroupLabel>{t("sidebar.groups.settings")}</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={toggleTheme} tooltip={themeLabel}>
-                <ThemeIcon aria-hidden="true" />
-                <span>{themeLabel}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={switchLocale} tooltip={localeLabel}>
-                <Globe aria-hidden="true" />
-                <span>{localeLabel}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton onClick={cycleTextSize} tooltip={textSizeLabel}>
-                <ALargeSmall aria-hidden="true" />
-                <span>{textSizeLabel}</span>
-              </SidebarMenuButton>
+              <DropdownMenu>
+                <DropdownMenuTrigger render={<SidebarMenuButton />}>
+                  <Settings aria-hidden="true" />
+                  <span>{t("sidebar.groups.settings")}</span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" side="top">
+                  <DropdownMenuItem onClick={toggleTheme}>
+                    <ThemeIcon aria-hidden="true" />
+                    {themeLabel}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={switchLocale}>
+                    <Globe aria-hidden="true" />
+                    {localeLabel}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={cycleTextSize}>
+                    <ALargeSmall aria-hidden="true" />
+                    {textSizeLabel}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={toggleLiteMode}>
+                    <LiteModeIcon aria-hidden="true" />
+                    {liteModeLabel}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
@@ -362,6 +384,9 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
           </div>
           <div className="mx-auto max-w-7xl space-y-8 pt-2">
             <PageBreadcrumb />
+            {/* Visible sur tout l'espace de travail d'un agent en attente de validation, plutôt
+                qu'auprès d'un échec : la restriction s'annonce au lieu de se découvrir. */}
+            {isStaff(user) && <AgentApprovalNotice />}
             {children}
           </div>
         </div>

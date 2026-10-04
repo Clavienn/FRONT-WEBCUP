@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState, type FormEvent } from "react"
-import { CircleAlert, Pencil, Plus, Trash2 } from "lucide-react"
+import { CircleAlert, Pencil, Plus, Trash2, TrendingUp } from "lucide-react"
 
 import { ServiceIcon, serviceIcons } from "@/components/services/service-icon"
 import {
@@ -43,6 +43,9 @@ const notifySuccess = (title: string) => toast.add({ title, type: "success" })
 
 const bySortOrder = (a: MunicipalService, b: MunicipalService) =>
   a.sortOrder - b.sortOrder || a.name.localeCompare(b.name)
+
+const byUsage = (a: MunicipalService, b: MunicipalService) =>
+  (b.requestsCount ?? 0) - (a.requestsCount ?? 0) || a.name.localeCompare(b.name)
 
 interface FormState {
   code: string
@@ -244,24 +247,35 @@ export function ServicesAdmin() {
   const [editing, setEditing] = useState<MunicipalService | null | undefined>(undefined)
   const [deleting, setDeleting] = useState<MunicipalService | null>(null)
   const [busyId, setBusyId] = useState<number | null>(null)
+  const [sortByUsage, setSortByUsage] = useState(false)
 
   const load = useCallback(async () => {
     try {
-      setServices((await serviceRepository.list(true)).sort(bySortOrder))
+      const fetched = await serviceRepository.list({ all: true, sort: sortByUsage ? "mostUsed" : undefined })
+      setServices(fetched.sort(sortByUsage ? byUsage : bySortOrder))
       setLoadError("")
     } catch (cause) {
       setLoadError(errorMessage(cause))
     }
-  }, [])
+  }, [sortByUsage])
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- chargement initial depuis l'API
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- chargement initial, puis à chaque bascule de tri
     load()
   }, [load])
 
+  // Édition/activation ne renvoient pas le nombre de demandes (seul le tri "plus utilisés" le calcule) :
+  // on le reporte depuis l'état courant pour ne pas le perdre tant que la liste n'est pas rechargée.
+  const mergeSaved = (current: MunicipalService[] | null, saved: MunicipalService): MunicipalService => {
+    const existing = current?.find((item) => item.id === saved.id)
+    return existing?.requestsCount !== undefined ? { ...saved, requestsCount: existing.requestsCount } : saved
+  }
+
   const handleSaved = (saved: MunicipalService, created: boolean) => {
     setServices((current) =>
-      [...(current ?? []).filter((item) => item.id !== saved.id), saved].sort(bySortOrder)
+      [...(current ?? []).filter((item) => item.id !== saved.id), mergeSaved(current, saved)].sort(
+        sortByUsage ? byUsage : bySortOrder
+      )
     )
     setEditing(undefined)
     notifySuccess(created ? "Service créé" : "Service modifié")
@@ -271,7 +285,7 @@ export function ServicesAdmin() {
     setBusyId(service.id)
     try {
       const saved = await serviceRepository.update(service.id, { isActive })
-      setServices((current) => current?.map((item) => (item.id === saved.id ? saved : item)) ?? null)
+      setServices((current) => current?.map((item) => (item.id === saved.id ? mergeSaved(current, saved) : item)) ?? null)
     } catch (cause) {
       notifyError(cause)
     } finally {
@@ -305,10 +319,22 @@ export function ServicesAdmin() {
             Créez, modifiez, désactivez ou supprimez les services municipaux affichés aux habitants.
           </p>
         </div>
-        <Button onClick={() => setEditing(null)} className="w-fit rounded-xl">
-          <Plus aria-hidden="true" />
-          Nouveau service
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant={sortByUsage ? "default" : "outline"}
+            size="sm"
+            aria-pressed={sortByUsage}
+            onClick={() => setSortByUsage((on) => !on)}
+          >
+            <TrendingUp aria-hidden="true" />
+            Trier par les plus utilisés
+          </Button>
+          <Button onClick={() => setEditing(null)} className="w-fit rounded-xl">
+            <Plus aria-hidden="true" />
+            Nouveau service
+          </Button>
+        </div>
       </section>
 
       {loadError ? (
@@ -329,6 +355,7 @@ export function ServicesAdmin() {
                 <TableHead>Service</TableHead>
                 <TableHead className="hidden md:table-cell">Code</TableHead>
                 <TableHead className="hidden text-right sm:table-cell">Ordre</TableHead>
+                <TableHead className="hidden text-right lg:table-cell">Demandes</TableHead>
                 <TableHead>Actif</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -336,7 +363,7 @@ export function ServicesAdmin() {
             <TableBody>
               {services.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-10 text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
                     Aucun service. Créez le premier avec « Nouveau service ».
                   </TableCell>
                 </TableRow>
@@ -356,6 +383,9 @@ export function ServicesAdmin() {
                   </TableCell>
                   <TableCell className="hidden font-mono text-xs md:table-cell">{service.code}</TableCell>
                   <TableCell className="hidden text-right tabular-nums sm:table-cell">{service.sortOrder}</TableCell>
+                  <TableCell className="hidden text-right tabular-nums lg:table-cell">
+                    {service.requestsCount ?? "—"}
+                  </TableCell>
                   <TableCell>
                     <Switch
                       checked={service.isActive}
