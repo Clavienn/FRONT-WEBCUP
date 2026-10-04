@@ -20,9 +20,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { isPasswordStrong, PasswordRequirements } from "@/components/auth/password-requirements"
-import type { SignupRole } from "@/repository/auth.repository"
+import { isTwoFactorChallenge, type SignupRole } from "@/repository/auth.repository"
 import { SESSION_EXPIRED_KEY } from "@/components/auth/idle-logout"
 import { ACCOUNT_DELETED_KEY } from "@/components/profile/delete-account-section"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 
 const signupRoles: SignupRole[] = ["citizen", "agent"]
 const ROLE_DICT_KEY: Record<SignupRole, string> = { citizen: "roleCitizen", agent: "roleAgent" }
@@ -32,9 +33,13 @@ type AuthMode = "login" | "register"
 
 export function AuthForm() {
   const router = useRouter()
-  const { user, isLoading, signIn, signUp } = useAuth()
+  const { user, isLoading, signIn, signUp, completeTwoFactorLogin } = useAuth()
   const { locale, setLocale, t } = useLanguage()
   const [mode, setMode] = useState<AuthMode>("login")
+  // Mot de passe validé mais double authentification requise : challengeToken identifie la tentative
+  // auprès du serveur, le reste de la page passe à la saisie du code à 6 chiffres.
+  const [twoFactorChallenge, setTwoFactorChallenge] = useState<{ challengeToken: string } | null>(null)
+  const [twoFactorCode, setTwoFactorCode] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
@@ -87,17 +92,42 @@ export function AuthForm() {
     setIsSubmitting(true)
 
     try {
-      await guard.run((headers) =>
+      const result = await guard.run((headers) =>
         isRegistering
           ? signUp({ email, password, firstName: firstName.trim(), lastName: lastName.trim(), role }, headers)
           : signIn({ email, password }, headers)
       )
+      if (!isRegistering && isTwoFactorChallenge(result)) {
+        setTwoFactorChallenge({ challengeToken: result.challengeToken })
+        return
+      }
       router.replace("/dashboard")
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t("authForm.errorGeneric"))
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleTwoFactorSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!twoFactorChallenge) return
+    setError("")
+    setIsSubmitting(true)
+    try {
+      await completeTwoFactorLogin(twoFactorChallenge.challengeToken, twoFactorCode)
+      router.replace("/dashboard")
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : t("authForm.errorGeneric"))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const cancelTwoFactor = () => {
+    setTwoFactorChallenge(null)
+    setTwoFactorCode("")
+    setError("")
   }
 
   const changeMode = () => {
@@ -159,7 +189,55 @@ export function AuthForm() {
               <p className="text-xs text-muted-foreground">{t("authForm.brandTagline")}</p>
             </div>
           </div>
+          {twoFactorChallenge ? (
+            <>
+              <header className="mb-7 space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+                  {t("authForm.kicker")}
+                </p>
+                <h1 className="text-3xl font-medium tracking-tight text-foreground">
+                  {t("authForm.twoFactor.title")}
+                </h1>
+                <p className="text-sm leading-6 text-muted-foreground">{t("authForm.twoFactor.subtitle")}</p>
+              </header>
 
+              <form onSubmit={handleTwoFactorSubmit} className="space-y-5">
+                <div className="flex justify-center">
+                  <InputOTP
+                    maxLength={6}
+                    value={twoFactorCode}
+                    onChange={setTwoFactorCode}
+                    autoFocus
+                    inputMode="numeric"
+                  >
+                    <InputOTPGroup>
+                      {Array.from({ length: 6 }, (_, index) => (
+                        <InputOTPSlot key={index} index={index} />
+                      ))}
+                    </InputOTPGroup>
+                  </InputOTP>
+                </div>
+
+                <p className="text-center text-xs text-muted-foreground">{t("authForm.twoFactor.recoveryHint")}</p>
+
+                {error && (
+                  <p role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
+                    <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                    <span>{error}</span>
+                  </p>
+                )}
+
+                <Button type="submit" className="h-10 w-full rounded-xl" disabled={isSubmitting || twoFactorCode.trim().length < 6}>
+                  {isSubmitting ? <Spinner /> : null}
+                  {isSubmitting ? t("authForm.submitWait") : t("authForm.twoFactor.submit")}
+                </Button>
+                <Button type="button" variant="ghost" className="w-full" disabled={isSubmitting} onClick={cancelTwoFactor}>
+                  {t("authForm.twoFactor.back")}
+                </Button>
+              </form>
+            </>
+          ) : (
+            <>
           <header className="mb-7 space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
               {t("authForm.kicker")}
@@ -384,6 +462,8 @@ export function AuthForm() {
               </div>
             )}
           </section>
+            </>
+          )}
         </div>
       </section>
     </main>

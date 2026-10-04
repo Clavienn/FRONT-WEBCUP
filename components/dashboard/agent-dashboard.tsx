@@ -29,6 +29,7 @@ import { Badge } from "@/components/ui/badge"
 import { Spinner } from "@/components/ui/spinner"
 import { CitizenDashboard } from "@/components/dashboard/citizen-dashboard"
 import { AdminDashboard } from "@/components/dashboard/admin-dashboard"
+import { PartnerDashboard } from "@/components/dashboard/partner-dashboard"
 import { MostUsedServices } from "@/components/services/most-used-services"
 
 const metrics: { key: string; status: RequestStatus; icon: typeof Clock3; tone: string }[] = [
@@ -71,6 +72,11 @@ export function AgentDashboard() {
         <Spinner />
       </main>
     )
+  }
+
+  // Un partenaire n'est ni citoyen ni personnel : son accueil propre, avant tout le reste
+  if (user.roles.includes("partner")) {
+    return <PartnerDashboard user={user} />
   }
 
   if (!isStaff(user)) {

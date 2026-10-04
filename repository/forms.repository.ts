@@ -1,7 +1,15 @@
 import { authorizedRequest } from "@/repository/auth.repository"
 
 // Formulaires protégés contre l'envoi automatique (api/README.md, « Protection anti-robots »)
-export type GuardedForm = "register" | "login" | "contact" | "request" | "appointment" | "review" | "comment"
+export type GuardedForm =
+  | "register"
+  | "login"
+  | "contact"
+  | "request"
+  | "appointment"
+  | "review"
+  | "comment"
+  | "partner_request"
 
 export interface FormTokenResponse {
   token: string
