@@ -20,8 +20,8 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import {
+  ANNOUNCEMENT_STATUSES,
   announcementRepository,
-  statusLabels,
   type Announcement,
   type AnnouncementPriority,
   type AnnouncementStatus,
@@ -67,7 +67,7 @@ function AnnouncementForm({
         : await announcementRepository.create(data)
       onSaved(saved, !isEditing)
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Une erreur est survenue")
+      setError(cause instanceof Error ? cause.message : t("announcementHub.errorGeneric"))
       setIsSaving(false)
     }
   }
@@ -75,27 +75,27 @@ function AnnouncementForm({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>{isEditing ? "Modifier l’annonce" : "Nouvelle annonce"}</DialogTitle>
-        <DialogDescription>
-          Annonce municipale, information pratique ou changement de service. Seules les annonces publiées sont visibles des habitants.
-        </DialogDescription>
+        <DialogTitle>
+          {isEditing ? t("announcementHub.form.editTitle") : t("announcementHub.form.createTitle")}
+        </DialogTitle>
+        <DialogDescription>{t("announcementHub.form.description")}</DialogDescription>
       </DialogHeader>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="announcement-title">Titre</Label>
+          <Label htmlFor="announcement-title">{t("announcementHub.form.titleLabel")}</Label>
           <Input
             id="announcement-title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             required
             maxLength={255}
-            placeholder="Ex. Coupure d’eau dans le secteur B"
+            placeholder={t("announcementHub.form.titlePlaceholder")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="announcement-content">Contenu</Label>
+          <Label htmlFor="announcement-content">{t("announcementHub.form.contentLabel")}</Label>
           <Textarea
             id="announcement-content"
             rows={7}
@@ -107,16 +107,16 @@ function AnnouncementForm({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="announcement-status">Statut</Label>
+          <Label htmlFor="announcement-status">{t("announcementHub.form.statusLabel")}</Label>
           <NativeSelect
             id="announcement-status"
             className="w-full"
             value={status}
             onChange={(event) => setStatus(event.target.value as AnnouncementStatus)}
           >
-            {(Object.keys(statusLabels) as AnnouncementStatus[]).map((value) => (
+            {ANNOUNCEMENT_STATUSES.map((value) => (
               <NativeSelectOption key={value} value={value}>
-                {statusLabels[value]}
+                {t(`announcementHub.status.${value}`)}
               </NativeSelectOption>
             ))}
           </NativeSelect>
@@ -148,11 +148,11 @@ function AnnouncementForm({
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
-            Annuler
+            {t("announcementHub.cancel")}
           </Button>
           <Button type="submit" disabled={isSaving}>
             {isSaving && <Spinner />}
-            {isEditing ? "Enregistrer" : "Créer l’annonce"}
+            {isEditing ? t("announcementHub.form.submitEdit") : t("announcementHub.form.submitCreate")}
           </Button>
         </DialogFooter>
       </form>

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, CircleAlert, Pencil, Trash2 } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { useLanguage } from "@/components/i18n/language-provider"
 import {
   canEditAnnouncement,
   formatPublicationDate,
@@ -29,18 +30,22 @@ import { toast } from "@/components/ui/toast"
 import { AuthApiError } from "@/repository/auth.repository"
 import { announcementRepository, type Announcement } from "@/repository/announcement.repository"
 
-const BACK_LINK = (
-  <Link
-    href="/dashboard/announcements"
-    className="inline-flex items-center gap-2 text-sm font-medium text-secondary-foreground transition-colors hover:text-primary"
-  >
-    <ArrowLeft className="size-4" aria-hidden="true" />
-    Toutes les annonces
-  </Link>
-)
+function BackLink() {
+  const { t } = useLanguage()
+  return (
+    <Link
+      href="/dashboard/announcements"
+      className="inline-flex items-center gap-2 text-sm font-medium text-secondary-foreground transition-colors hover:text-primary"
+    >
+      <ArrowLeft className="size-4" aria-hidden="true" />
+      {t("announcementHub.backLink")}
+    </Link>
+  )
+}
 
 export function AnnouncementDetail() {
   const router = useRouter()
+  const { t, locale } = useLanguage()
   const { user } = useAuth()
   const params = useSearchParams()
   const id = Number(params.get("id"))
@@ -70,10 +75,10 @@ export function AnnouncementDetail() {
         if (!mounted) return
         setError(
           cause instanceof AuthApiError && cause.status === 404
-            ? "Cette annonce est introuvable ou n’est plus disponible."
+            ? t("announcementHub.notFound")
             : cause instanceof Error
               ? cause.message
-              : "Chargement impossible"
+              : t("announcementHub.loadFailed")
         )
         setLoadedId(id)
       })
@@ -81,26 +86,30 @@ export function AnnouncementDetail() {
     return () => {
       mounted = false
     }
-  }, [id, isValidId])
+  }, [id, isValidId, t])
 
   const handleDelete = async () => {
     setIsDeleting(false)
     try {
       await announcementRepository.remove(id)
-      toast.add({ title: "Annonce supprimée", type: "success" })
+      toast.add({ title: t("announcementHub.deleted"), type: "success" })
       router.replace("/dashboard/announcements")
     } catch (cause) {
-      toast.add({ title: "Erreur", description: cause instanceof Error ? cause.message : "Suppression impossible", type: "error" })
+      toast.add({
+        title: t("announcementHub.errorTitle"),
+        description: cause instanceof Error ? cause.message : t("announcementHub.removeFailed"),
+        type: "error",
+      })
     }
   }
 
   if (!isValidId || (loadedId === id && error)) {
     return (
       <div className="space-y-6">
-        {BACK_LINK}
+        <BackLink />
         <p role="alert" className="flex items-start gap-2 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
           <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          {isValidId ? error : "Identifiant d’annonce invalide."}
+          {isValidId ? error : t("announcementHub.invalidId")}
         </p>
       </div>
     )
@@ -109,7 +118,7 @@ export function AnnouncementDetail() {
   if (!announcement || loadedId !== id) {
     return (
       <div className="space-y-6">
-        {BACK_LINK}
+        <BackLink />
         <Skeleton className="h-64 rounded-2xl" />
       </div>
     )
@@ -121,12 +130,16 @@ export function AnnouncementDetail() {
 
   return (
     <div className="space-y-6">
-      {BACK_LINK}
+      <BackLink />
 
       <article className="rounded-2xl border border-border/80 bg-card/75 p-6 shadow-sm backdrop-blur-sm sm:p-8">
         <header className="space-y-3 border-b border-border/70 pb-5">
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <span>Publiée le {formatPublicationDate(announcement.publishedAt, announcement.createdAt)}</span>
+            <span>
+              {t("announcementHub.publishedOn", {
+                date: formatPublicationDate(announcement.publishedAt, announcement.createdAt, locale),
+              })}
+            </span>
             {author && <span>· {author}</span>}
             <AnnouncementPriorityBadge priority={announcement.priority} />
             {announcement.status !== "published" && <StatusBadge status={announcement.status} />}
@@ -136,11 +149,11 @@ export function AnnouncementDetail() {
             <div className="flex flex-wrap gap-2 pt-1">
               <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                 <Pencil />
-                Modifier
+                {t("announcementHub.edit")}
               </Button>
               <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={() => setIsDeleting(true)}>
                 <Trash2 />
-                Supprimer
+                {t("announcementHub.remove")}
               </Button>
             </div>
           )}
@@ -155,22 +168,20 @@ export function AnnouncementDetail() {
         onSaved={(saved) => {
           setAnnouncement(saved)
           setIsEditing(false)
-          toast.add({ title: "Annonce modifiée", type: "success" })
+          toast.add({ title: t("announcementHub.updated"), type: "success" })
         }}
       />
 
       <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cette annonce ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est définitive. Pour la retirer de la vue publique en gardant l’historique, passez-la en « Archivée ».
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("announcementHub.removeTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("announcementHub.deleteDescription")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t("announcementHub.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={handleDelete}>
-              Supprimer
+              {t("announcementHub.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

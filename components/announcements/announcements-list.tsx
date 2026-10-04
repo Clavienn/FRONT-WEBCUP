@@ -1,10 +1,11 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowRight, CircleAlert, Pencil, Plus, Search, Trash2 } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { useLanguage } from "@/components/i18n/language-provider"
 import {
   canCreateAnnouncement,
   canEditAnnouncement,
@@ -29,16 +30,14 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "@/components/ui/toast"
 import {
+  ANNOUNCEMENT_STATUSES,
   announcementRepository,
-  statusLabels,
   type Announcement,
   type AnnouncementPage,
   type AnnouncementQuery,
 } from "@/repository/announcement.repository"
 
 const PAGE_SIZE = 9
-
-const errorMessage = (cause: unknown) => (cause instanceof Error ? cause.message : "Une erreur est survenue")
 
 type StatusFilter = NonNullable<AnnouncementQuery["status"]>
 
@@ -49,11 +48,19 @@ interface Result {
 }
 
 export function AnnouncementsList() {
+  const { t, locale } = useLanguage()
   const { user } = useAuth()
   const canCreate = !!user && canCreateAnnouncement(user)
   const canEdit = !!user && canEditAnnouncement(user)
   // Les gestionnaires voient aussi brouillons et archives ; les citoyens uniquement les annonces publiées
   const isManager = canCreate
+
+  // Le message d'erreur dépend de la languecourante : useCallback le stabilise pour que le
+  // chargement ci-dessous ne se relance pas à chaque changement de langue suivi d'un rendu.
+  const errorMessage = useCallback(
+    (cause: unknown) => (cause instanceof Error ? cause.message : t("announcementHub.errorGeneric")),
+    [t]
+  )
 
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
@@ -86,7 +93,7 @@ export function AnnouncementsList() {
     return () => {
       mounted = false
     }
-  }, [key, debouncedSearch, status, page])
+  }, [key, debouncedSearch, status, page, errorMessage])
 
   const reload = () => setReloadKey((current) => current + 1)
 
@@ -96,10 +103,10 @@ export function AnnouncementsList() {
     setDeleting(null)
     try {
       await announcementRepository.remove(target.id)
-      toast.add({ title: "Annonce supprimée", type: "success" })
+      toast.add({ title: t("announcementHub.deleted"), type: "success" })
       reload()
     } catch (cause) {
-      toast.add({ title: "Erreur", description: errorMessage(cause), type: "error" })
+      toast.add({ title: t("announcementHub.errorTitle"), description: errorMessage(cause), type: "error" })
     }
   }
 
@@ -111,16 +118,16 @@ export function AnnouncementsList() {
     <>
       <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm font-medium text-primary">Haut Conseil de Terra Nova</p>
-          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">Annonces</h1>
+          <p className="text-sm font-medium text-primary">{t("announcementHub.eyebrow")}</p>
+          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("announcementHub.title")}</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Annonces municipales, informations pratiques et changements de service publiés par la ville.
+            {t("announcementHub.subtitle")}
           </p>
         </div>
         {canCreate && (
           <Button onClick={() => setEditing(null)} className="w-fit rounded-xl">
             <Plus aria-hidden="true" />
-            Nouvelle annonce
+            {t("announcementHub.newButton")}
           </Button>
         )}
       </section>
@@ -130,8 +137,8 @@ export function AnnouncementsList() {
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
           <Input
             type="search"
-            aria-label="Rechercher une annonce"
-            placeholder="Rechercher une annonce"
+            aria-label={t("announcementHub.searchAriaLabel")}
+            placeholder={t("announcementHub.searchPlaceholder")}
             className="pl-9"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -139,17 +146,17 @@ export function AnnouncementsList() {
         </div>
         {isManager && (
           <NativeSelect
-            aria-label="Filtrer par statut"
+            aria-label={t("announcementHub.filterAriaLabel")}
             value={status}
             onChange={(event) => {
               setStatus(event.target.value as StatusFilter)
               setPage(1)
             }}
           >
-            <NativeSelectOption value="all">Tous les statuts</NativeSelectOption>
-            {(Object.keys(statusLabels) as (keyof typeof statusLabels)[]).map((value) => (
+            <NativeSelectOption value="all">{t("announcementHub.filterAll")}</NativeSelectOption>
+            {ANNOUNCEMENT_STATUSES.map((value) => (
               <NativeSelectOption key={value} value={value}>
-                {statusLabels[value]}
+                {t(`announcementHub.status.${value}`)}
               </NativeSelectOption>
             ))}
           </NativeSelect>
@@ -162,7 +169,7 @@ export function AnnouncementsList() {
             <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
             {error}
           </span>
-          <Button variant="outline" size="sm" onClick={reload}>Réessayer</Button>
+          <Button variant="outline" size="sm" onClick={reload}>{t("announcementHub.retry")}</Button>
         </div>
       ) : isLoading || !data ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -172,7 +179,7 @@ export function AnnouncementsList() {
         </div>
       ) : data.announcements.length === 0 ? (
         <p className="rounded-2xl border border-border/80 bg-card/70 p-8 text-center text-sm text-muted-foreground">
-          {debouncedSearch ? "Aucune annonce ne correspond à votre recherche." : "Aucune annonce pour le moment."}
+          {debouncedSearch ? t("announcementHub.emptySearch") : t("announcementHub.empty")}
         </p>
       ) : (
         <>
@@ -182,7 +189,7 @@ export function AnnouncementsList() {
                 <article className="group relative flex h-full cursor-pointer flex-col rounded-xl border border-border/80 bg-card/75 p-5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-xs text-muted-foreground">
-                      {formatPublicationDate(announcement.publishedAt, announcement.createdAt)}
+                      {formatPublicationDate(announcement.publishedAt, announcement.createdAt, locale)}
                     </p>
                     <div className="flex items-center gap-2">
                       <AnnouncementPriorityBadge priority={announcement.priority} />
@@ -203,7 +210,7 @@ export function AnnouncementsList() {
                   </p>
                   <div className="mt-4 flex items-center justify-between gap-2">
                     <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
-                      Lire l’annonce
+                      {t("announcementHub.readMore")}
                       <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                     </span>
                     {canEdit && (
@@ -212,7 +219,7 @@ export function AnnouncementsList() {
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => setEditing(announcement)}
-                          aria-label={`Modifier ${announcement.title}`}
+                          aria-label={t("announcementHub.editAria", { title: announcement.title })}
                         >
                           <Pencil />
                         </Button>
@@ -220,7 +227,7 @@ export function AnnouncementsList() {
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => setDeleting(announcement)}
-                          aria-label={`Supprimer ${announcement.title}`}
+                          aria-label={t("announcementHub.deleteAria", { title: announcement.title })}
                           className="text-destructive hover:text-destructive"
                         >
                           <Trash2 />
@@ -234,15 +241,15 @@ export function AnnouncementsList() {
           </ul>
 
           {totalPages > 1 && (
-            <nav aria-label="Pagination" className="flex items-center justify-center gap-3">
+            <nav aria-label={t("announcementHub.paginationAriaLabel")} className="flex items-center justify-center gap-3">
               <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                Précédent
+                {t("announcementHub.previous")}
               </Button>
               <span className="text-sm text-muted-foreground">
-                Page {page} sur {totalPages}
+                {t("announcementHub.pageOf", { page, pages: totalPages })}
               </span>
               <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-                Suivant
+                {t("announcementHub.next")}
               </Button>
             </nav>
           )}
@@ -255,7 +262,7 @@ export function AnnouncementsList() {
         onClose={() => setEditing(undefined)}
         onSaved={(_saved, created) => {
           setEditing(undefined)
-          toast.add({ title: created ? "Annonce créée" : "Annonce modifiée", type: "success" })
+          toast.add({ title: created ? t("announcementHub.created") : t("announcementHub.updated"), type: "success" })
           reload()
         }}
       />
@@ -263,15 +270,13 @@ export function AnnouncementsList() {
       <AlertDialog open={deleting !== null} onOpenChange={(open) => !open && setDeleting(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer « {deleting?.title} » ?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Cette action est définitive. Pour la retirer de la vue publique en gardant l’historique, passez-la en « Archivée ».
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("announcementHub.deleteTitle", { title: deleting?.title ?? "" })}</AlertDialogTitle>
+            <AlertDialogDescription>{t("announcementHub.deleteDescription")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t("announcementHub.cancel")}</AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={confirmDelete}>
-              Supprimer
+              {t("announcementHub.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -63,8 +63,7 @@ export const announcementRepository = {
   remove: (id: number) => authorizedRequest<void>(`/announcements/${id}`, { method: "DELETE" }),
 }
 
-export const statusLabels: Record<AnnouncementStatus, string> = {
-  draft: "Brouillon",
-  published: "Publiée",
-  archived: "Archivée",
-}
+// Ordre d'affichage des statuts : l'ordre du cycle de vie, du plus tôt au plus tard. Les libellés
+// vivent dans le dictionnaire (announcementHub.status) et non ici : ce dépôt est partagé par
+// l'écran connecté et la page publique, qui n'affichent pas les mêmes libellés.
+export const ANNOUNCEMENT_STATUSES: AnnouncementStatus[] = ["draft", "published", "archived"]
