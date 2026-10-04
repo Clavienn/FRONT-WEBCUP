@@ -12,6 +12,7 @@ import { isStaff, roleLabel } from "@/repository/auth.repository"
 import { DeleteAccountSection } from "@/components/profile/delete-account-section"
 import { PasswordForm } from "@/components/profile/password-form"
 import { SecuritySection } from "@/components/profile/security-section"
+import { TwoFactorSection } from "@/components/profile/two-factor-section"
 import { ProfileForm } from "@/components/profile/profile-form"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -373,16 +374,20 @@ export default function ProfilPage() {
               <PasswordForm />
             </section>
 
-            <section className="flex flex-col gap-4 rounded-2xl border border-border/80 bg-card/80 p-6 backdrop-blur-sm shadow-sm sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-display text-base font-bold text-foreground">{t("profilePage.sessionsTitle")}</p>
-                <p className="text-sm text-muted-foreground">{t("profilePage.sessionsSubtitle")}</p>
-              </div>
-              <Button variant="outline" onClick={() => setConfirmAll(true)} disabled={signingOut !== null} className="shrink-0">
-                {signingOut === "all" ? <Spinner /> : <MonitorSmartphoneIcon />}
-                {t("profilePage.signOutEverywhere")}
-              </Button>
-            </section>
+          <section className="flex flex-col gap-3 rounded-2xl border border-border/80 bg-card/70 p-6 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="font-medium text-foreground">{t("profilePage.sessionsTitle")}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("profilePage.sessionsSubtitle")}
+              </p>
+            </div>
+            <Button variant="outline" onClick={() => setConfirmAll(true)} disabled={signingOut !== null}>
+              {signingOut === "all" ? <Spinner /> : <MonitorSmartphoneIcon />}
+              {t("profilePage.signOutEverywhere")}
+            </Button>
+          </section>
+
+          <TwoFactorSection />
 
             <SecuritySection />
 

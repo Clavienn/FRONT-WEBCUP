@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
-import { BadgeCheck, CircleAlert, ClipboardList, RefreshCw, Star } from "lucide-react"
+import { BadgeCheck, CircleAlert, ClipboardList, Download, Loader2, RefreshCw, Star } from "lucide-react"
 
+import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { NewRequestForm } from "@/components/requests/new-request-form"
 import { ReviewDialog } from "@/components/services/review-dialog"
@@ -13,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "@/components/ui/toast"
+import { buildMyRequestsExportPdf, MY_REQUESTS_EXPORT_LIMIT } from "@/lib/myRequestsExportPdf"
 import {
   citizenRequestRepository,
   requestStatusKey,
@@ -110,7 +112,8 @@ interface CitizenRequestsPanelProps {
 }
 
 export function CitizenRequestsPanel({ onChanged, requestsHref, hideHeader }: CitizenRequestsPanelProps = {}) {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
+  const { user } = useAuth()
   const statusLabel = useStatusLabel()
   const [state, setState] = useState<LoadState>("loading")
   const [requests, setRequests] = useState<CitizenRequest[]>([])
@@ -118,6 +121,7 @@ export function CitizenRequestsPanel({ onChanged, requestsHref, hideHeader }: Ci
   const [formOpen, setFormOpen] = useState(false)
   const [openId, setOpenId] = useState<number | null>(null)
   const [error, setError] = useState("")
+  const [exporting, setExporting] = useState(false)
   // Services déjà notés par le citoyen : un seul avis par service, le bouton disparaît ensuite
   const [reviewedServiceIds, setReviewedServiceIds] = useState<Set<number>>(new Set())
   const [reviewing, setReviewing] = useState<{ id: number; name: string } | null>(null)
@@ -173,6 +177,31 @@ const load = useCallback(() => {
     refresh()
   }
 
+  // Le récapitulatif porte sur l'ensemble des demandes du citoyen, pas sur la période filtrée
+  // à l'écran : un filtre de date restreint l'affichage, pas ce que la personne a réellement déposé.
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const page = await citizenRequestRepository.listMine({ limit: MY_REQUESTS_EXPORT_LIMIT })
+      await buildMyRequestsExportPdf({
+        locale,
+        t,
+        author: user ? [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email : "",
+        requests: page.requests,
+        total: page.total,
+      })
+      toast.add({ title: t("citizenRequests.export.successTitle"), type: "success" })
+    } catch {
+      toast.add({
+        title: t("citizenRequests.export.errorTitle"),
+        description: t("citizenRequests.export.errorDescription"),
+        type: "error",
+      })
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <section
       id="recent-requests-title"
@@ -193,13 +222,25 @@ const load = useCallback(() => {
             {t("citizenRequests.newLabel")}
           </Button>
         ) : (
-          <Button
-            variant={formOpen ? "outline" : "default"}
-            onClick={() => setFormOpen((open) => !open)}
-            aria-expanded={formOpen}
-          >
-            {formOpen ? t("citizenRequests.cancelLabel") : t("citizenRequests.newLabel")}
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            {state === "ready" && total > 0 && (
+              <Button variant="outline" className="gap-2" onClick={handleExport} disabled={exporting}>
+                {exporting ? (
+                  <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Download className="size-4" aria-hidden="true" />
+                )}
+                {exporting ? t("citizenRequests.export.running") : t("citizenRequests.export.button")}
+              </Button>
+            )}
+            <Button
+              variant={formOpen ? "outline" : "default"}
+              onClick={() => setFormOpen((open) => !open)}
+              aria-expanded={formOpen}
+            >
+              {formOpen ? t("citizenRequests.cancelLabel") : t("citizenRequests.newLabel")}
+            </Button>
+          </div>
         )}
       </div>
 
