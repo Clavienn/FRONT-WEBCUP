@@ -14,6 +14,11 @@ export const actionKeys: Record<string, string> = {
   "login.failed": "auditLog.actions.loginFailed",
   "login.blocked": "auditLog.actions.loginBlocked",
   "bot.blocked": "auditLog.actions.botBlocked",
+  "bot.attack_probe": "auditLog.actions.botAttackProbe",
+  "bot.role_escalation": "auditLog.actions.botRoleEscalation",
+  "security.bulk_access": "auditLog.actions.securityBulkAccess",
+  "agent.validate": "auditLog.actions.agentValidate",
+  "session.revoke": "auditLog.actions.sessionRevoke",
   "bot.missing_token": "auditLog.actions.botMissingToken",
   "bot.bad_token": "auditLog.actions.botBadToken",
   "bot.too_fast": "auditLog.actions.botTooFast",
@@ -124,7 +129,7 @@ export const formatDate = (value: string, locale: Locale) =>
   new Date(value).toLocaleString(DATE_LOCALES[locale], { dateStyle: "short", timeStyle: "medium" });
 
 export const isFailure = (action: string) =>
-  action === "login.failed" || action === "login.blocked" || action.startsWith("bot.") || action === "rate.limited"
+  action === "login.failed" || action === "login.blocked" || action.startsWith("bot.") || action === "rate.limited" || action === "security.bulk_access"
 
 // Regroupements du filtre : le préfixe du code décide du thème, l'ordre suit le suivi quotidien
 export const ACTION_GROUPS: { prefixes: string[]; labelKey: string }[] = [
