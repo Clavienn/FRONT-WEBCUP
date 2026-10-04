@@ -1,10 +1,10 @@
 import { getAppLocale } from "@/lib/i18n/types"
 import { resilientFetch } from "@/lib/network"
 
-export type UserRole = "citizen" | "agent" | "admin"
+export type UserRole = "citizen" | "agent" | "admin" | "partner"
 
-// Rôles que l'utilisateur peut choisir à l'inscription (admin est attribué côté serveur)
-export type SignupRole = Exclude<UserRole, "admin">
+// Rôles que l'utilisateur peut choisir à l'inscription (admin et partner sont attribués côté serveur)
+export type SignupRole = Exclude<UserRole, "admin" | "partner">
 
 export interface AuthUser {
   id: number
@@ -21,6 +21,9 @@ export interface AuthUser {
 
 // Agents et admins accèdent à la console ; les citoyens à l'espace citoyen
 export const isStaff = (user: AuthUser) => user.roles.some((role) => role === "agent" || role === "admin")
+
+// Un partenaire n'a ni les permissions citoyennes ni les permissions agent : son propre espace
+export const isPartner = (user: AuthUser) => user.roles.includes("partner")
 
 export interface Credentials {
   email: string
@@ -74,6 +77,7 @@ function normalizeRole(value: unknown): UserRole | null {
   if (["citizen", "resident", "user"].includes(code)) return "citizen"
   if (["agent", "municipalagent", "staff"].includes(code)) return "agent"
   if (["admin", "administrator"].includes(code)) return "admin"
+  if (["partner", "partenaire"].includes(code)) return "partner"
   return null
 }
 
@@ -134,6 +138,7 @@ export function normalizeAuthUser(value: unknown): AuthUser {
 export function roleLabel(user: AuthUser) {
   if (user.roles.includes("admin")) return "admin"
   if (user.roles.includes("agent")) return "agent"
+  if (user.roles.includes("partner")) return "partner"
   return "citizen"
 }
 
