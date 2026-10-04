@@ -213,3 +213,20 @@
 .dark .ambient-cloud__puff {
   background: radial-gradient(ellipse at 48% 48%, rgba(228, 240, 255, 0.9), rgba(190, 212, 245, 0.68) 48%, rgba(150, 180, 230, 0.14) 78%, transparent 100%);
 }
+
+/*
+ * Glyphe Terra Nova servant de masque : la forme provient de l'image, la couleur de currentColor.
+ * C'est ce qui permet au même asset de fonctionner sur la landing, en thème clair et en thème
+ * sombre sans déclencher le optimiseur d'images ni dupliquer une version par thème.
+ */
+.brand-mark {
+  display: inline-block;
+  flex-shrink: 0;
+  background-color: currentColor;
+  -webkit-mask-image: url("/img/brand/terra-nova-mark-white.png");
+  mask-image: url("/img/brand/terra-nova-mark-white.png");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}

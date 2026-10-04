@@ -2,8 +2,10 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, CircleAlert, CircleCheck, ShieldCheck } from "lucide-react"
+import { ArrowRight, CircleAlert, CircleCheck } from "lucide-react"
 
+import { BrandMark } from "@/components/brand/brand-mark"
+import { BRAND_NAME } from "@/config/brand"
 import { useAuth } from "@/components/auth/auth-provider"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Breadcrumb } from "@/components/navigation/breadcrumb"
@@ -106,11 +108,11 @@ export function AuthForm() {
 
         <div className="rounded-2xl border border-border/80 bg-card/85 p-6 shadow-[0_16px_48px_rgba(30,55,90,0.08)] backdrop-blur-xl sm:p-8">
           <div className="mb-8 flex items-center gap-3">
-            <span className="grid size-10 place-items-center rounded-xl bg-accent text-primary">
-              <ShieldCheck className="size-5" aria-hidden="true" />
-            </span>
+            <BrandMark className="w-9 text-foreground" />
             <div>
-              <p className="text-sm font-semibold tracking-[0.08em] text-foreground">TERRA NOVA</p>
+              <p className="text-sm font-semibold tracking-[0.08em] text-foreground uppercase">
+                {BRAND_NAME}
+              </p>
               <p className="text-xs text-muted-foreground">{t("authForm.brandTagline")}</p>
             </div>
           </div>
