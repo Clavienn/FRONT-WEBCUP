@@ -15,6 +15,8 @@ import {
   ShieldAlert,
   Siren,
   BellRing,
+  Bus,
+  TramFront,
   ClipboardList,
   Home,
   LogOut,
@@ -76,6 +78,7 @@ import { signalementRepository, type SignalementEvent } from "@/repository/signa
 import { useStaffChannel } from "@/components/signalements/use-staff-channel"
 import { toast } from "@/components/ui/toast"
 import { AlertBanner } from "@/components/alerts/alert-banner"
+import { LoginSecurityNotice } from "@/components/auth/login-security-notice"
 
 type DashboardView = "citizen" | "staff"
 
@@ -112,6 +115,7 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.servicesMunicipaux", icon: Landmark, permission: "citizen.services.view", href: "/dashboard/services" },
       { label: "sidebar.items.lieuxUtiles", icon: MapPin, permission: "citizen.establishments.view", href: "/dashboard/lieux-utiles" },
       { label: "sidebar.items.projets", icon: FolderKanban, permission: "citizen.projects.view", href: "/dashboard/projects" },
+      { label: "sidebar.items.transports", icon: Bus, href: "/dashboard/transports" },
       { label: "sidebar.items.annonces", icon: Megaphone, permission: "citizen.announcements.view", href: "/dashboard/announcements" },
     ],
   },
@@ -123,29 +127,42 @@ const menu: MenuGroup[] = [
       { label: "sidebar.items.mesRendezVous", icon: CalendarClock, permission: "citizen.appointments.view", view: "citizen", href: "/dashboard/appointments" },
     ],
   },
+  // Agents et administrateurs : trois sections après « Navigation », du plus urgent au plus rare
   {
-    label: "sidebar.groups.agentConsole",
+    // 1. Ce qui demande une réaction rapide : urgences, alertes, demandes, rendez-vous
+    label: "sidebar.groups.operations",
     items: [
-      { label: "sidebar.items.alertesPopulation", icon: BellRing, permission: "agent.alerts.manage", view: "staff", href: "/dashboard/agent/alerts", emphasis: true },
       { label: "sidebar.items.signalementsStaff", icon: Siren, permission: "agent.signalements.view", view: "staff", href: "/dashboard/agent/signalements", signalementsBadge: true, emphasis: true },
+      { label: "sidebar.items.alertesPopulation", icon: BellRing, permission: "agent.alerts.manage", view: "staff", href: "/dashboard/agent/alerts", emphasis: true },
+      { label: "sidebar.items.interruptionsTransport", icon: TramFront, permission: "agent.transport.manage", view: "staff", href: "/dashboard/agent/transport" },
       { label: "sidebar.items.demandesCitoyennes", icon: ClipboardList, permission: "agent.requests.view", view: "staff", href: "/dashboard/agent/requests" },
-      { label: "sidebar.items.comptesCitoyens", icon: Users, permission: "agent.citizens.manage", view: "staff", href: "/dashboard/agent/citizens" },
       { label: "sidebar.items.rendezVousCitoyens", icon: CalendarClock, permission: "agent.appointments.view", view: "staff", href: "/dashboard/appointments" },
       { label: "sidebar.items.historiqueOperations", icon: ScrollText, permission: "agent.activity.view", view: "staff", agentOnly: true, href: "/dashboard/agent/activite" },
       { label: "sidebar.items.gererEtablissements", icon: MapPin, permission: "agent.establishments.manage", view: "staff", href: "/dashboard/agent/etablissements" },
     ],
   },
   {
-    label: "sidebar.groups.administration",
+    // 2. Ce qu'on publie et ceux qu'on accompagne : contenus, services, comptes et messages des habitants
+    label: "sidebar.groups.management",
     items: [
+      { label: "sidebar.items.comptesCitoyens", icon: Users, permission: "agent.citizens.manage", view: "staff", href: "/dashboard/agent/citizens" },
+      { label: "sidebar.items.messagesHabitants", icon: MessageSquare, adminOnly: true, newMessagesBadge: true, href: "/dashboard/admin/messages" },
+      { label: "sidebar.items.gererEtablissements", icon: MapPin, permission: "agent.establishments.manage", view: "staff", href: "/dashboard/agent/etablissements" },
       { label: "sidebar.items.gererServices", icon: Building2, permission: "admin.services.manage", href: "/dashboard/admin/services" },
       { label: "sidebar.items.gererProjets", icon: FolderKanban, permission: "admin.projects.manage", href: "/dashboard/admin/projects" },
       { label: "sidebar.items.ideesHabitants", icon: Lightbulb, permission: "admin.ideas.manage", href: "/dashboard/admin/ideas" },
-      { label: "sidebar.items.messagesHabitants", icon: MessageSquare, adminOnly: true, newMessagesBadge: true, href: "/dashboard/admin/messages" },
+    ],
+  },
+  {
+    // 3. Accès, droits et traçabilité : réservé à l'administration (l'agent n'y voit que son propre journal)
+    label: "sidebar.groups.administration",
+    items: [
       { label: "sidebar.items.utilisateurs", icon: Users, permission: "admin.users.manage", href: "/dashboard/admin/users" },
       { label: "sidebar.items.roles", icon: ShieldCheck, permission: "admin.users.manage", href: "/dashboard/admin/roles" },
       { label: "sidebar.items.permissions", icon: KeyRound, permission: "admin.users.manage", href: "/dashboard/admin/permissions" },
+      { label: "sidebar.items.securite", icon: ShieldAlert, permission: "admin.users.manage", href: "/dashboard/admin/security" },
       { label: "sidebar.items.journalAudit", icon: ScrollText, permission: "admin.users.manage", href: "/dashboard/admin/audit" },
+      { label: "sidebar.items.historiqueOperations", icon: ScrollText, permission: "agent.activity.view", view: "staff", agentOnly: true, href: "/dashboard/agent/activite" },
     ],
   },
 ]
@@ -262,15 +279,12 @@ function AppSidebar({ user }: { user: AuthUser }) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="group-data-[collapsible=icon]:hidden">
-          <GlobalSearchBar user={user} />
-        </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="gap-1">
         {visibleMenu(user, view).map((group) => (
-          <SidebarGroup key={group.label}>
-            <SidebarGroupLabel>{t(group.label)}</SidebarGroupLabel>
+          <SidebarGroup key={group.label} className="px-2 py-2.5">
+            <SidebarGroupLabel className="mb-1 h-8">{t(group.label)}</SidebarGroupLabel>
             <SidebarMenu>
               {group.items.map(({ label, icon: Icon, href, newMessagesBadge, signalementsBadge, emphasis }) => (
                 <SidebarMenuItem key={label}>
@@ -279,6 +293,7 @@ function AppSidebar({ user }: { user: AuthUser }) {
                       render={<Link href={href} />}
                       isActive={!href.includes("#") && pathname === href}
                       tooltip={t(label)}
+                      className="h-9"
                     >
                       <Icon aria-hidden="true" className={emphasis ? "text-red-600" : undefined} />
                       <span>{t(label)}</span>
@@ -378,6 +393,8 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
       <SidebarInset className="app-atmosphere min-h-screen bg-transparent text-foreground">
         {/* Alertes à la population : visibles sur toutes les pages, collées en haut pendant le défilement */}
         <AlertBanner variant="inline" />
+        {/* Tentatives de connexion échouées sur ce compte ces dernières 24 h : prévenu à l'ouverture de session */}
+        <LoginSecurityNotice />
         <div className="px-4 pb-12 pt-4 sm:px-6 lg:px-8">
           <div className="mb-4 flex items-center justify-between">
             <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />

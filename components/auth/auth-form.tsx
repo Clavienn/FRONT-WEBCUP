@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowRight, CircleAlert, CircleCheck } from "lucide-react"
+import { ShieldAlert, ArrowRight, CircleAlert, CircleCheck } from "lucide-react"
 
 import { BrandMark } from "@/components/brand/brand-mark"
 import { BRAND_NAME } from "@/config/brand"
@@ -20,7 +20,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { isPasswordStrong, PasswordRequirements } from "@/components/auth/password-requirements"
-import { isTwoFactorChallenge, type SignupRole } from "@/repository/auth.repository"
+import { AuthApiError, isTwoFactorChallenge, type SignupRole } from "@/repository/auth.repository"
+import { formatCountdown, useLoginThrottle } from "@/components/auth/use-login-throttle"
 import { SESSION_EXPIRED_KEY } from "@/components/auth/idle-logout"
 import { ACCOUNT_DELETED_KEY } from "@/components/profile/delete-account-section"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
@@ -64,6 +65,9 @@ export function AuthForm() {
   const isRegistering = mode === "register"
   // Un jeton par formulaire : renouvelé quand on passe de la connexion à l'inscription
   const guard = useFormGuard(isRegistering ? "register" : "login")
+  // Friction progressive après plusieurs mots de passe faux, et blocage annoncé par le serveur (voir use-login-throttle)
+  const throttle = useLoginThrottle()
+  const locked = !isRegistering && throttle.secondsLeft > 0
 
   // Le drapeau ne vaut que pour l'arrivée sur la page : le retirer évite de le revoir plus tard.
   useEffect(() => {
@@ -80,6 +84,7 @@ export function AuthForm() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (locked) return
     setError("")
     if (isRegistering && !isPasswordStrong(password)) {
       setError(t("authForm.passwordRequirementsError"))
@@ -97,12 +102,14 @@ export function AuthForm() {
           ? signUp({ email, password, firstName: firstName.trim(), lastName: lastName.trim(), role }, headers)
           : signIn({ email, password }, headers)
       )
-      if (!isRegistering && isTwoFactorChallenge(result)) {
-        setTwoFactorChallenge({ challengeToken: result.challengeToken })
-        return
-      }
+      if (!isRegistering) throttle.recordSuccess()
       router.replace("/dashboard")
     } catch (cause) {
+      if (!isRegistering && cause instanceof AuthApiError) {
+        // 429 bot_blocked : adresse bloquée par le serveur ; 401 : mot de passe ou identifiant incorrect
+        if (cause.status === 429 && cause.code === "bot_blocked") throttle.recordServerBlock(cause.retryAfterMs)
+        else if (cause.status === 401) throttle.recordFailure()
+      }
       setError(cause instanceof Error ? cause.message : t("authForm.errorGeneric"))
     } finally {
       setIsSubmitting(false)
@@ -381,12 +388,27 @@ export function AuthForm() {
               </p>
             )}
 
+            {locked && (
+              <p
+                role="status"
+                className="flex items-start gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-2.5 text-sm"
+              >
+                <ShieldAlert className="mt-0.5 size-4 shrink-0 text-amber-600" aria-hidden="true" />
+                <span>
+                  {throttle.serverBlocked
+                    ? t("authForm.throttle.blocked", { time: formatCountdown(throttle.secondsLeft) })
+                    : t("authForm.throttle.wait", { time: formatCountdown(throttle.secondsLeft) })}
+                </span>
+              </p>
+            )}
+
             <Button
               type="submit"
               className="h-10 w-full rounded-xl"
               disabled={
                 isLoading ||
                 isSubmitting ||
+                locked ||
                 (isRegistering && (!isPasswordStrong(password) || !acceptedLegal || !acceptedPrivacy))
               }
             >
@@ -395,10 +417,12 @@ export function AuthForm() {
                 ? t("authForm.submitChecking")
                 : isSubmitting
                   ? t("authForm.submitWait")
-                  : isRegistering
-                    ? t("authForm.submitCreate")
-                    : t("authForm.submitLogin")}
-              {!isLoading && !isSubmitting && <ArrowRight className="size-4" aria-hidden="true" />}
+                  : locked
+                    ? t("authForm.throttle.retryIn", { time: formatCountdown(throttle.secondsLeft) })
+                    : isRegistering
+                      ? t("authForm.submitCreate")
+                      : t("authForm.submitLogin")}
+              {!isLoading && !isSubmitting && !locked && <ArrowRight className="size-4" aria-hidden="true" />}
             </Button>
           </form>
 

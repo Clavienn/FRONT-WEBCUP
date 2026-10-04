@@ -1,9 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { AnimatePresence, motion } from "framer-motion"
 import { ChevronDown } from "lucide-react"
 
+import { useAuth } from "@/components/auth/auth-provider"
 import { getPublicServices, type PublicMunicipalService } from "@/lib/services/municipalServices"
 import { ServiceIcon } from "@/components/services/service-icon"
 import { useLanguage } from "@/components/i18n/language-provider"
@@ -16,8 +18,12 @@ type Status = "loading" | "error" | "empty" | "success"
 const VISIBLE_COUNT = 3
 
 function ServiceCard({ service }: { service: PublicMunicipalService }) {
+  const { user, isLoading } = useAuth()
+  // Connecté : droit au détail du service. Visiteur : connexion d'abord. Pendant la vérification de la session,
+  // on pointe vers le détail : l'espace connecté renvoie lui-même un visiteur vers /connexion.
+  const href = user || isLoading ? `/dashboard/services/detail?id=${service.id}` : "/connexion"
   return (
-    <a href="/connexion" className="tn-card group block h-full">
+    <Link href={href} className="tn-card group block h-full">
       <span className="tn-icon-badge">
         <ServiceIcon name={service.icon} className="size-5" />
       </span>
@@ -25,7 +31,7 @@ function ServiceCard({ service }: { service: PublicMunicipalService }) {
       {service.description && (
         <p className="mt-3 text-sm leading-relaxed text-[var(--tn-text-muted)]">{service.description}</p>
       )}
-    </a>
+    </Link>
   )
 }
 

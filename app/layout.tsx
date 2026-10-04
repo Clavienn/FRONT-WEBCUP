@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/components/i18n/language-provider";
 import { LiteModeProvider } from "@/components/lite-mode/lite-mode-provider";
 import { IdleLogout } from "@/components/auth/idle-logout";
 import { NetworkStatus } from "@/components/network-status";
+import { SignalementOutbox } from "@/components/signalements/signalement-outbox";
 import { AnnouncementAlerts } from "@/components/realtime/announcement-alerts";
 import { SiteChrome } from "@/components/site-chrome";
 import { SupportBubble } from "@/components/support-bubble";
@@ -57,6 +58,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                     <AnnouncementAlerts />
                     <SupportBubble />
                     <NetworkStatus />
+                    <SignalementOutbox />
+                    <IdleLogout />
                   </AuthProvider>
                 </div>
               </SiteChrome>

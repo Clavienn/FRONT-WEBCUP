@@ -6,6 +6,7 @@ import {
   ChevronDown,
   CloudRain,
   Droplet,
+  Bus,
   Droplets,
   Flame,
   HeartPulse,
@@ -13,12 +14,16 @@ import {
   OctagonAlert,
   ShieldAlert,
   TriangleAlert,
+  WifiOff,
   Wind,
   X,
   Zap,
   type LucideIcon,
 } from "lucide-react"
 
+import Link from "next/link"
+
+import { LineChip } from "@/components/transport/transport-ui"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import type { AlertColor, AlertHazard, AlertZone, PublicAlert } from "@/repository/alert.repository"
@@ -62,6 +67,8 @@ const HAZARD_ICONS: Record<AlertHazard, LucideIcon> = {
   water_outage: Droplet,
   security: ShieldAlert,
   health: HeartPulse,
+  transport: Bus,
+  network: WifiOff,
   other: Info,
 }
 
@@ -177,6 +184,20 @@ export function AlertCard({ alert, zone, defaultOpen, onDismiss }: AlertCardProp
                           )}
                         </>
                       )}
+                    </div>
+                  )}
+
+                  {alert.transport && alert.transport.length > 0 && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      {alert.transport.map((item) => (
+                        <LineChip key={item.disruptionId} line={item.line} size="sm" />
+                      ))}
+                      <Link
+                        href="/transports?tab=journey"
+                        className="inline-flex items-center gap-1.5 rounded-lg border-2 border-current px-3 py-1.5 text-sm font-bold underline-offset-4 hover:underline"
+                      >
+                        {t("transport.findRoute")}
+                      </Link>
                     </div>
                   )}
 

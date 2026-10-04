@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react"
 import { CircleAlert, Phone, Send, Siren } from "lucide-react"
 
+import { useAuth } from "@/components/auth/auth-provider"
 import { useZone } from "@/components/alerts/use-zone"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { AlertCard } from "@/components/alerts/alert-card"
@@ -14,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
+import { enqueue, isRetryable, newClientRef } from "@/lib/signalement-outbox"
 import { ALERT_ZONES, type AlertZone } from "@/repository/alert.repository"
 import {
   signalementRepository,
@@ -25,8 +27,9 @@ import {
 // Formulaire de signalement d'urgence. VOLONTAIREMENT sans protection anti-robots (jeton, délai minimal) :
 // l'API n'en demande pas, une personne en détresse ne doit pas attendre. Pas de champ « priorité » non plus :
 // elle vient du type, et la personne peut seulement l'élever (« danger immédiat »).
-export function ReportForm({ onSent }: { onSent: (receipt: SignalementReceipt) => void }) {
+export function ReportForm({ onSent, onQueued }: { onSent: (receipt: SignalementReceipt) => void; onQueued: () => void }) {
   const { t, locale } = useLanguage()
+  const { user } = useAuth()
   const [types, setTypes] = useState<SignalementTypeInfo[] | null>(null)
   const [type, setType] = useState<SignalementType>("medical")
   const { zone: savedZone, setZone: saveZone } = useZone()
@@ -64,19 +67,31 @@ export function ReportForm({ onSent }: { onSent: (receipt: SignalementReceipt) =
     }
     setError("")
     setIsSending(true)
+    // Identifiant et heure du constat fixés dès l'envoi : si le réseau lâche, le renvoi automatique reste unique
+    const input = {
+      clientRef: newClientRef(),
+      reportedAt: new Date().toISOString(),
+      type,
+      location: location.trim(),
+      ...(zone ? { zone } : {}),
+      ...(lifeThreatening ? { lifeThreatening: true } : {}),
+      ...(title.trim() ? { title: title.trim() } : {}),
+      ...(description.trim() ? { description: description.trim() } : {}),
+      ...(phone.trim() ? { contactPhone: phone.trim() } : {}),
+    }
     try {
-      const receipt = await signalementRepository.create({
-        type,
-        location: location.trim(),
-        ...(zone ? { zone } : {}),
-        ...(lifeThreatening ? { lifeThreatening: true } : {}),
-        ...(title.trim() ? { title: title.trim() } : {}),
-        ...(description.trim() ? { description: description.trim() } : {}),
-        ...(phone.trim() ? { contactPhone: phone.trim() } : {}),
-      })
+      const receipt = await signalementRepository.create(input)
       if (zone && zone !== savedZone) saveZone(zone)
       onSent(receipt)
     } catch (cause) {
+      // Réseau coupé ou service indisponible : le signalement est gardé sur l'appareil et part tout seul au
+      // retour de la connexion (voir signalement-outbox). Une personne en détresse ne perd pas son alerte.
+      if (user && isRetryable(cause)) {
+        enqueue(user.id, input)
+        if (zone && zone !== savedZone) saveZone(zone)
+        onQueued()
+        return
+      }
       // Y compris 429 RATE_LIMITED : le message de l'API invite à appeler les secours
       setError(cause instanceof Error ? cause.message : t("signalements.form.sendError"))
       setIsSending(false)
@@ -224,6 +239,26 @@ export function ReportReceipt({ receipt, onClose }: { receipt: SignalementReceip
           ))}
         </section>
       )}
+      <Button onClick={onClose}>{t("signalements.receipt.close")}</Button>
+    </div>
+  )
+}
+
+// Envoi en attente : le signalement est sur l'appareil et partira automatiquement ; l'urgence vitale reste un appel
+export function ReportQueued({ onClose }: { onClose: () => void }) {
+  const { t } = useLanguage()
+  return (
+    <div className="grid gap-4" role="status">
+      <div className="flex items-start gap-3 rounded-xl border border-amber-500/50 bg-amber-500/10 p-4">
+        <Siren className="mt-0.5 size-5 shrink-0 text-amber-600" aria-hidden="true" />
+        <div>
+          <p className="font-semibold">{t("signalements.queued.title")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("signalements.queued.body")}</p>
+        </div>
+      </div>
+      <p className="rounded-xl border-2 border-red-600/60 bg-red-600/10 p-4 text-base font-semibold leading-6 text-red-900 dark:text-red-100">
+        {t("signalements.queued.emergency")}
+      </p>
       <Button onClick={onClose}>{t("signalements.receipt.close")}</Button>
     </div>
   )

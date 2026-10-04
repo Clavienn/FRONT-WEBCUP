@@ -14,6 +14,9 @@ export const actionKeys: Record<string, string> = {
   "login.failed": "auditLog.actions.loginFailed",
   "login.blocked": "auditLog.actions.loginBlocked",
   "bot.blocked": "auditLog.actions.botBlocked",
+  "transport.disruption.create": "auditLog.actions.transportDisruptionCreate",
+  "transport.disruption.update": "auditLog.actions.transportDisruptionUpdate",
+  "transport.disruption.end": "auditLog.actions.transportDisruptionEnd",
   "alert.publish": "auditLog.actions.alertPublish",
   "alert.update": "auditLog.actions.alertUpdate",
   "alert.end": "auditLog.actions.alertEnd",
@@ -170,3 +173,4 @@ export function groupActions(t: Translate): [string, string[]][] {
   }
   return [...groups.entries()].map(([labelKey, codes]) => [t(labelKey), codes]);
 }
+

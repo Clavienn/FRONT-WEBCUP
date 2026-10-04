@@ -79,6 +79,10 @@ export interface NewSignalementInput {
   lifeThreatening?: boolean
   // Quartier du signalement (mêmes codes que les alertes, sans « all »)
   zone?: AlertZone
+  // Envoi hors ligne : identifiant client (8 à 64 caractères) et heure du constat. Un renvoi avec le même clientRef
+  // ne crée jamais un second signalement (l'API répond « duplicate »).
+  clientRef?: string
+  reportedAt?: string
 }
 
 // Vue du personnel

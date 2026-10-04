@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { CircleAlert, Clock3, ShieldCheck, Siren } from "lucide-react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
-import { ReportForm, ReportReceipt } from "@/components/signalements/report-form"
+import { ReportForm, ReportQueued, ReportReceipt } from "@/components/signalements/report-form"
 import { PriorityBadge, StatusBadge } from "@/components/signalements/signalement-badges"
 import {
   AlertDialog,
@@ -74,6 +74,8 @@ export function MySignalements() {
   const [error, setError] = useState("")
   const [formOpen, setFormOpen] = useState(false)
   const [receipt, setReceipt] = useState<SignalementReceipt | null>(null)
+  // Envoi sans réseau : le signalement est sur l'appareil et partira au retour de la connexion
+  const [queued, setQueued] = useState(false)
   const [openId, setOpenId] = useState<number | null>(null)
   const [cancelling, setCancelling] = useState<Signalement | null>(null)
 
@@ -175,6 +177,7 @@ export function MySignalements() {
             size="lg"
             onClick={() => {
               setReceipt(null)
+              setQueued(false)
               setFormOpen(true)
             }}
             className="h-12 w-fit rounded-xl bg-red-600 px-5 text-base text-white hover:bg-red-700"
@@ -236,12 +239,15 @@ export function MySignalements() {
           </DialogHeader>
           {receipt ? (
             <ReportReceipt receipt={receipt} onClose={() => setFormOpen(false)} />
+          ) : queued ? (
+            <ReportQueued onClose={() => setFormOpen(false)} />
           ) : (
             <ReportForm
               onSent={(sent) => {
                 setReceipt(sent)
                 void load()
               }}
+              onQueued={() => setQueued(true)}
             />
           )}
         </DialogContent>
