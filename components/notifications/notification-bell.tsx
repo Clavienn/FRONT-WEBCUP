@@ -21,8 +21,9 @@ function formatTimestamp(value: string, locale: Locale) {
   }).format(new Date(value))
 }
 
-// Pas de WebSocket dans ce projet : un sondage espacé suffit à faire apparaître un
-// rappel sans recharger la page, sans justifier une connexion persistante.
+// Les notifications gardent un sondage espacé : seule la publication d'une annonce passe par
+// le canal temps réel (components/realtime/announcement-alerts.tsx), un rappel personnel
+// n'a pas besoin d'une connexion persistante.
 const POLL_MS = 45_000
 
 // Corps d'une notification, partagé par la variante lien et la variante bouton : seul l'élément
@@ -45,6 +46,9 @@ function renderContent(
         {formatTimestamp(notification.createdAt, locale)}
         {notification.requestId && (
           <span className="ml-1 font-medium text-primary">{t("notifications.viewRequest")}</span>
+        )}
+        {notification.announcementId && (
+          <span className="ml-1 font-medium text-primary">{t("notifications.viewAnnouncement")}</span>
         )}
       </p>
     </>
@@ -159,11 +163,15 @@ export function NotificationBell() {
             <ul className="space-y-1.5">
               {notifications.map((notification) => (
                 <li key={notification.id}>
-                  {/* Une notification de demande se consulte sur place : un lien, sinon le citoyen
-                      doit retrouver son dossier lui-même après avoir lu "refusée, motif : ..." */}
-                  {notification.requestId ? (
+                  {/* Une notification de demande ou d'annonce se consulte sur place : un lien, sinon
+                      le citoyen doit retrouver lui-même le dossier ou l'annonce qu'on lui annonce. */}
+                  {notification.requestId || notification.announcementId ? (
                     <Link
-                      href="/dashboard/my-requests"
+                      href={
+                        notification.announcementId
+                          ? `/dashboard/announcements/detail?id=${notification.announcementId}`
+                          : "/dashboard/my-requests"
+                      }
                       onClick={() => !notification.read && handleMarkRead(notification.id)}
                       className={`block rounded-lg p-2.5 transition-colors hover:bg-accent/60 ${notification.read ? "opacity-60" : "bg-accent/30"}`}
                     >

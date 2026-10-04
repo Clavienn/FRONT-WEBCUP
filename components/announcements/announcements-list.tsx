@@ -11,6 +11,7 @@ import {
   formatPublicationDate,
 } from "@/components/announcements/announcement-permissions"
 import { AnnouncementFormDialog } from "@/components/announcements/announcement-form-dialog"
+import { AnnouncementPriorityBadge } from "@/components/announcements/announcement-priority-badge"
 import { StatusBadge } from "@/components/announcements/status-badge"
 import {
   AlertDialog,
@@ -183,7 +184,10 @@ export function AnnouncementsList() {
                     <p className="text-xs text-muted-foreground">
                       {formatPublicationDate(announcement.publishedAt, announcement.createdAt)}
                     </p>
-                    {isManager && <StatusBadge status={announcement.status} />}
+                    <div className="flex items-center gap-2">
+                      <AnnouncementPriorityBadge priority={announcement.priority} />
+                      {isManager && <StatusBadge status={announcement.status} />}
+                    </div>
                   </div>
                   <h2 className="mt-3 text-base font-semibold leading-snug">
                     {/* Le lien couvre toute la carte (after:inset-0) ; les boutons admin restent au-dessus */}

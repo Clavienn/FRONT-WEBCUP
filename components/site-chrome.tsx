@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation"
 import type { ReactNode } from "react"
 
+import { AccessibilityToggle } from "@/components/accessibility-toggle"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 // La landing affiche déjà son propre switch de langue dans la navbar
@@ -20,7 +21,12 @@ export function SiteChrome({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {showAppChrome && !hasSidebarSettings && <ThemeToggle />}
+      {showAppChrome && !hasSidebarSettings && (
+        <>
+          <ThemeToggle />
+          <AccessibilityToggle />
+        </>
+      )}
       {children}
     </>
   )
