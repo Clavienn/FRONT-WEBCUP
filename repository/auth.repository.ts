@@ -138,7 +138,13 @@ export function roleLabel(user: AuthUser) {
 }
 
 export class AuthApiError extends Error {
-  constructor(message: string, readonly status: number) {
+  constructor(
+    message: string,
+    readonly status: number,
+    // Code métier de l'API (ex. form_too_fast, bot_blocked) et délai avant un nouvel essai, quand fournis
+    readonly code?: string,
+    readonly retryAfterMs?: number
+  ) {
     super(message)
     this.name = "AuthApiError"
   }
@@ -178,7 +184,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 
   const body = response.status === 204 ? undefined : await response.json().catch(() => null)
   if (!response.ok) {
-    throw new AuthApiError(body?.message || `Erreur ${response.status}`, response.status)
+    throw new AuthApiError(
+      body?.message || `Erreur ${response.status}`,
+      response.status,
+      typeof body?.code === "string" ? body.code : undefined,
+      typeof body?.retryAfterMs === "number" ? body.retryAfterMs : undefined
+    )
   }
 
   return body as T
@@ -199,10 +210,15 @@ export async function authorizedRequest<T>(path: string, init: RequestInit = {})
   }
 }
 
-async function authenticate(path: string, data: Credentials | RegistrationData): Promise<AuthUser> {
+async function authenticate(
+  path: string,
+  data: Credentials | RegistrationData,
+  headers?: Record<string, string>
+): Promise<AuthUser> {
   const session = await request<AuthResponse>(path, {
     method: "POST",
     body: JSON.stringify(data),
+    headers,
   })
   const user = normalizeAuthUser(session.user)
   accessToken = session.accessToken
@@ -210,9 +226,10 @@ async function authenticate(path: string, data: Credentials | RegistrationData):
 }
 
 export const authRepository = {
-  login: (credentials: Credentials) => authenticate("/auth/login", credentials),
+  // headers : protection anti-robots (voir components/forms/form-guard.tsx)
+  login: (credentials: Credentials, headers?: Record<string, string>) => authenticate("/auth/login", credentials, headers),
 
-  register: (data: RegistrationData) => authenticate("/auth/register", data),
+  register: (data: RegistrationData, headers?: Record<string, string>) => authenticate("/auth/register", data, headers),
 
   async refresh(): Promise<AuthUser> {
     if (!refreshRequest) {

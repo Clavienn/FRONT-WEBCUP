@@ -7,6 +7,7 @@ import { Bell, Building2, CheckCircle2, CircleAlert, CircleX, ClipboardList, Clo
 import type { AuthUser } from "@/repository/auth.repository"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { CitizenRequestsPanel } from "@/components/requests/citizen-requests-panel"
+import { IdeaBox } from "@/components/ideas/idea-box"
 import {
   citizenRequestRepository,
   type RequestStatus,
@@ -62,21 +63,8 @@ export function CitizenDashboard({ user }: { user: AuthUser }) {
 
   return (
     <>
-        <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <p className="text-sm font-medium text-primary">{t("citizenDashboard.eyebrow")}</p>
-            <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">
-              {t("citizenDashboard.greeting", { name: user.firstName ? `, ${user.firstName}` : "" })}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-              {t("citizenDashboard.subtitle")}
-            </p>
-          </div>
-          <Badge variant="outline" className="w-fit gap-1.5 rounded-full px-3 py-1 text-muted-foreground">
-            <Building2 className="size-3.5 text-primary" aria-hidden="true" />
-            {t("citizenDashboard.badge")}
-          </Badge>
-        </section>
+        {/* La participation de l'habitant passe avant tout le reste : c'est le premier levier de l'accueil */}
+        {user.permissions.includes("citizen.ideas.create") && <IdeaBox />}
 
         <section aria-labelledby="services-title" className="space-y-4">
           <div className="flex flex-wrap items-end justify-between gap-2">

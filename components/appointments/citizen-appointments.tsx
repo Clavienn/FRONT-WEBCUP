@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { CalendarClock, CircleAlert, Info, MapPin, RefreshCw } from "lucide-react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useFormGuard } from "@/components/forms/form-guard"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -99,6 +100,8 @@ function BookingDialog({ slot, onClose, onBooked }: BookingDialogProps) {
   const [subject, setSubject] = useState("")
   const [error, setError] = useState("")
   const [submitting, setSubmitting] = useState(false)
+  // Jeton demandé à l'ouverture du dialogue (les hooks restent avant le return anticipé ci-dessous)
+  const guard = useFormGuard("appointment", { enabled: slot !== null })
 
   useEffect(() => {
     setSubject("")
@@ -112,7 +115,7 @@ function BookingDialog({ slot, onClose, onBooked }: BookingDialogProps) {
     setSubmitting(true)
     setError("")
     try {
-      await appointmentRepository.book(slot.id, subject.trim() || null)
+      await guard.run((headers) => appointmentRepository.book(slot.id, subject.trim() || null, headers))
       toast.add({ title: t("appointments.booked"), description: t("appointments.bookedDescription"), type: "success" })
       onBooked()
     } catch (cause) {
@@ -125,6 +128,7 @@ function BookingDialog({ slot, onClose, onBooked }: BookingDialogProps) {
   return (
     <Dialog open={slot !== null} onOpenChange={(next) => !next && onClose()}>
       <DialogContent className="sm:max-w-lg">
+        {guard.trap}
         <DialogHeader>
           <DialogTitle>{t("appointments.confirmTitle")}</DialogTitle>
           <DialogDescription>{t("appointments.confirmDescription")}</DialogDescription>

@@ -203,6 +203,7 @@ const fr = {
       gererEtablissements: "Gérer les établissements",
       gererServices: "Gérer les services",
       gererProjets: "Gérer les projets",
+      ideesHabitants: "Idées des habitants",
       messagesHabitants: "Messages des habitants",
       utilisateurs: "Utilisateurs",
       roles: "Rôles",
@@ -234,6 +235,15 @@ const fr = {
       login: "Connexion",
       loginFailed: "Échec de connexion",
       loginBlocked: "Connexion refusée (compte désactivé)",
+      botBlocked: "Adresse bloquée (envois automatiques)",
+      botMissingToken: "Formulaire envoyé sans jeton",
+      botBadToken: "Jeton de formulaire falsifié",
+      botTooFast: "Formulaire envoyé trop vite",
+      botReusedToken: "Jeton de formulaire réutilisé",
+      botHoneypot: "Champ piège rempli (robot)",
+      botVelocity: "Envois en rafale",
+      botLoginFailures: "Trop d'échecs de connexion",
+      rateLimited: "Trop d'envois en peu de temps",
       logoutAll: "Déconnexion de tous les appareils",
       passwordChange: "Changement de mot de passe",
       profileUpdate: "Modification du profil",
@@ -368,10 +378,6 @@ const fr = {
   },
 
   citizenDashboard: {
-    eyebrow: "La première ville d'un nouveau monde",
-    greeting: "Bonjour{{name}}",
-    subtitle: "Retrouvez vos démarches et les informations utiles de Terra Nova.",
-    badge: "Espace citoyen",
     requestStates: { toProcess: "À traiter", inProgress: "En cours", accepted: "Acceptées", refused: "Refusées" },
     requestsTitle: "Mes démarches",
     requestsSubtitle: "Suivez l'avancement de vos demandes citoyennes.",
@@ -398,6 +404,54 @@ const fr = {
       "De nouveaux besoins peuvent être publiés chaque heure. Les services numériques évolueront avec les demandes des habitants.",
     consultRegularly: "Consultez régulièrement les informations de Terra Nova.",
     footerTagline: "Plateforme centrale de Terra Nova",
+  },
+
+  // Boîte à idées — l'habitant donne son avis sur l'amélioration de la ville
+  ideaBox: {
+    title: "Une idée pour améliorer Terra Nova ?",
+    subtitle:
+      "Dites-nous ce qui rendrait la ville plus agréable à vivre. Une phrase suffit : chaque idée est enregistrée et vous répondrez par un numéro de référence.",
+    label: "Votre idée pour améliorer la ville",
+    placeholder: "Ex. : des jardins partagés dans chaque quartier",
+    hint: "Une phrase suffit, vous recevrez une référence.",
+    counter: "{{count}} / {{max}} caractères",
+    submitLabel: "Envoyer mon idée",
+    sendingLabel: "Envoi en cours",
+    tooShort: "Votre idée doit contenir au moins {{min}} caractères",
+    submitError: "Votre idée n'a pas pu être envoyée",
+    historyTitle: "Mes idées",
+    loadError: "Impossible de charger vos idées.",
+  },
+
+  // Menu contextuel des mentions : "@" dans la boîte à idées
+  ideaMentions: {
+    types: {
+      request: "Demande",
+      service: "Service",
+      appointment: "Rendez-vous",
+      establishment: "Établissement",
+      project: "Projet",
+      announcement: "Annonce",
+    },
+    menuLabel: "Objets à mentionner",
+    resultsAll: "Objets de la ville",
+    results: "Objets contenant « {{query}} »",
+    empty: "Aucun objet ne correspond",
+  },
+
+  // File des idées — administration uniquement
+  ideasAdmin: {
+    eyebrow: "Administration",
+    title: "Idées des habitants",
+    subtitle:
+      "Toutes les idées déposées depuis l'accueil des citoyens, de la plus récente à la plus ancienne.",
+    refresh: "Actualiser",
+    empty: "Aucune idée n'a encore été déposée par les habitants.",
+    anonymous: "Habitant",
+    loadError: "Impossible de charger les idées.",
+    total: "{{count}} idée(s) — page {{page}} sur {{pages}}",
+    previous: "Précédent",
+    next: "Suivant",
   },
 
   // Demandes citoyennes — dépôt, suivi et evolution
@@ -1230,6 +1284,7 @@ const en = {
       gererEtablissements: "Manage facilities",
       gererServices: "Manage services",
       gererProjets: "Manage projects",
+      ideesHabitants: "Residents' ideas",
       messagesHabitants: "Resident messages",
       utilisateurs: "Users",
       roles: "Roles",
@@ -1261,6 +1316,15 @@ const en = {
       login: "Sign-in",
       loginFailed: "Failed sign-in",
       loginBlocked: "Sign-in refused (account disabled)",
+      botBlocked: "Address blocked (automated submissions)",
+      botMissingToken: "Form submitted without a token",
+      botBadToken: "Forged form token",
+      botTooFast: "Form submitted too fast",
+      botReusedToken: "Form token reused",
+      botHoneypot: "Hidden trap field filled (bot)",
+      botVelocity: "Burst of submissions",
+      botLoginFailures: "Too many failed sign-ins",
+      rateLimited: "Too many submissions in a short time",
       logoutAll: "Sign-out of all devices",
       passwordChange: "Password change",
       profileUpdate: "Profile update",
@@ -1395,10 +1459,6 @@ const en = {
   },
 
   citizenDashboard: {
-    eyebrow: "The first city of a new world",
-    greeting: "Hello{{name}}",
-    subtitle: "Find your requests and useful information about Terra Nova.",
-    badge: "Citizen space",
     requestStates: { toProcess: "To process", inProgress: "In progress", accepted: "Accepted", refused: "Refused" },
     requestsTitle: "My requests",
     requestsSubtitle: "Track the progress of your citizen requests.",
@@ -1423,6 +1483,53 @@ const en = {
     noticeBody: "New needs may be published every hour. Digital services will evolve with residents' requests.",
     consultRegularly: "Check Terra Nova's information regularly.",
     footerTagline: "Terra Nova's central platform",
+  },
+
+  // Boîte à idées — l'habitant donne son avis sur l'amélioration de la ville
+  ideaBox: {
+    title: "An idea to make Terra Nova better?",
+    subtitle:
+      "Tell us what would make the city nicer to live in. A single sentence is enough: every idea is recorded and you will receive a reference number.",
+    label: "Your idea to improve the city",
+    placeholder: "E.g.: shared gardens in every district",
+    hint: "A single sentence is enough, you will get a reference.",
+    counter: "{{count}} / {{max}} characters",
+    submitLabel: "Send my idea",
+    sendingLabel: "Sending",
+    tooShort: "Your idea must be at least {{min}} characters",
+    submitError: "Your idea could not be sent",
+    historyTitle: "My ideas",
+    loadError: "Your ideas could not be loaded.",
+  },
+
+  // Menu contextuel des mentions : "@" dans la boîte à idées
+  ideaMentions: {
+    types: {
+      request: "Request",
+      service: "Service",
+      appointment: "Appointment",
+      establishment: "Facility",
+      project: "Project",
+      announcement: "Announcement",
+    },
+    menuLabel: "Objects to mention",
+    resultsAll: "City objects",
+    results: "Objects containing “{{query}}”",
+    empty: "No matching object",
+  },
+
+  // File des idées — administration uniquement
+  ideasAdmin: {
+    eyebrow: "Administration",
+    title: "Residents' ideas",
+    subtitle: "Every idea submitted from the citizen home page, newest first.",
+    refresh: "Refresh",
+    empty: "No idea has been submitted by residents yet.",
+    anonymous: "Resident",
+    loadError: "The ideas could not be loaded.",
+    total: "{{count}} idea(s) — page {{page}} of {{pages}}",
+    previous: "Previous",
+    next: "Next",
   },
 
   citizenRequests: {

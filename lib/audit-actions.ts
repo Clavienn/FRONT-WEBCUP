@@ -13,6 +13,15 @@ export const actionKeys: Record<string, string> = {
   login: "auditLog.actions.login",
   "login.failed": "auditLog.actions.loginFailed",
   "login.blocked": "auditLog.actions.loginBlocked",
+  "bot.blocked": "auditLog.actions.botBlocked",
+  "bot.missing_token": "auditLog.actions.botMissingToken",
+  "bot.bad_token": "auditLog.actions.botBadToken",
+  "bot.too_fast": "auditLog.actions.botTooFast",
+  "bot.reused_token": "auditLog.actions.botReusedToken",
+  "bot.honeypot": "auditLog.actions.botHoneypot",
+  "bot.velocity": "auditLog.actions.botVelocity",
+  "bot.login_failures": "auditLog.actions.botLoginFailures",
+  "rate.limited": "auditLog.actions.rateLimited",
   "logout.all": "auditLog.actions.logoutAll",
   "password.change": "auditLog.actions.passwordChange",
   "profile.update": "auditLog.actions.profileUpdate",
@@ -93,6 +102,7 @@ export const entityKeys: Record<string, string> = {
   audit_logs: "auditLog.entities.auditLogs",
   "audit-logs": "auditLog.entities.auditLogsRoute",
   auth: "auditLog.entities.auth",
+  forms: "auditLog.entities.forms",
 };
 
 // Une action non déclarée affiche son code brut : lisible et traçable, donc preferable à une ligne vide
@@ -113,7 +123,8 @@ const DATE_LOCALES: Record<Locale, string> = { fr: "fr-FR", en: "en-GB" };
 export const formatDate = (value: string, locale: Locale) =>
   new Date(value).toLocaleString(DATE_LOCALES[locale], { dateStyle: "short", timeStyle: "medium" });
 
-export const isFailure = (action: string) => action === "login.failed" || action === "login.blocked";
+export const isFailure = (action: string) =>
+  action === "login.failed" || action === "login.blocked" || action.startsWith("bot.") || action === "rate.limited"
 
 // Regroupements du filtre : le préfixe du code décide du thème, l'ordre suit le suivi quotidien
 export const ACTION_GROUPS: { prefixes: string[]; labelKey: string }[] = [

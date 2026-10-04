@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react"
 import { CircleAlert, Send } from "lucide-react"
 
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useFormGuard } from "@/components/forms/form-guard"
 import { StarInput } from "@/components/services/star-rating"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,6 +35,7 @@ function ReviewForm({
   const [comment, setComment] = useState("")
   const [error, setError] = useState("")
   const [isSending, setIsSending] = useState(false)
+  const guard = useFormGuard("review")
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -44,7 +46,7 @@ function ReviewForm({
     setError("")
     setIsSending(true)
     try {
-      onSubmitted(await serviceRepository.createReview(service.id, { rating, comment: comment.trim() }))
+      onSubmitted(await guard.run((headers) => serviceRepository.createReview(service.id, { rating, comment: comment.trim() }, headers)))
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t("serviceReviews.sendError"))
       setIsSending(false)
@@ -58,6 +60,7 @@ function ReviewForm({
         <DialogDescription>{t("serviceReviews.dialogDescription")}</DialogDescription>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="grid gap-4">
+        {guard.trap}
         <div className="grid gap-2">
           <Label>{t("serviceReviews.ratingLabel")}</Label>
           <StarInput

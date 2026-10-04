@@ -18,8 +18,10 @@ export function PageBreadcrumb() {
   let items: BreadcrumbItem[] = []
 
   switch (pathname) {
+    // La racine du tableau de bord n'affiche pas de fil : un fil d'un seul élément, qui est la
+    // page courante, n'apporte rien et n'occupe que de l'espace sous l'en-tête.
     case "/dashboard":
-      items = [current("sidebar.items.accueil")]
+      items = []
       break
     case "/profil":
       items = [home, current("sidebar.items.monProfil")]

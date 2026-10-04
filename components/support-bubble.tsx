@@ -5,6 +5,7 @@ import Link from "next/link"
 import { CheckCircle2, CircleAlert, LifeBuoy, Send } from "lucide-react"
 
 import { useAuth } from "@/components/auth/auth-provider"
+import { useFormGuard } from "@/components/forms/form-guard"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import {
@@ -37,6 +38,8 @@ export function SupportBubble() {
   const { user, isLoading } = useAuth()
   const { t } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
+  // Jeton demandé seulement quand le dialogue s'ouvre : pas de requête pour chaque visiteur de chaque page
+  const guard = useFormGuard("contact", { enabled: isOpen && !!user })
   const [subject, setSubject] = useState("")
   const [message, setMessage] = useState("")
   const [isSending, setIsSending] = useState(false)
@@ -110,7 +113,7 @@ export function SupportBubble() {
     setError("")
     setIsSending(true)
     try {
-      setReceipt(await contactMessageRepository.send({ subject: subject.trim(), message: message.trim() }))
+      setReceipt(await guard.run((headers) => contactMessageRepository.send({ subject: subject.trim(), message: message.trim() }, headers)))
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t("supportBubble.submitError"))
     } finally {
@@ -183,6 +186,7 @@ export function SupportBubble() {
               </DialogHeader>
 
               <form onSubmit={handleSubmit} className="grid gap-4">
+                {guard.trap}
                 <div className="grid gap-2">
                   <Label htmlFor="support-subject">{t("supportBubble.subjectLabel")}</Label>
                   <Input

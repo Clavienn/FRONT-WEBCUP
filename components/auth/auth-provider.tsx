@@ -13,8 +13,8 @@ import {
 interface AuthContextValue {
   user: AuthUser | null
   isLoading: boolean
-  signIn: (credentials: Credentials) => Promise<AuthUser>
-  signUp: (data: RegistrationData) => Promise<AuthUser>
+  signIn: (credentials: Credentials, headers?: Record<string, string>) => Promise<AuthUser>
+  signUp: (data: RegistrationData, headers?: Record<string, string>) => Promise<AuthUser>
   signOut: () => Promise<void>
   signOutEverywhere: () => Promise<void>
   deleteAccount: (password: string) => Promise<void>
@@ -49,14 +49,14 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
     }
   }, [])
 
-  const signIn = async (credentials: Credentials) => {
-    const sessionUser = await authRepository.login(credentials)
+  const signIn = async (credentials: Credentials, headers?: Record<string, string>) => {
+    const sessionUser = await authRepository.login(credentials, headers)
     setUser(sessionUser)
     return sessionUser
   }
 
-  const signUp = async (data: RegistrationData) => {
-    const sessionUser = await authRepository.register(data)
+  const signUp = async (data: RegistrationData, headers?: Record<string, string>) => {
+    const sessionUser = await authRepository.register(data, headers)
     setUser(sessionUser)
     return sessionUser
   }
