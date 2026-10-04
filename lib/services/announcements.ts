@@ -1,5 +1,6 @@
 import { resilientFetch } from "@/lib/network"
 import { withStaleFallback } from "@/lib/stale-cache"
+import { API_URL } from "@/lib/api-url"
 
 export type AnnouncementPriority = "default" | "medium" | "max"
 
@@ -26,8 +27,6 @@ interface PublicAnnouncement {
   publishedAt: string
   priority?: AnnouncementPriority
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
 
 // Une annonce antérieure à cette version de l'API peut ne pas renvoyer de priorité :
 // "default" garde le rendu historique plutôt que d'afficher une pastille d'alerte inventée.

@@ -6,6 +6,7 @@ import { ChevronUp, PhoneCall, TriangleAlert, WifiOff } from "lucide-react"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import { readEssentials, refreshEssentials, type Essentials } from "@/lib/essentials"
+import { API_URL } from "@/lib/api-url"
 
 function subscribe(onChange: () => void) {
   window.addEventListener("online", onChange)
@@ -16,7 +17,6 @@ function subscribe(onChange: () => void) {
   }
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
 const ESSENTIALS_REFRESH_MS = 10 * 60_000
 const STATUS_POLL_MS = 2 * 60_000
 

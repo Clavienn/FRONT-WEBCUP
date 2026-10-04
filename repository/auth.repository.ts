@@ -1,5 +1,6 @@
 import { getAppLocale } from "@/lib/i18n/types"
 import { resilientFetch } from "@/lib/network"
+import { API_URL } from "@/lib/api-url"
 
 export type UserRole = "citizen" | "agent" | "admin" | "partner"
 
@@ -213,8 +214,6 @@ export class AuthApiError extends Error {
     this.name = "AuthApiError"
   }
 }
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
 
 let accessToken: string | null = null
 let refreshRequest: Promise<AuthResponse> | null = null

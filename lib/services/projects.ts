@@ -1,3 +1,5 @@
+import { API_URL, BACKEND_API_URL } from "@/lib/api-url"
+
 export type ProjectStatus = "planned" | "ongoing" | "completed"
 
 export interface Project {
@@ -19,8 +21,7 @@ interface PublicProject {
   createdAt: string
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
-const API_ORIGIN = API_URL?.replace(/\/api$/, "")
+const API_ORIGIN = BACKEND_API_URL?.replace(/\/api$/, "")
 
 export function resolveProjectImageUrl(imageUrl: string | null): string | null {
   if (!imageUrl || !API_ORIGIN) return null

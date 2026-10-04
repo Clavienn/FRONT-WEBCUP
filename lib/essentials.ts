@@ -1,3 +1,5 @@
+import { API_URL } from "@/lib/api-url"
+
 // Kit essentiel gardé sur l'appareil (GET /api/public/essentials, sans compte, ~15 Ko) : numéro d'urgence,
 // conduite à tenir, alertes en cours, horaires bruts des lignes, services. Il est relu sans réseau quand la
 // connexion est perdue : en crise, l'essentiel reste consultable avec l'heure de la dernière mise à jour.
@@ -46,7 +48,6 @@ export interface Essentials {
 }
 
 const KEY = "terra-nova:essentials"
-const API_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "")
 
 interface Stored {
   etag: string | null
