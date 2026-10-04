@@ -105,18 +105,16 @@ export function ServiceDetail() {
     <div className="space-y-8">
       {backLink}
 
-      <header className="relative overflow-hidden flex flex-col gap-5 rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:flex-row sm:items-start sm:p-8">
-        <span className="grid size-16 shrink-0 place-items-center rounded-2xl border border-border/70 bg-muted/60 text-primary shadow-xs">
-          <ServiceIcon name={service.icon} className="size-8" />
+      <header className="flex flex-col gap-5 rounded-2xl border border-border/80 bg-card/75 p-6 shadow-sm backdrop-blur-sm sm:flex-row sm:items-start sm:p-8">
+        <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-accent text-accent-foreground">
+          <ServiceIcon name={service.icon} className="size-7" />
         </span>
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-mono text-xs font-semibold uppercase tracking-widest text-primary">
-              MODULE MUNICIPAL // {service.code}
-            </span>
+            <p className="text-sm font-medium text-primary">{t("serviceDetail.eyebrow")}</p>
             {!service.isActive && <Badge variant="outline">{t("serviceDetail.disabledBadge")}</Badge>}
           </div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-4xl">{service.name}</h1>
+          <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">{service.name}</h1>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
             {service.averageRating !== null && (
               <StarDisplay value={service.averageRating} label={t("serviceReviews.averageAria", { value: service.averageRating })} />

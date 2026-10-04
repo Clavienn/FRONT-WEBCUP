@@ -411,7 +411,7 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
         {/* Tentatives de connexion échouées sur ce compte ces dernières 24 h : prévenu à l'ouverture de session */}
         <LoginSecurityNotice />
         <div className="px-4 pb-12 pt-4 sm:px-6 lg:px-8">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
+<div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
             <div className="flex items-center gap-3">
               <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
             </div>

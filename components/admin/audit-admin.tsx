@@ -158,31 +158,18 @@ export function AuditAdmin() {
 
   return (
     <>
-      <section className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
-        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
-          <span className="flex items-center gap-2 font-medium text-primary">
-            <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
-            JOURNAL D'AUDIT SÉCURITÉ // SYSTÈME CENTRAL
-          </span>
-          <span className="hidden sm:inline font-mono text-xs uppercase text-muted-foreground">
-            TRACABILITÉ & ÉVÉNEMENTS
-          </span>
+      <section className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p className="text-sm font-medium text-primary">{t("auditLog.adminPage.eyebrow")}</p>
+          <h1 className="mt-1 text-3xl font-medium tracking-tight sm:text-4xl">{t("auditLog.adminPage.title")}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            {t("auditLog.adminPage.description")}
+          </p>
         </div>
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary">{t("auditLog.adminPage.eyebrow")}</p>
-            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl text-foreground">
-              {t("auditLog.adminPage.title")}
-            </h1>
-            <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              {t("auditLog.adminPage.description")}
-            </p>
-          </div>
-          <Button variant="outline" onClick={reload} disabled={!current} className="w-fit">
-            {current ? <RefreshCw aria-hidden="true" /> : <Spinner />}
-            {t("auditLog.common.refresh")}
-          </Button>
-        </div>
+        <Button variant="outline" onClick={reload} disabled={!current} className="w-fit">
+          {current ? <RefreshCw aria-hidden="true" /> : <Spinner />}
+          {t("auditLog.common.refresh")}
+        </Button>
       </section>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

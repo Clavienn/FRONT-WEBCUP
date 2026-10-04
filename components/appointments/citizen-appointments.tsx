@@ -353,18 +353,12 @@ export function CitizenAppointments() {
 
   return (
     <div className="space-y-8">
-      <section aria-labelledby="appointments-title" className="relative overflow-hidden rounded-2xl border border-border/80 bg-card/85 p-6 shadow-sm backdrop-blur-xl sm:p-7">
-        <div className="mb-3 flex items-center justify-between border-b border-border/60 pb-2.5 text-[11px] font-mono tracking-wider text-muted-foreground">
-          <span className="flex items-center gap-2 font-medium text-primary">
-            <span className="size-2 rounded-full bg-cyan-400 animate-pulse" />
-            MODULE PLANIFICATION // GUICHET DES AGENTS
-          </span>
-        </div>
+<section aria-labelledby="appointments-title">
         <div>
-          <h1 id="appointments-title" className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          <h1 id="appointments-title" className="text-3xl font-medium tracking-tight sm:text-4xl">
             {t("appointments.title")}
           </h1>
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{t("appointments.subtitle")}</p>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{t("appointments.subtitle")}</p>
         </div>
 
         <div className="mt-6 flex flex-wrap items-end justify-between gap-3">
