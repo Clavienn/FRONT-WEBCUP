@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { Mail } from "lucide-react"
 
-import { FOOTER_CONTENT, NAV_LINKS, SITE_NAME } from "@/config/landing-content"
+import { BrandLockup } from "@/components/brand/brand-lockup"
+import { FOOTER_CONTENT, NAV_LINKS } from "@/config/landing-content"
 import { LegalDocumentDialog } from "@/components/legal/legal-document-dialog"
 import { useLanguage } from "@/components/i18n/language-provider"
 
@@ -15,9 +16,10 @@ export function LandingFooter() {
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-12">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-2">
-            <span className="tn-display text-sm font-bold tracking-[0.2em] text-[var(--tn-text)]">
-              {SITE_NAME.toUpperCase()}
-            </span>
+            <BrandLockup
+              markClassName="w-7"
+              wordmarkClassName="tn-display text-sm font-bold tracking-[0.2em] text-[var(--tn-text)]"
+            />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-[var(--tn-text-muted)]">
               {t("footer.description")}
             </p>

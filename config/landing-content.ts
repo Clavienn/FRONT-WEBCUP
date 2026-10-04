@@ -3,8 +3,6 @@ export interface NavLink {
   href: string
 }
 
-export const SITE_NAME = "Terra Nova"
-
 export const NAV_LINKS: NavLink[] = [
   { id: "accueil", href: "#accueil" },
   { id: "presentation", href: "#presentation" },

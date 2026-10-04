@@ -67,6 +67,16 @@ export interface AgentRequest extends CitizenRequest {
   assignedTo: number | null
   owner: { id: number; firstName: string; lastName: string } | null
   assignee: { id: number; firstName: string; lastName: string } | null
+  // Nombre d'autres demandes qui parlent probablement du même problème ; absent si non calculé
+  similarCount?: number
+}
+
+export interface SimilarRequest {
+  id: number
+  subject: string
+  status: RequestStatus
+  owner: { id: number; firstName: string; lastName: string } | null
+  createdAt: string
 }
 
 export type AgentRequestDetail = AgentRequest & { history: RequestHistoryEntry[] }
@@ -94,6 +104,8 @@ export interface AgentQuery {
   status?: RequestStatus | "all"
   assignedTo?: number
   mine?: boolean
+  // Recherche libre sur l'objet et la description
+  q?: string
   // Pagination côté serveur (limit plafonné à 100 par l'API)
   page?: number
   limit?: number
@@ -124,15 +136,20 @@ function create(input: NewRequestInput): Promise<CitizenRequest> {
   return authorizedRequest<CitizenRequest>("/requests", json("POST", input))
 }
 
-/** File agent : filtres par statut, par agent, ou file personally suivie. */
+/** File agent : filtres par statut, par agent, par mot-clé, ou file personally suivie. */
 function listAll(query_: AgentQuery): Promise<RequestPage<AgentRequest>> {
   return authorizedRequest<RequestPage<AgentRequest>>(
-    `/requests${query({ status: query_.status, assignedTo: query_.assignedTo, mine: query_.mine, page: query_.page, limit: query_.limit })}`
+    `/requests${query({ status: query_.status, assignedTo: query_.assignedTo, mine: query_.mine, q: query_.q, page: query_.page, limit: query_.limit })}`
   )
 }
 
 function getOne(id: number): Promise<AgentRequestDetail> {
   return authorizedRequest<AgentRequestDetail>(`/requests/${id}`)
+}
+
+/** Demandes qui parlent probablement du même problème (même service, vocabulaire proche). */
+function getSimilar(id: number): Promise<SimilarRequest[]> {
+  return authorizedRequest<SimilarRequest[]>(`/requests/${id}/similar`)
 }
 
 function update(id: number, input: RequestUpdateInput): Promise<AgentRequestDetail> {
@@ -162,6 +179,7 @@ export const citizenRequestRepository = {
   create,
   listAll,
   getOne,
+  getSimilar,
   update,
   statsMine,
   statsAll,

@@ -26,6 +26,8 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
+import { BrandMark } from "@/components/brand/brand-mark"
+import { BRAND_NAME } from "@/config/brand"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
 import { useTheme } from "@/hooks/use-theme"
@@ -183,12 +185,12 @@ function AppSidebar({ user }: { user: AuthUser }) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<Link href="/" />} tooltip="Terra Nova">
-              <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground">
-                <Building2 className="size-4" aria-hidden="true" />
-              </span>
+            <SidebarMenuButton size="lg" render={<Link href="/" />} tooltip={BRAND_NAME}>
+              <BrandMark className="w-6 text-foreground" />
               <span className="grid min-w-0 flex-1 text-left leading-tight">
-                <span className="truncate text-sm font-semibold tracking-[0.08em]">TERRA NOVA</span>
+                <span className="truncate text-sm font-semibold tracking-[0.08em] uppercase">
+                  {BRAND_NAME}
+                </span>
                 <span className="truncate text-xs text-muted-foreground">
                   {view === "staff" ? t("sidebar.brand.staff") : t("sidebar.brand.citizen")}
                 </span>

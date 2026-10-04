@@ -546,6 +546,13 @@ const fr = {
     updated: "Demande mise à jour",
     lastChange: "Dernière évolution : {{status}} le {{date}}",
     byCitizen: "Déposée par {{name}}",
+    searchAriaLabel: "Rechercher une demande",
+    searchPlaceholder: "Mot-clé dans l'objet ou la description",
+    similarCountOne: "{{count}} demande similaire",
+    similarCountMany: "{{count}} demandes similaires",
+    similarHide: "Masquer",
+    similarLoadError: "Impossible de charger les demandes similaires.",
+    similarEmpty: "Aucune autre demande similaire trouvée.",
   },
 
   notifications: {
@@ -1550,6 +1557,13 @@ const en = {
     updated: "Request updated",
     lastChange: "Last change: {{status}} on {{date}}",
     byCitizen: "Submitted by {{name}}",
+    searchAriaLabel: "Search for a request",
+    searchPlaceholder: "Keyword in the subject or description",
+    similarCountOne: "{{count}} similar request",
+    similarCountMany: "{{count}} similar requests",
+    similarHide: "Hide",
+    similarLoadError: "Couldn't load similar requests.",
+    similarEmpty: "No other similar request found.",
   },
 
   notifications: {
