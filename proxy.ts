@@ -29,10 +29,15 @@ export function proxy(request: NextRequest) {
   const headers = new Headers(request.headers)
   headers.delete("origin")
 
-  const target = new URL(`${API_URL}${request.nextUrl.pathname.replace(/^\/api/, "")}${request.nextUrl.search}`)
+  const { pathname, search } = request.nextUrl
+  // socket.io (lib/api-url.ts) est monté à la racine du serveur de l'API, hors de /api, et y attend la barre finale
+  const target =
+    pathname === "/socket.io"
+      ? new URL(`/socket.io/${search}`, API_URL)
+      : new URL(`${API_URL}${pathname.replace(/^\/api/, "")}${search}`)
   return NextResponse.rewrite(target, { request: { headers } })
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  matcher: ["/api/:path*", "/socket.io"],
 }

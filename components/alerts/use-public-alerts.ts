@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { io } from "socket.io-client"
 
+import { SOCKET_OPTIONS, SOCKET_URL } from "@/lib/api-url"
 import { withStaleFallback } from "@/lib/stale-cache"
 import {
   alertRepository,
@@ -11,9 +12,6 @@ import {
   type PublicAlert,
   type PublicAlerts,
 } from "@/repository/alert.repository"
-
-// L'API est exposée sous /api pour le HTTP ; socket.io se connecte à la racine du même hôte (canal public).
-const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "").replace(/\/api$/, "")
 
 const POLL_MS = 60_000
 const SEVERITY_RANK = { emergency: 0, warning: 1, watch: 2, info: 3 } as const
@@ -70,7 +68,7 @@ export function usePublicAlerts(zone: AlertZone | null) {
   // Temps réel : l'événement contient l'alerte complète, appliquée sans nouvelle requête
   useEffect(() => {
     if (!SOCKET_URL) return
-    const socket = io(SOCKET_URL, { transports: ["websocket", "polling"] })
+    const socket = io(SOCKET_URL, SOCKET_OPTIONS)
 
     const apply = (event: AlertEvent) => (alert: PublicAlert) => {
       setNow(Date.now())

@@ -3,11 +3,9 @@
 import { useEffect, useRef, useState } from "react"
 import { io, type Socket } from "socket.io-client"
 
+import { SOCKET_OPTIONS, SOCKET_URL } from "@/lib/api-url"
 import { authRepository } from "@/repository/auth.repository"
 import type { SignalementEvent } from "@/repository/signalement.repository"
-
-// L'API est exposée sous /api pour le HTTP ; socket.io se connecte à la racine du même hôte.
-const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "").replace(/\/api$/, "")
 
 export type ChannelState = "connecting" | "live" | "offline"
 
@@ -30,9 +28,9 @@ export function useStaffChannel(onEvent: (kind: "new" | "updated", event: Signal
 
     let closed = false
     const socket: Socket = io(`${SOCKET_URL}/staff`, {
+      ...SOCKET_OPTIONS,
       // Évalué à chaque (re)connexion : toujours le jeton d'accès courant
       auth: (done) => done({ token: authRepository.getAccessToken() }),
-      transports: ["websocket", "polling"],
     })
 
     // Jeton expiré : le serveur a coupé ou refusé la connexion, on le renouvelle puis on réessaie

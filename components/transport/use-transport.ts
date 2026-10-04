@@ -3,11 +3,10 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react"
 import { io } from "socket.io-client"
 
+import { SOCKET_OPTIONS, SOCKET_URL } from "@/lib/api-url"
 import { withStaleFallback } from "@/lib/stale-cache"
 import { TRANSPORT_UPDATED_EVENT, transportRepository, type TransportStatus } from "@/repository/transport.repository"
 
-// L'API est exposée sous /api pour le HTTP ; socket.io se connecte à la racine du même hôte (canal public).
-const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/+$/, "").replace(/\/api$/, "")
 const POLL_MS = 60_000
 
 // ── « Mes lignes » : lignes suivies par l'habitant, mémorisées sur cet appareil ──
@@ -91,7 +90,7 @@ export function useTransportStatus() {
 
   useEffect(() => {
     if (!SOCKET_URL) return
-    const socket = io(SOCKET_URL, { transports: ["websocket", "polling"] })
+    const socket = io(SOCKET_URL, SOCKET_OPTIONS)
     const onUpdate = () => void load()
     socket.on(TRANSPORT_UPDATED_EVENT, onUpdate)
     socket.io.on("reconnect", onUpdate)
