@@ -606,10 +606,6 @@
     gap: var(--tn-space-3);
   }
 
-  .tn-scrollseq__chapter--hero .tn-title {
-    margin-top: var(--tn-space-2);
-  }
-
   .tn-scrollseq__chapter--hero .tn-lead {
     margin-top: var(--tn-space-3);
   }
