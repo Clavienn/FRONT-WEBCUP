@@ -11,6 +11,7 @@ import {
   formatPublicationDate,
 } from "@/components/announcements/announcement-permissions"
 import { AnnouncementFormDialog } from "@/components/announcements/announcement-form-dialog"
+import { AnnouncementPriorityBadge } from "@/components/announcements/announcement-priority-badge"
 import { StatusBadge } from "@/components/announcements/status-badge"
 import {
   AlertDialog,
@@ -127,6 +128,7 @@ export function AnnouncementDetail() {
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <span>Publiée le {formatPublicationDate(announcement.publishedAt, announcement.createdAt)}</span>
             {author && <span>· {author}</span>}
+            <AnnouncementPriorityBadge priority={announcement.priority} />
             {announcement.status !== "published" && <StatusBadge status={announcement.status} />}
           </div>
           <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">{announcement.title}</h1>

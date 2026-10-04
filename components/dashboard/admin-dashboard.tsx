@@ -18,6 +18,7 @@ import {
 
 import type { AuthUser } from "@/repository/auth.repository"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { AdminExportDialog } from "@/components/admin/admin-export-dialog"
 import { Badge } from "@/components/ui/badge"
 
 const adminMetrics = [
@@ -51,10 +52,13 @@ export function AdminDashboard({ user }: { user: AuthUser }) {
             {t("adminDashboard.subtitle")}
           </p>
         </div>
-        <Badge variant="outline" className="w-fit gap-1.5 rounded-full px-3 py-1 text-muted-foreground">
-          <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
-          {t("adminDashboard.accessBadge")}
-        </Badge>
+        <div className="flex flex-wrap items-center gap-3">
+          <AdminExportDialog user={user} />
+          <Badge variant="outline" className="w-fit gap-1.5 rounded-full px-3 py-1 text-muted-foreground">
+            <ShieldCheck className="size-3.5 text-primary" aria-hidden="true" />
+            {t("adminDashboard.accessBadge")}
+          </Badge>
+        </div>
       </section>
 
       <section aria-labelledby="admin-metrics-title" className="space-y-3">

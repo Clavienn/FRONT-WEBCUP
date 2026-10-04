@@ -1,0 +1,10 @@
+/* Taille de texte confortable (voir hooks/use-accessibility.ts) : une classe sur <html> qui
+   agrandit l'échelle rem globale, indépendante du thème clair/sombre et des autres styles. */
+
+html.text-size-large {
+  font-size: 112.5%;
+}
+
+html.text-size-xlarge {
+  font-size: 125%;
+}

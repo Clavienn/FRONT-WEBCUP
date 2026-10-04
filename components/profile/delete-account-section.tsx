@@ -49,8 +49,8 @@ export function DeleteAccountSection() {
       handleOpenChange(false)
       // Drapeau en sessionStorage et non query string : setUser(null) déclenche par ailleurs la
       // redirection générique de DashboardFrame vers /connexion, qui écraserait un "?compteSupprime=1"
-      // et ferait perdre la confirmation. Le Toaster ne convient pas non plus, il vit dans
-      // DashboardFrame et disparaît avec la page.
+      // et ferait perdre la confirmation. Le Toaster ne convient pas non plus, il est porté par
+      // le layout racine et disparaît lui aussi avec la page.
       window.sessionStorage.setItem(ACCOUNT_DELETED_KEY, "1")
       router.replace("/connexion")
     } catch (err) {

@@ -3,6 +3,8 @@
 import { useState, type FormEvent } from "react"
 import { CircleAlert } from "lucide-react"
 
+import { useAuth } from "@/components/auth/auth-provider"
+import { useLanguage } from "@/components/i18n/language-provider"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -21,8 +23,12 @@ import {
   announcementRepository,
   statusLabels,
   type Announcement,
+  type AnnouncementPriority,
   type AnnouncementStatus,
 } from "@/repository/announcement.repository"
+
+// Priorités proposées dans l'ordre : la plus basse d'abord, pour que "par défaut" reste le choix évident
+const PRIORITIES: AnnouncementPriority[] = ["default", "medium", "max"]
 
 // Formulaire monté à chaque ouverture du dialogue : son état repart donc toujours de zéro
 function AnnouncementForm({
@@ -34,19 +40,27 @@ function AnnouncementForm({
   onClose: () => void
   onSaved: (announcement: Announcement, created: boolean) => void
 }) {
+  const { t } = useLanguage()
+  const { user } = useAuth()
   const [title, setTitle] = useState(announcement?.title ?? "")
   const [content, setContent] = useState(announcement?.content ?? "")
   const [status, setStatus] = useState<AnnouncementStatus>(announcement?.status ?? "draft")
+  const [priority, setPriority] = useState<AnnouncementPriority>(announcement?.priority ?? "default")
   const [error, setError] = useState("")
   const [isSaving, setIsSaving] = useState(false)
   const isEditing = announcement !== null
+
+  // Le Haut Conseil seul peut publier en priorité max : le serveur le refuse, on ne propose donc
+  // pas l'option à un agent pour éviter un envoi qui échouerait.
+  const canPublishUrgent = user?.permissions.includes("admin.announcements.urgent") ?? false
+  const availablePriorities = canPublishUrgent ? PRIORITIES : PRIORITIES.filter((value) => value !== "max")
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
     setIsSaving(true)
 
-    const data = { title: title.trim(), content: content.trim(), status }
+    const data = { title: title.trim(), content: content.trim(), status, priority }
     try {
       const saved = isEditing
         ? await announcementRepository.update(announcement.id, data)
@@ -106,6 +120,23 @@ function AnnouncementForm({
               </NativeSelectOption>
             ))}
           </NativeSelect>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="announcement-priority">{t("announcementPriorities.label")}</Label>
+          <NativeSelect
+            id="announcement-priority"
+            className="w-full"
+            value={priority}
+            onChange={(event) => setPriority(event.target.value as AnnouncementPriority)}
+          >
+            {availablePriorities.map((value) => (
+              <NativeSelectOption key={value} value={value}>
+                {t(`announcementPriorities.${value}`)}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+          <p className="text-xs text-muted-foreground">{t(`announcementPriorities.hint.${priority}`)}</p>
         </div>
 
         {error && (
