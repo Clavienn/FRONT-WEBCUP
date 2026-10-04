@@ -52,7 +52,22 @@ export interface PermissionInput {
 
 const json = (method: string, data: unknown): RequestInit => ({ method, body: JSON.stringify(data) })
 
+// Agent inscrit seul, pas encore validé par un administrateur
+export interface PendingAgent {
+  id: number
+  email: string
+  firstName: string
+  lastName: string
+  createdAt: string
+}
+
 export const userAdminRepository = {
+  // Tant qu'un agent n'est pas validé, il ne voit que des coordonnées partielles et ne peut pas modifier de compte citoyen
+  pendingAgents: () => authorizedRequest<{ users: PendingAgent[] }>("/users/pending-agents"),
+
+  validateAgent: (id: number) =>
+    authorizedRequest<{ validated: boolean }>(`/users/${id}/validate-agent`, { method: "POST" }),
+
   list(query: { q?: string; page?: number; limit?: number } = {}) {
     const params = new URLSearchParams()
     if (query.q) params.set("q", query.q)

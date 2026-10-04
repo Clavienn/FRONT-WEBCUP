@@ -18,11 +18,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
 import { isPasswordStrong, PasswordRequirements } from "@/components/auth/password-requirements"
-import { ACCOUNT_DELETED_KEY } from "@/components/profile/delete-account-section"
 import type { SignupRole } from "@/repository/auth.repository"
+import { SESSION_EXPIRED_KEY } from "@/components/auth/idle-logout"
+import { ACCOUNT_DELETED_KEY } from "@/components/profile/delete-account-section"
 
 const signupRoles: SignupRole[] = ["citizen", "agent"]
 const ROLE_DICT_KEY: Record<SignupRole, string> = { citizen: "roleCitizen", agent: "roleAgent" }
+
 
 type AuthMode = "login" | "register"
 
@@ -45,6 +47,10 @@ export function AuthForm() {
   const [accountDeleted] = useState(
     () => typeof window !== "undefined" && window.sessionStorage.getItem(ACCOUNT_DELETED_KEY) === "1"
   )
+  // Session fermée automatiquement après une longue inactivité : on l'explique à l'arrivée sur la page
+  const [sessionExpired] = useState(
+    () => typeof window !== "undefined" && window.sessionStorage.getItem(SESSION_EXPIRED_KEY) === "1"
+  )
   const isRegistering = mode === "register"
   // Un jeton par formulaire : renouvelé quand on passe de la connexion à l'inscription
   const guard = useFormGuard(isRegistering ? "register" : "login")
@@ -53,6 +59,10 @@ export function AuthForm() {
   useEffect(() => {
     if (accountDeleted) window.sessionStorage.removeItem(ACCOUNT_DELETED_KEY)
   }, [accountDeleted])
+
+  useEffect(() => {
+    if (sessionExpired) window.sessionStorage.removeItem(SESSION_EXPIRED_KEY)
+  }, [sessionExpired])
 
   useEffect(() => {
     if (!isLoading && user) router.replace("/dashboard")
@@ -102,6 +112,16 @@ export function AuthForm() {
           ]}
           className="mb-6"
         />
+
+        {sessionExpired && (
+          <p
+            role="status"
+            className="mb-6 flex items-start gap-2 rounded-xl border border-primary/30 bg-accent px-4 py-3 text-sm text-foreground"
+          >
+            <CircleCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+            <span>{t("authForm.sessionExpired")}</span>
+          </p>
+        )}
 
         {accountDeleted && (
           <p

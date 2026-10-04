@@ -137,6 +137,39 @@ export function roleLabel(user: AuthUser) {
   return "citizen"
 }
 
+// Sécurité du compte (GET /auth/me/security)
+export interface SecuritySession {
+  id: string | number
+  // Navigateur et système, ex. « Chrome sur Windows »
+  device: string
+  // Adresse masquée par le serveur (203.0.113.x)
+  ip: string
+  createdAt: string
+  lastUsedAt: string
+  expiresAt: string
+  current: boolean
+}
+
+export interface SecurityEvent {
+  action: string
+  at: string
+  ip: string | null
+}
+
+// Consultation d'une de MES données par un membre du personnel (jamais son e-mail)
+export interface SecurityDataAccess {
+  at: string
+  by: string
+  role: "agent" | "admin"
+  resource: "request" | "message" | "account"
+}
+
+export interface SecurityOverview {
+  sessions: SecuritySession[]
+  events: SecurityEvent[]
+  dataAccess: SecurityDataAccess[]
+}
+
 export class AuthApiError extends Error {
   constructor(
     message: string,
@@ -226,6 +259,11 @@ async function authenticate(
 }
 
 export const authRepository = {
+  security: () => authorizedRequest<SecurityOverview>("/auth/me/security"),
+
+  // Ferme une session (un autre appareil) ; 404 si inconnue ou pas la sienne
+  revokeSession: (id: string | number) => authorizedRequest<void>(`/auth/me/sessions/${id}`, { method: "DELETE" }),
+
   // headers : protection anti-robots (voir components/forms/form-guard.tsx)
   login: (credentials: Credentials, headers?: Record<string, string>) => authenticate("/auth/login", credentials, headers),
 

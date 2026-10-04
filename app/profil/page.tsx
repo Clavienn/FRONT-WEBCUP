@@ -11,6 +11,7 @@ import { DashboardFrame } from "@/components/dashboard/dashboard-shell"
 import { isStaff, roleLabel } from "@/repository/auth.repository"
 import { DeleteAccountSection } from "@/components/profile/delete-account-section"
 import { PasswordForm } from "@/components/profile/password-form"
+import { SecuritySection } from "@/components/profile/security-section"
 import { ProfileForm } from "@/components/profile/profile-form"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -366,6 +367,8 @@ export default function ProfilPage() {
               {t("profilePage.signOutEverywhere")}
             </Button>
           </section>
+
+          <SecuritySection />
 
           {/* Un agent ou un administrateur reste administrable via la console : la suppression
               de compte n'est proposée qu'à l'espace citoyen, comme le refuse l'API. */}
