@@ -185,6 +185,7 @@ export function StaffAlerts() {
       ? {
           hazard: ALERT_HAZARDS.includes(params.get("hazard") as AlertHazard) ? (params.get("hazard") as AlertHazard) : undefined,
           zone: ALERT_ZONES.includes(params.get("zone") as AlertZone) ? (params.get("zone") as AlertZone) : undefined,
+          autoDraft: params.get("draft") === "1",
         }
       : null
   const [publishing, setPublishing] = useState<AlertPrefill | null>(initialPrefill)

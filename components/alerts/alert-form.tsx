@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, type FormEvent } from "react"
-import { CircleAlert, Plus, Send, Trash2 } from "lucide-react"
+import { useEffect, useState, type FormEvent } from "react"
+import { CircleAlert, Plus, Send, Sparkles, Trash2 } from "lucide-react"
 
 import { AlertCard } from "@/components/alerts/alert-card"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -12,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
+import { AuthApiError } from "@/repository/auth.repository"
 import {
   ALERT_HAZARDS,
   ALERT_SEVERITIES,
@@ -19,6 +21,7 @@ import {
   SEVERITY_REQUIRES_ACTION,
   alertRepository,
   type AlertColor,
+  type AlertDraftResponse,
   type AlertHazard,
   type AlertSeverity,
   type AlertZone,
@@ -80,6 +83,8 @@ export interface AlertPrefill {
   hazard?: AlertHazard
   severity?: AlertSeverity
   zone?: AlertZone
+  // Demande tout de suite un brouillon à l'IA (point chaud : « Prévenir le quartier »)
+  autoDraft?: boolean
 }
 
 // Publication d'une alerte, avec aperçu en direct : le rédacteur voit EXACTEMENT ce que les habitants verront
@@ -93,6 +98,13 @@ export function AlertForm({ prefill, onPublished }: { prefill?: AlertPrefill; on
   const [message, setMessage] = useState("")
   const [instructions, setInstructions] = useState<string[]>([])
   const [duration, setDuration] = useState("")
+  // Durées proposées + celle du brouillon de l'IA si elle n'est pas dans la liste
+  const [durations, setDurations] = useState<number[]>(DURATIONS)
+  // Assistant de rédaction : l'agent garde la main, le formulaire reste modifiable pendant la rédaction
+  const [drafting, setDrafting] = useState(false)
+  const [draftInfo, setDraftInfo] = useState<Pick<AlertDraftResponse, "source" | "basedOn" | "notice"> | null>(null)
+  const [notes, setNotes] = useState("")
+  const [showNotes, setShowNotes] = useState(false)
   const [error, setError] = useState("")
   const [isSending, setIsSending] = useState(false)
 
@@ -108,6 +120,48 @@ export function AlertForm({ prefill, onPublished }: { prefill?: AlertPrefill; on
     setMessage(t(`alerts.staff.templates.${kind}.message`))
     setInstructions(tList(`alerts.staff.templates.${kind}.instructions`))
   }
+
+  // Brouillon rédigé par l'IA à partir des signalements du quartier ; rien n'est publié
+  const requestDraft = async (zoneOverride?: AlertZoneOrAll) => {
+    const zone = zoneOverride ?? (zones.length === 1 ? zones[0] : null)
+    if (!zone) return setError(t("alerts.staff.aiNeedZone"))
+    setError("")
+    setDrafting(true)
+    try {
+      const response = await alertRepository.draft({
+        zone,
+        ...(prefill?.hazard ? { hazard: prefill.hazard } : {}),
+        ...(notes.trim().length >= 3 ? { notes: notes.trim() } : {}),
+      })
+      const { draft } = response
+      setHazard(draft.hazard)
+      setSeverity(draft.severity)
+      setZones(draft.zones)
+      setTitle(draft.title)
+      setMessage(draft.message)
+      setInstructions(draft.instructions)
+      if (draft.expiresInMinutes) {
+        setDurations((current) => (current.includes(draft.expiresInMinutes) ? current : [...current, draft.expiresInMinutes].sort((a, b) => a - b)))
+        setDuration(String(draft.expiresInMinutes))
+      }
+      setDraftInfo({ source: response.source, basedOn: response.basedOn, notice: response.notice })
+    } catch (cause) {
+      // 422 nothing_to_draft : aucun signalement récent ni note -> proposer d'écrire une précision
+      if (cause instanceof AuthApiError && cause.code === "nothing_to_draft") setShowNotes(true)
+      setError(errorMessage(cause) || t("alerts.staff.aiError"))
+    } finally {
+      setDrafting(false)
+    }
+  }
+
+  // Ouvert depuis un point chaud : le brouillon est demandé dès l'affichage
+  useEffect(() => {
+    if (prefill?.autoDraft && prefill.zone) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- demande unique à l'ouverture du formulaire
+      void requestDraft(prefill.zone)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- une seule fois, à l'ouverture
+  }, [])
 
   const toggleZone = (zone: AlertZoneOrAll, checked: boolean) => {
     if (zone === "all") return setZones(checked ? ["all"] : [])
@@ -174,6 +228,47 @@ export function AlertForm({ prefill, onPublished }: { prefill?: AlertPrefill; on
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-5">
+      <div className="grid gap-2 rounded-xl border border-dashed border-border bg-background/50 p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" variant="outline" size="sm" disabled={drafting} onClick={() => void requestDraft()}>
+            {drafting ? <Spinner /> : <Sparkles aria-hidden="true" />}
+            {drafting ? t("alerts.staff.aiDrafting") : t("alerts.staff.aiDraft")}
+          </Button>
+          <button
+            type="button"
+            className="cursor-pointer text-xs font-medium text-primary underline-offset-4 hover:underline"
+            aria-expanded={showNotes}
+            onClick={() => setShowNotes((value) => !value)}
+          >
+            {t("alerts.staff.aiNotesToggle")}
+          </button>
+          <span aria-live="polite" className="sr-only">{drafting ? t("alerts.staff.aiDrafting") : ""}</span>
+        </div>
+        {showNotes && (
+          <Textarea
+            aria-label={t("alerts.staff.aiNotesLabel")}
+            rows={2}
+            value={notes}
+            maxLength={1000}
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder={t("alerts.staff.aiNotesPlaceholder")}
+          />
+        )}
+        {draftInfo && (
+          <div className="space-y-1 text-xs">
+            <p className="flex flex-wrap items-center gap-2">
+              <Badge variant="outline" className="border-violet-500/40 bg-violet-500/10 text-violet-800 dark:text-violet-200">
+                {draftInfo.source === "ai" ? t("alerts.staff.aiBadge") : t("alerts.staff.aiBadgeTemplate")}
+              </Badge>
+              <span className="text-muted-foreground">
+                {t("alerts.staff.aiBasedOn", { count: draftInfo.basedOn.signalements, locations: draftInfo.basedOn.locations.join(", ") || "—" })}
+              </span>
+            </p>
+            {draftInfo.notice && <p className="text-muted-foreground">{draftInfo.notice}</p>}
+          </div>
+        )}
+      </div>
+
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs font-medium text-muted-foreground">{t("alerts.staff.templatesLabel")}</span>
         <Button type="button" variant="outline" size="sm" onClick={() => applyTemplate("flood")}>
@@ -188,7 +283,7 @@ export function AlertForm({ prefill, onPublished }: { prefill?: AlertPrefill; on
         <div className="grid gap-2">
           <Label htmlFor="al-hazard">{t("alerts.staff.hazard")}</Label>
           <NativeSelect id="al-hazard" className="w-full" value={hazard} onChange={(event) => setHazard(event.target.value as AlertHazard)}>
-            {ALERT_HAZARDS.map((value) => (
+            {ALERT_HAZARDS.filter((value) => value !== "transport").map((value) => (
               <NativeSelectOption key={value} value={value}>{t(`alerts.hazards.${value}`)}</NativeSelectOption>
             ))}
           </NativeSelect>
@@ -245,7 +340,7 @@ export function AlertForm({ prefill, onPublished }: { prefill?: AlertPrefill; on
         <Label htmlFor="al-duration">{t("alerts.staff.duration")}</Label>
         <NativeSelect id="al-duration" className="w-full" value={duration} onChange={(event) => setDuration(event.target.value)}>
           <NativeSelectOption value="">{t("alerts.staff.durationAuto")}</NativeSelectOption>
-          {DURATIONS.map((minutes) => (
+          {durations.map((minutes) => (
             <NativeSelectOption key={minutes} value={minutes}>{durationLabel(minutes)}</NativeSelectOption>
           ))}
         </NativeSelect>

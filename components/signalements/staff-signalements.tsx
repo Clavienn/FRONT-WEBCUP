@@ -380,7 +380,7 @@ export function StaffSignalements() {
               <Button
                 size="sm"
                 nativeButton={false}
-                render={<Link href={`/dashboard/agent/alerts?new=1&hazard=${HAZARD_FOR_TYPE[hotspot.type] ?? "other"}&zone=${hotspot.zone}`} />}
+                render={<Link href={`/dashboard/agent/alerts?new=1&hazard=${HAZARD_FOR_TYPE[hotspot.type] ?? "other"}&zone=${hotspot.zone}&draft=1`} />}
               >
                 {t("alerts.staff.hotspotAction")}
               </Button>

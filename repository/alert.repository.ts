@@ -17,6 +17,8 @@ export type AlertHazard =
   | "water_outage"
   | "security"
   | "health"
+  | "transport"
+  | "network"
   | "other"
 export const ALERT_HAZARDS: AlertHazard[] = [
   "flood",
@@ -27,6 +29,8 @@ export const ALERT_HAZARDS: AlertHazard[] = [
   "water_outage",
   "security",
   "health",
+  "transport",
+  "network",
   "other",
 ]
 
@@ -80,6 +84,14 @@ export interface PublicAlert {
   version: number
   // L'évolution de la situation, la plus récente d'abord
   updates: AlertUpdateEntry[]
+  // Alertes « transport » : les lignes touchées (le bandeau les affiche en couleur, avec « Trouver un autre trajet »)
+  transport?: {
+    disruptionId: number
+    line: { code: string; name: string; mode: "bus" | "tram" | "shuttle" | "cable"; color: string }
+    kind: "interrupted" | "delayed"
+    status: "active" | "ended"
+    headline: Localized
+  }[]
 }
 
 export interface PublicAlerts {
@@ -122,6 +134,32 @@ export interface AlertUpdateInput {
   expiresInMinutes?: number
 }
 
+// Brouillon rédigé par l'IA à partir des signalements du quartier : RIEN n'est publié, l'agent relit
+export interface AlertDraftInput {
+  zone: AlertZoneOrAll
+  hazard?: AlertHazard
+  // Précisions de l'agent (3 à 1 000 caractères) ; utiles quand il n'y a pas encore de signalement
+  notes?: string
+}
+
+export interface AlertDraftResponse {
+  // Directement acceptable par POST /api/alerts
+  draft: {
+    title: string
+    hazard: AlertHazard
+    severity: AlertSeverity
+    zones: AlertZoneOrAll[]
+    message: string
+    instructions: string[]
+    expiresInMinutes: number
+  }
+  // « ai » : rédigé par le modèle ; « template » : repli sur un modèle (IA indisponible)
+  source: "ai" | "template"
+  model?: string
+  basedOn: { signalements: number; urgent: number; withinHours: number; locations: string[] }
+  notice?: string
+}
+
 // Événements temps réel (canal public) : la charge utile est la vue publique de l'alerte
 export type AlertEvent = "alert:published" | "alert:updated" | "alert:ended"
 
@@ -138,6 +176,9 @@ export const alertRepository = {
   // ── Personnel (permission agent.alerts.manage, compte validé pour publier) ──
   listStaff: (status?: "active" | "ended", page = 1, limit = 20) =>
     authorizedRequest<AlertPage>(`/alerts?page=${page}&limit=${limit}${status ? `&status=${status}` : ""}`),
+
+  // 5 à 12 s avec l'IA, moins de 100 ms en repli. 422 nothing_to_draft : aucun signalement récent ni note.
+  draft: (input: AlertDraftInput) => authorizedRequest<AlertDraftResponse>("/alerts/draft", json("POST", input)),
 
   publish: (input: NewAlertInput) => authorizedRequest<StaffAlert>("/alerts", json("POST", input)),
 

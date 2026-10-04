@@ -176,7 +176,9 @@ export class AuthApiError extends Error {
     readonly status: number,
     // Code métier de l'API (ex. form_too_fast, bot_blocked) et délai avant un nouvel essai, quand fournis
     readonly code?: string,
-    readonly retryAfterMs?: number
+    readonly retryAfterMs?: number,
+    // Corps complet de la réponse d'erreur : certains refus portent des données utiles (ex. suggestions d'arrêts)
+    readonly body?: unknown
   ) {
     super(message)
     this.name = "AuthApiError"
@@ -236,7 +238,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
       body?.message || `Erreur ${response.status}`,
       response.status,
       typeof body?.code === "string" ? body.code : undefined,
-      retryDelayMs(response, body)
+      retryDelayMs(response, body),
+      body ?? undefined
     )
   }
 
