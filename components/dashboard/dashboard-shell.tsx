@@ -396,9 +396,16 @@ function DashboardShell({ user, children }: Readonly<{ user: AuthUser; children:
         {/* Tentatives de connexion échouées sur ce compte ces dernières 24 h : prévenu à l'ouverture de session */}
         <LoginSecurityNotice />
         <div className="px-4 pb-12 pt-4 sm:px-6 lg:px-8">
-          <div className="mb-4 flex items-center justify-between">
-            <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
-            {user.permissions.includes("citizen.notifications.view") && <NotificationBell />}
+<div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger aria-label={t("sidebar.toggleAriaLabel")} />
+            </div>
+            <div className="flex flex-1 items-center justify-end gap-3 max-w-md">
+              <div className="hidden sm:block flex-1">
+                <GlobalSearchBar user={user} />
+              </div>
+              {user.permissions.includes("citizen.notifications.view") && <NotificationBell />}
+            </div>
           </div>
           <div className="mx-auto max-w-7xl space-y-8 pt-2">
             <PageBreadcrumb />

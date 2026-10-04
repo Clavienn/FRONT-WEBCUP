@@ -368,14 +368,12 @@ export default function ProfilPage() {
               {t("profilePage.signOutEverywhere")}
             </Button>
           </section>
-<<<<<<< HEAD
-=======
-
-          <TwoFactorSection />
->>>>>>> f9dd8bb88424d50bcce546db9007b960124361be
+<TwoFactorSection />
 
           <SecuritySection />
 
+
+          <SecuritySection />
           {/* Un agent ou un administrateur reste administrable via la console : la suppression
               de compte n'est proposée qu'à l'espace citoyen, comme le refuse l'API. */}
           {!isStaff(user) && <DeleteAccountSection />}

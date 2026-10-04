@@ -196,7 +196,8 @@ export function AuthForm() {
               <p className="text-xs text-muted-foreground">{t("authForm.brandTagline")}</p>
             </div>
           </div>
-          {twoFactorChallenge ? (
+
+{twoFactorChallenge ? (
             <>
               <header className="mb-7 space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
