@@ -14,10 +14,13 @@ import { Spinner } from "@/components/ui/spinner"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/toast"
 import {
+  REQUEST_PRIORITIES,
   REQUEST_STATUS_TRANSITIONS,
   citizenRequestRepository,
+  requestPriorityKey,
   requestStatusKey,
   type AgentRequest,
+  type RequestPriority,
   type RequestStatus,
   type SimilarRequest,
 } from "@/repository/citizenRequest.repository"
@@ -31,6 +34,14 @@ const STATUS_STYLES: Record<RequestStatus, string> = {
   in_progress: "border-sky-500/30 bg-sky-500/10 text-sky-800 dark:text-sky-200",
   resolved: "border-emerald-500/30 bg-emerald-500/10 text-emerald-800 dark:text-emerald-200",
   rejected: "border-destructive/30 bg-destructive/10 text-destructive",
+}
+
+// Le niveau d'urgence se lit à la couleur, comme l'état : rouge = à traiter en premier
+const PRIORITY_STYLES: Record<RequestPriority, string> = {
+  urgent: "border-destructive/30 bg-destructive/10 text-destructive",
+  high: "border-orange-500/30 bg-orange-500/10 text-orange-800 dark:text-orange-200",
+  medium: "border-sky-500/30 bg-sky-500/10 text-sky-800 dark:text-sky-200",
+  low: "border-border bg-muted/50 text-muted-foreground",
 }
 
 const FILTERS: Array<RequestStatus | "all"> = ["all", "pending", "in_progress", "resolved", "rejected"]
@@ -108,6 +119,7 @@ interface RequestRowProps {
 function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
   const { t } = useLanguage()
   const statusLabel = (status: RequestStatus) => t(`agentRequests.filter${requestStatusKey(status)}`)
+  const priorityLabel = (priority: RequestPriority) => t(`agentRequests.priority${requestPriorityKey(priority)}`)
 
   const [target, setTarget] = useState<RequestStatus | "">("")
   const [note, setNote] = useState("")
@@ -158,9 +170,14 @@ function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
-          <Badge variant="outline" className={STATUS_STYLES[request.status]}>
-            {statusLabel(request.status)}
-          </Badge>
+          <div className="flex flex-wrap items-center justify-end gap-1.5">
+            <Badge variant="outline" className={PRIORITY_STYLES[request.priority]}>
+              {t("agentRequests.priorityLabel")} : {priorityLabel(request.priority)}
+            </Badge>
+            <Badge variant="outline" className={STATUS_STYLES[request.status]}>
+              {statusLabel(request.status)}
+            </Badge>
+          </div>
           <span className="text-xs text-muted-foreground">
             {request.assignee
               ? t("agentRequests.assignedTo", {
@@ -209,6 +226,19 @@ function RequestRow({ request, currentUserId, onUpdated }: RequestRowProps) {
         >
           {statusLabel("in_progress")}
         </Button>
+        <NativeSelect
+          size="sm"
+          aria-label={`${t("agentRequests.priorityLabel")} : ${request.subject}`}
+          value={request.priority}
+          disabled={saving}
+          onChange={(event) => apply({ priority: event.target.value as RequestPriority })}
+        >
+          {REQUEST_PRIORITIES.map((value) => (
+            <NativeSelectOption key={value} value={value}>
+              {t("agentRequests.priorityLabel")} : {priorityLabel(value)}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
       </div>
 
       {transitions.length > 0 && (
@@ -281,6 +311,8 @@ interface AgentRequestsPanelProps {
   pageSize?: number
   // Masque le titre quand la page fournit déjà le sien
   hideHeading?: boolean
+  // Les plus urgentes d'abord (puis les plus anciennes) dès l'ouverture
+  initialSortByPriority?: boolean
 }
 
 /** File des demandes citoyennes : l'agent filtre, prend en charge, fait évoluer l'état. */
@@ -289,6 +321,7 @@ export function AgentRequestsPanel({
   initialStatus = "pending",
   pageSize = 20,
   hideHeading = false,
+  initialSortByPriority = false,
 }: AgentRequestsPanelProps = {}) {
   const { t } = useLanguage()
   const { user } = useAuth()
@@ -296,6 +329,8 @@ export function AgentRequestsPanel({
   const [requests, setRequests] = useState<AgentRequest[]>([])
   const [error, setError] = useState("")
   const [status, setStatus] = useState<RequestStatus | "all">(initialStatus)
+  const [priorityFilter, setPriorityFilter] = useState<RequestPriority | "all">("all")
+  const [sortByPriority, setSortByPriority] = useState(initialSortByPriority)
   const [mineOnly, setMineOnly] = useState(false)
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
@@ -316,7 +351,14 @@ export function AgentRequestsPanel({
   const load = useCallback(() => {
     if (!user) return
     citizenRequestRepository
-      .listAll({ status, mine: mineOnly || undefined, q: debouncedSearch || undefined, page, limit: pageSize })
+      .listAll({
+        status,
+        priority: priorityFilter,
+        sort: sortByPriority ? "priority" : undefined,
+        mine: mineOnly || undefined,
+        page,
+        limit: pageSize,
+      })
       .then((result) => {
         setRequests(result.requests)
         setTotal(result.total)
@@ -328,7 +370,7 @@ export function AgentRequestsPanel({
         setError(cause instanceof Error ? cause.message : "")
         setState("error")
       })
-  }, [mineOnly, status, debouncedSearch, page, pageSize, user, onChanged])
+  }, [mineOnly, status, priorityFilter, sortByPriority, page, pageSize, user, onChanged])
 
   useEffect(() => {
     load()
@@ -342,6 +384,8 @@ export function AgentRequestsPanel({
   if (!user) return null
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
+
+  const priorityLabel = (priority: RequestPriority) => t(`agentRequests.priority${requestPriorityKey(priority)}`)
 
   const filterLabel = (value: RequestStatus | "all") =>
     value === "all" ? t("agentRequests.filterAll") : t(`agentRequests.filter${requestStatusKey(value)}`)
@@ -386,6 +430,32 @@ export function AgentRequestsPanel({
               </NativeSelectOption>
             ))}
           </NativeSelect>
+          <NativeSelect
+            aria-label={t("agentRequests.priorityLabel")}
+            value={priorityFilter}
+            onChange={(event) => {
+              setPriorityFilter(event.target.value as RequestPriority | "all")
+              setPage(1)
+            }}
+          >
+            <NativeSelectOption value="all">{t("agentRequests.filterPriorityAll")}</NativeSelectOption>
+            {REQUEST_PRIORITIES.map((value) => (
+              <NativeSelectOption key={value} value={value}>
+                {priorityLabel(value)}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+          <Button
+            variant={sortByPriority ? "default" : "outline"}
+            size="sm"
+            aria-pressed={sortByPriority}
+            onClick={() => {
+              setSortByPriority((on) => !on)
+              setPage(1)
+            }}
+          >
+            {t("agentRequests.sortByPriority")}
+          </Button>
           <Button
             variant={mineOnly ? "default" : "outline"}
             size="sm"
