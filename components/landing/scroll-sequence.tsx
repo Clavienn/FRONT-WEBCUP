@@ -5,6 +5,7 @@ import type { CSSProperties, ReactNode } from "react"
 import { useMotionValue, type MotionValue } from "framer-motion"
 
 import { createFrameLoader } from "@/lib/frame-loader"
+import { isConstrainedConnection } from "@/lib/network"
 import { cn } from "@/lib/utils"
 
 const ScrollProgressContext = createContext<MotionValue<number> | null>(null)
@@ -60,7 +61,11 @@ export function ScrollSequence({
     const canvas = canvasRef.current
     if (!section || !stage || !canvas) return
 
-    const total = frames.length
+    // Économie de données ou 2G : une image sur trois suffit à garder l'effet, pour un tiers du poids
+    const constrained = isConstrainedConnection()
+    const sequence = constrained ? frames.filter((_, index) => index % 3 === 0 || index === frames.length - 1) : frames
+
+    const total = sequence.length
     if (total === 0) return
 
     const ctx = canvas.getContext("2d", { alpha: false })
@@ -129,7 +134,8 @@ export function ScrollSequence({
       schedule()
     }
 
-    const loader = createFrameLoader(frames, {
+    const loader = createFrameLoader(sequence, {
+      concurrency: constrained ? 2 : 6,
       priorityCount: Math.min(4, total),
       onSettled: () => {
         dirty = true

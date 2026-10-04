@@ -4,6 +4,16 @@ export type RequestStatus = "pending" | "in_progress" | "resolved" | "rejected"
 
 export const REQUEST_STATUSES: RequestStatus[] = ["pending", "in_progress", "resolved", "rejected"]
 
+// Priorité de traitement : fixée par les agents, absente de la vue du citoyen
+export type RequestPriority = "low" | "medium" | "high" | "urgent"
+
+export const REQUEST_PRIORITIES: RequestPriority[] = ["urgent", "high", "medium", "low"]
+
+// "low" -> "Low" : suffixe des clés de traduction (priorityLow, ...)
+export function requestPriorityKey(priority: RequestPriority): string {
+  return priority[0].toUpperCase() + priority.slice(1)
+}
+
 export type RequestStatusCounts = Record<RequestStatus, number>
 
 // L'agent ne peut proposer que ces transitions ; le serveur reste l'autorité et
@@ -63,6 +73,7 @@ export interface CitizenRequestDetail extends CitizenRequest {
 }
 
 export interface AgentRequest extends CitizenRequest {
+  priority: RequestPriority
   userId: number
   assignedTo: number | null
   owner: { id: number; firstName: string; lastName: string } | null
@@ -86,12 +97,16 @@ export interface NewRequestInput {
 
 export interface RequestUpdateInput {
   status?: RequestStatus
+  priority?: RequestPriority
   assignedTo?: number | null
   note?: string | null
 }
 
 export interface AgentQuery {
   status?: RequestStatus | "all"
+  priority?: RequestPriority | "all"
+  // "priority" : les plus urgentes d'abord, puis les plus anciennes
+  sort?: "priority"
   assignedTo?: number
   mine?: boolean
   // Pagination côté serveur (limit plafonné à 100 par l'API)
@@ -127,7 +142,15 @@ function create(input: NewRequestInput): Promise<CitizenRequest> {
 /** File agent : filtres par statut, par agent, ou file personally suivie. */
 function listAll(query_: AgentQuery): Promise<RequestPage<AgentRequest>> {
   return authorizedRequest<RequestPage<AgentRequest>>(
-    `/requests${query({ status: query_.status, assignedTo: query_.assignedTo, mine: query_.mine, page: query_.page, limit: query_.limit })}`
+    `/requests${query({
+      status: query_.status,
+      priority: query_.priority,
+      sort: query_.sort,
+      assignedTo: query_.assignedTo,
+      mine: query_.mine,
+      page: query_.page,
+      limit: query_.limit,
+    })}`
   )
 }
 

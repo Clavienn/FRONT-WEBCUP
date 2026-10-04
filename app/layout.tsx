@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import { AuthProvider } from "@/components/auth/auth-provider";
 import { LanguageProvider } from "@/components/i18n/language-provider";
+import { NetworkStatus } from "@/components/network-status";
 import { SiteChrome } from "@/components/site-chrome";
 import { SupportBubble } from "@/components/support-bubble";
 import "./globals.css";
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <AuthProvider>
                 {children}
                 <SupportBubble />
+                <NetworkStatus />
               </AuthProvider>
             </div>
           </SiteChrome>

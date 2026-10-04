@@ -1,4 +1,5 @@
 import { getAppLocale } from "@/lib/i18n/types"
+import { resilientFetch } from "@/lib/network"
 
 export type UserRole = "citizen" | "agent" | "admin"
 
@@ -165,17 +166,14 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Accept-Language", getAppLocale().toUpperCase())
   }
 
-  let response: Response
-  try {
-    response = await fetch(`${API_URL}${path}`, {
-      ...init,
-      credentials: "include",
-      cache: "no-store",
-      headers,
-    })
-  } catch {
-    throw new Error("Impossible de joindre l’API. Vérifiez que le serveur est démarré.")
-  }
+  // Délai maximal, et nouvelles tentatives sur les lectures si le serveur est surchargé (429/502/503/504)
+  // ou injoignable : voir lib/network.ts. Les écritures ne sont jamais rejouées.
+  const response = await resilientFetch(`${API_URL}${path}`, {
+    ...init,
+    credentials: "include",
+    cache: "no-store",
+    headers,
+  })
 
   const body = response.status === 204 ? undefined : await response.json().catch(() => null)
   if (!response.ok) {

@@ -486,6 +486,14 @@ const fr = {
     filterRejected: "Refusées",
     mineOnly: "Mes demandes",
     totalLabel: "{{count}} demande(s)",
+    priorityLabel: "Priorité",
+    priorityLow: "Faible",
+    priorityMedium: "Moyenne",
+    priorityHigh: "Haute",
+    priorityUrgent: "Urgente",
+    filterPriorityAll: "Toutes les priorités",
+    sortByPriority: "Trier par priorité",
+    priorityUpdated: "Priorité mise à jour",
     paginationLabel: "Pagination",
     previousLabel: "Précédent",
     nextLabel: "Suivant",
@@ -840,6 +848,10 @@ const fr = {
     submitLabel: "Envoyer à l'administration",
     sendingLabel: "Envoi en cours...",
     submitError: "Impossible d'envoyer votre demande.",
+  },
+
+  network: {
+    offline: "Vous êtes hors connexion. Les informations affichées peuvent ne pas être à jour.",
   },
 
   serviceReviews: {
@@ -1391,6 +1403,14 @@ const en = {
     filterRejected: "Refused",
     mineOnly: "My requests",
     totalLabel: "{{count}} request(s)",
+    priorityLabel: "Priority",
+    priorityLow: "Low",
+    priorityMedium: "Medium",
+    priorityHigh: "High",
+    priorityUrgent: "Urgent",
+    filterPriorityAll: "All priorities",
+    sortByPriority: "Sort by priority",
+    priorityUpdated: "Priority updated",
     paginationLabel: "Pagination",
     previousLabel: "Previous",
     nextLabel: "Next",
@@ -1743,6 +1763,10 @@ const en = {
     submitLabel: "Send to the administration",
     sendingLabel: "Sending...",
     submitError: "Your request could not be sent.",
+  },
+
+  network: {
+    offline: "You are offline. The information shown may be out of date.",
   },
 
   serviceReviews: {
