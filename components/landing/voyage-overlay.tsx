@@ -56,8 +56,7 @@ export function VoyageOverlay() {
         className="tn-scrollseq__chapter tn-scrollseq__chapter--hero mx-auto flex h-full w-full max-w-7xl flex-col justify-center gap-5 overflow-y-auto px-5 py-5 sm:gap-8 sm:px-8 sm:py-12 lg:gap-10 lg:px-12 lg:py-24"
       >
         <div className="max-w-2xl">
-          <p className="tn-kicker">{t("hero.kicker")}</p>
-          <h1 className="tn-title tn-display mt-3 sm:mt-6">
+          <h1 className="tn-title tn-display">
             <span className="tn-title-accent">{firstLetter}</span>
             {restOfTitle.join("")}
           </h1>
