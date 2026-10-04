@@ -17,6 +17,15 @@ export interface MunicipalService {
   reviewedByMe: boolean
   // Nombre de demandes reçues : présent seulement quand la liste est triée par `mostUsed`
   requestsCount?: number
+  // GET /services/:id seulement : 3 autres services à proposer (dès que le catalogue en compte au moins 4)
+  related?: RelatedService[]
+}
+
+// Pourquoi ce service est proposé : sollicité par les mêmes habitants, très demandé, ou simple suite du catalogue
+export type RelatedReason = "often_together" | "popular" | "catalog"
+
+export interface RelatedService extends Omit<MunicipalService, "related"> {
+  reason: RelatedReason
 }
 
 export interface ServiceReview {

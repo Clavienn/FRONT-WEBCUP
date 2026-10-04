@@ -12,7 +12,7 @@ import { useLanguage } from "@/components/i18n/language-provider"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AuthApiError } from "@/repository/auth.repository"
-import { serviceRepository, type MunicipalService } from "@/repository/service.repository"
+import { serviceRepository, type MunicipalService, type RelatedService } from "@/repository/service.repository"
 
 const formatDate = (value: string) => new Date(value).toLocaleDateString("fr-FR", { dateStyle: "long" })
 
@@ -23,7 +23,7 @@ export function ServiceDetail() {
   const isValidId = Number.isInteger(id) && id > 0
 
   const [service, setService] = useState<MunicipalService | null>(null)
-  const [others, setOthers] = useState<MunicipalService[]>([])
+  const [others, setOthers] = useState<(MunicipalService | RelatedService)[]>([])
   const [error, setError] = useState("")
   // Id dont la réponse (succès ou erreur) a été reçue : évite d'afficher l'ancien service pendant un changement d'id
   const [loadedId, setLoadedId] = useState<number | null>(null)
@@ -46,7 +46,18 @@ export function ServiceDetail() {
       .then(([current, all]) => {
         if (!mounted) return
         setService(current)
-        setOthers(all.filter((item) => item.id !== current.id).slice(0, 3))
+        // Les 3 services qui suivent celui-ci dans l'ordre de la ville (en reprenant au début) : chaque fiche
+        // propose ainsi d'autres services, au lieu de toujours renvoyer vers les trois premiers
+        // L'API choisit elle-même 3 services liés (souvent demandés ensemble, très demandés) : priorité à son choix
+        if (current.related && current.related.length > 0) {
+          setOthers(current.related.slice(0, 3))
+          setError("")
+          setLoadedId(id)
+          return
+        }
+        const index = all.findIndex((item) => item.id === current.id)
+        const rest = index === -1 ? all : [...all.slice(index + 1), ...all.slice(0, index)]
+        setOthers(rest.filter((item) => item.id !== current.id).slice(0, 3))
         setError("")
         setLoadedId(id)
       })
@@ -153,18 +164,44 @@ export function ServiceDetail() {
       {others.length > 0 && (
         <section aria-labelledby="other-services" className="space-y-3">
           <h2 id="other-services" className="text-lg font-semibold">{t("serviceDetail.otherServicesHeading")}</h2>
-          <ul className="grid gap-3 md:grid-cols-3">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {others.map((other) => (
               <li key={other.id}>
                 <Link
                   href={`/dashboard/services/detail?id=${other.id}`}
-                  className="group flex h-full cursor-pointer items-center gap-3 rounded-xl border border-border/80 bg-card/70 p-4 transition-colors hover:border-primary/50"
+                  className="group flex h-full cursor-pointer flex-col rounded-xl border border-border/80 bg-card/75 p-5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
-                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent text-accent-foreground">
-                    <ServiceIcon name={other.icon} className="size-4" />
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="grid size-10 place-items-center rounded-lg bg-accent text-accent-foreground">
+                      <ServiceIcon name={other.icon} className="size-5" />
+                    </span>
+                    {other.reviewedByMe && (
+                      <BadgeCheck className="size-4 text-emerald-600" aria-label={t("serviceReviews.reviewedBadge")} />
+                    )}
+                  </div>
+                  <h3 className="mt-4 text-base font-semibold">{other.name}</h3>
+                  {"reason" in other && other.reason !== "catalog" && (
+                    <p className="mt-1 text-xs font-medium text-primary">
+                      {t(other.reason === "often_together" ? "serviceDetail.reasonOftenTogether" : "serviceDetail.reasonPopular")}
+                    </p>
+                  )}
+                  <p className="mt-2 line-clamp-3 flex-1 text-sm leading-6 text-muted-foreground">
+                    {other.description || t("servicesList.noDescription")}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    {other.averageRating !== null && other.averageRating !== undefined && (
+                      <StarDisplay
+                        value={other.averageRating}
+                        label={t("serviceReviews.averageAria", { value: other.averageRating })}
+                        className="[&_svg]:size-3.5"
+                      />
+                    )}
+                    <span>{t("serviceReviews.count", { count: other.reviewsCount ?? 0 })}</span>
+                  </div>
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                    {t("servicesList.seeInfo")}
+                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium">{other.name}</span>
-                  <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </Link>
               </li>
             ))}
