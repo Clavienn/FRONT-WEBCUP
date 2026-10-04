@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Spinner } from "@/components/ui/spinner"
 import { Switch } from "@/components/ui/switch"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "@/components/ui/toast"
@@ -25,6 +26,7 @@ import {
   roleRepository,
   userAdminRepository,
   type ManagedUser,
+  type PendingAgent,
   type Role,
   type UserPage,
 } from "@/repository/admin.repository"
@@ -124,6 +126,28 @@ export function UsersAdmin() {
   const [roles, setRoles] = useState<Role[]>([])
   const [busyId, setBusyId] = useState<number | null>(null)
   const [managedId, setManagedId] = useState<number | null>(null)
+  const [pendingAgents, setPendingAgents] = useState<PendingAgent[]>([])
+  const [validatingId, setValidatingId] = useState<number | null>(null)
+
+  useEffect(() => {
+    userAdminRepository
+      .pendingAgents()
+      .then((response) => setPendingAgents(response.users))
+      .catch(() => undefined)
+  }, [])
+
+  const validateAgent = async (agent: PendingAgent) => {
+    setValidatingId(agent.id)
+    try {
+      await userAdminRepository.validateAgent(agent.id)
+      setPendingAgents((current) => current.filter((item) => item.id !== agent.id))
+      toast.add({ title: "Agent validé", type: "success" })
+    } catch (cause) {
+      notifyError(cause)
+    } finally {
+      setValidatingId(null)
+    }
+  }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -205,6 +229,40 @@ export function UsersAdmin() {
           />
         </div>
       </section>
+
+      {pendingAgents.length > 0 && (
+        <section
+          aria-labelledby="pending-agents"
+          className="space-y-3 rounded-2xl border border-amber-500/40 bg-amber-500/5 p-5"
+        >
+          <div>
+            <h2 id="pending-agents" className="font-medium text-foreground">
+              Agents en attente de validation ({pendingAgents.length})
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Ces comptes se sont inscrits eux-mêmes comme agents. Tant qu’ils ne sont pas validés, ils ne voient que des
+              coordonnées partielles et ne peuvent pas modifier de compte citoyen. Validez uniquement les personnes que
+              vous connaissez.
+            </p>
+          </div>
+          <ul className="divide-y divide-border/70 rounded-xl border border-border/70 bg-background/60">
+            {pendingAgents.map((agent) => (
+              <li key={agent.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{`${agent.firstName} ${agent.lastName}`.trim()}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {agent.email} · inscrit le {formatDate(agent.createdAt)}
+                  </p>
+                </div>
+                <Button size="sm" disabled={validatingId !== null} onClick={() => void validateAgent(agent)}>
+                  {validatingId === agent.id && <Spinner />}
+                  Valider
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {current?.error ? (
         <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/20 bg-destructive/5 px-3 py-2.5 text-sm text-destructive">
