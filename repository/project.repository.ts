@@ -84,11 +84,11 @@ export const projectRepository = {
 
   listComments: (projectId: number) => authorizedRequest<ProjectComment[]>(`/projects/${projectId}/comments`),
 
-  createComment: (projectId: number, content: string) =>
-    authorizedRequest<{ comment: ProjectComment; message: string }>(
-      `/projects/${projectId}/comments`,
-      json("POST", { content })
-    ),
+  createComment: (projectId: number, content: string, headers?: Record<string, string>) =>
+    authorizedRequest<{ comment: ProjectComment; message: string }>(`/projects/${projectId}/comments`, {
+      ...json("POST", { content }),
+      headers,
+    }),
 
   // Modération : réservée aux administrateurs
   deleteComment: (projectId: number, commentId: number) =>

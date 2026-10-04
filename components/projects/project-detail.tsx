@@ -8,6 +8,7 @@ import { ArrowLeft, Building2, CircleAlert, MessageSquare, Users } from "lucide-
 
 import { useAuth } from "@/components/auth/auth-provider"
 import { useLanguage } from "@/components/i18n/language-provider"
+import { useFormGuard } from "@/components/forms/form-guard"
 import { ProjectProgressBar } from "@/components/projects/project-progress-bar"
 import { ProjectStatusBadge } from "@/components/projects/project-status-badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -37,6 +38,7 @@ function CommentForm({ projectId, onPosted }: { projectId: number; onPosted: (co
   const [content, setContent] = useState("")
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState("")
+  const guard = useFormGuard("comment")
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -47,7 +49,7 @@ function CommentForm({ projectId, onPosted }: { projectId: number; onPosted: (co
     setError("")
     setIsSaving(true)
     try {
-      const { comment, message } = await projectRepository.createComment(projectId, content.trim())
+      const { comment, message } = await guard.run((headers) => projectRepository.createComment(projectId, content.trim(), headers))
       onPosted(comment)
       setContent("")
       toast.add({ title: message, type: "success" })
@@ -60,6 +62,7 @@ function CommentForm({ projectId, onPosted }: { projectId: number; onPosted: (co
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3">
+      {guard.trap}
       <Textarea
         aria-label={t("projectDetail.commentPlaceholder")}
         placeholder={t("projectDetail.commentPlaceholder")}

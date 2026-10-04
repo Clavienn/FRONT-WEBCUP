@@ -7,6 +7,7 @@ import { ArrowRight, CircleAlert, CircleCheck } from "lucide-react"
 import { BrandMark } from "@/components/brand/brand-mark"
 import { BRAND_NAME } from "@/config/brand"
 import { useAuth } from "@/components/auth/auth-provider"
+import { useFormGuard } from "@/components/forms/form-guard"
 import { LegalDocumentDialog } from "@/components/legal/legal-document-dialog"
 import { PasswordInput } from "@/components/auth/password-input"
 import { Breadcrumb } from "@/components/navigation/breadcrumb"
@@ -45,6 +46,8 @@ export function AuthForm() {
     () => typeof window !== "undefined" && window.sessionStorage.getItem(ACCOUNT_DELETED_KEY) === "1"
   )
   const isRegistering = mode === "register"
+  // Un jeton par formulaire : renouvelé quand on passe de la connexion à l'inscription
+  const guard = useFormGuard(isRegistering ? "register" : "login")
 
   // Le drapeau ne vaut que pour l'arrivée sur la page : le retirer évite de le revoir plus tard.
   useEffect(() => {
@@ -69,17 +72,11 @@ export function AuthForm() {
     setIsSubmitting(true)
 
     try {
-      if (isRegistering) {
-        await signUp({
-          email,
-          password,
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          role,
-        })
-      } else {
-        await signIn({ email, password })
-      }
+      await guard.run((headers) =>
+        isRegistering
+          ? signUp({ email, password, firstName: firstName.trim(), lastName: lastName.trim(), role }, headers)
+          : signIn({ email, password }, headers)
+      )
       router.replace("/dashboard")
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : t("authForm.errorGeneric"))
@@ -140,6 +137,7 @@ export function AuthForm() {
           </header>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {guard.trap}
             {isRegistering && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">

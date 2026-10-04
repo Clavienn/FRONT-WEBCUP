@@ -147,8 +147,8 @@ function getMine(id: number): Promise<CitizenRequestDetail> {
   return authorizedRequest<CitizenRequestDetail>(`/requests/mine/${id}`)
 }
 
-function create(input: NewRequestInput): Promise<CitizenRequest> {
-  return authorizedRequest<CitizenRequest>("/requests", json("POST", input))
+function create(input: NewRequestInput, headers?: Record<string, string>): Promise<CitizenRequest> {
+  return authorizedRequest<CitizenRequest>("/requests", { ...json("POST", input), headers })
 }
 
 /** File agent : filtres par statut, par agent, par mot-clé, ou file personally suivie. */

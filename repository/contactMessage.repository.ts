@@ -42,8 +42,8 @@ export const contactStatusLabels: Record<ContactStatus, string> = {
 
 export const contactMessageRepository = {
   // Citoyen : envoyer un message aux services municipaux
-  send: (data: { subject: string; message: string }) =>
-    authorizedRequest<ContactReceipt>("/contact-messages", { method: "POST", body: JSON.stringify(data) }),
+  send: (data: { subject: string; message: string }, headers?: Record<string, string>) =>
+    authorizedRequest<ContactReceipt>("/contact-messages", { method: "POST", body: JSON.stringify(data), headers }),
 
   // Citoyen : suivre ses messages
   listMine: () => authorizedRequest<ContactMessage[]>("/contact-messages/mine"),
